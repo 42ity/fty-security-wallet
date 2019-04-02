@@ -1,0 +1,4 @@
+usr/bin/fty-security-wallet
+etc/fty-security-wallet/fty-security-wallet.cfg
+lib/systemd/system/fty-security-wallet.service
+

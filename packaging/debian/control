@@ -1,0 +1,85 @@
+#
+#    fty-security-wallet - Security Wallet to manage JSON document including a public and secret part
+#
+#    Copyright (C) 2019 Eaton
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License along
+#    with this program; if not, write to the Free Software Foundation, Inc.,
+#    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+Source:         fty-security-wallet
+Section:        net
+Priority:       optional
+Maintainer:     fty-security-wallet Developers <eatonipcopensource@eaton.com>
+Standards-Version: 4.0.1.0
+Build-Depends: debhelper (>= 9),
+    pkg-config,
+    libsodium-dev,
+    libzmq3-dev,
+    libczmq-dev (>= 3.0.2),
+    libmlm-dev (>= 1.0.0),
+    libssl-dev,
+    liblog4cplus-dev,
+    libfty-common-logging-dev,
+    libfty-common-dev,
+    libfty-common-mlm-dev,
+    libcxxtools-dev,
+    systemd,
+    dh-systemd,
+    asciidoc-base | asciidoc, xmlto,
+    dh-autoreconf
+
+Package: libfty-security-wallet1
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: fty-security-wallet shared library
+ This package contains shared library for fty-security-wallet:
+ security wallet to manage json document including a public and secret part
+
+Package: libfty-security-wallet-dev
+Architecture: any
+Section: libdevel
+Depends:
+    ${misc:Depends},
+    libsodium-dev,
+    libzmq3-dev,
+    libczmq-dev (>= 3.0.2),
+    libmlm-dev (>= 1.0.0),
+    libssl-dev,
+    liblog4cplus-dev,
+    libfty-common-logging-dev,
+    libfty-common-dev,
+    libfty-common-mlm-dev,
+    libcxxtools-dev,
+    libfty-security-wallet1 (= ${binary:Version})
+Description: fty-security-wallet development tools
+ This package contains development files for fty-security-wallet:
+ security wallet to manage json document including a public and secret part
+
+Package: fty-security-wallet
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends},
+Description: runnable binaries from fty-security-wallet
+ Main package for fty-security-wallet:
+ security wallet to manage json document including a public and secret part
+
+Package: fty-security-wallet-dbg
+Architecture: any
+Section: debug
+Priority: optional
+Depends:
+    fty-security-wallet (= ${binary:Version}),
+    ${misc:Depends}
+Description: fty-security-wallet debugging symbols
+ This package contains the debugging symbols for fty-security-wallet:
+ security wallet to manage json document including a public and secret part.

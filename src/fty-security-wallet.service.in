@@ -1,0 +1,20 @@
+[Unit]
+Description=fty-security-wallet service
+After=network.target malamute.service
+Requires=network.target malamute.service
+PartOf=bios.target
+
+[Service]
+Type=simple
+User=bios
+EnvironmentFile=-@prefix@/share/fty/etc/default/fty
+EnvironmentFile=-@prefix@/share/fty/etc/default/fty__%n.conf
+EnvironmentFile=-@CONFPATH@/default/fty
+EnvironmentFile=-@CONFPATH@/default/fty__%n.conf
+Environment="prefix=@prefix@"
+Environment='SYSTEMD_UNIT_FULLNAME=%n'
+ExecStart=@prefix@/bin/fty-security-wallet  -c @CONFPATH@/@PACKAGE@/fty-security-wallet.cfg
+Restart=always
+
+[Install]
+WantedBy=bios.target
