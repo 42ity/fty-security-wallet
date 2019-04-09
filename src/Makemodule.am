@@ -13,13 +13,17 @@ lib_LTLIBRARIES += src/libfty_security_wallet.la
 pkgconfig_DATA = src/libfty_security_wallet.pc
 
 src_libfty_security_wallet_la_SOURCES = \
+    src/secw_security_wallet.cc \
     src/secw_portfolio.cc \
-    src/secw_document.cc \
-    src/fty_actor.cc \
+    src/secw_access.cc \
     src/platform.h
 
 if ENABLE_DRAFTS
 src_libfty_security_wallet_la_SOURCES += \
+    src/secw_document.cc \
+    src/secw_exception.cc \
+    src/secw_client_accessor.cc \
+    src/secw_snmpv3.cc \
     src/fty_security_wallet_server.cc
 
 endif

@@ -1,6 +1,6 @@
 <project
     name = "fty-security-wallet"
-    description = "Security Wallet to manage JSON document including a public and secret part"
+    description = "Security Wallet to manage document including a public and secret part"
     script = "zproject.gsl"
     email = "EatonIPCOpenSource@eaton.com"
     url = "https://42ity.org"
@@ -131,9 +131,17 @@
         release = "2.2-FTY-master"
     />
 
-    <class name = "secw_portfolio" private = "1" selftest = "0">Portfolio to handle documents</class>
-    <class name = "secw_document" private = "1" selftest = "0">Document parsers</class>
-    <class name = "fty_actor" private = "1" selftest = "0"></class>
+    <class name = "secw_security_wallet" private = "1" selftest = "0">Security wallet to manage the storage and access</class>
+    <class name = "secw_portfolio" private = "1" selftest = "0">Portfolio to handle documents in the agent</class>
+    <class name = "secw_access" private = "1" selftest = "0">Handle the access rights on tag for client in the agent</class>
+    
+    <class name = "secw_document" selftest = "0">Document parsers</class>
+    <class name = "secw_exception" selftest = "0">secw exception</class>
+    <class name = "secw_client_accessor" selftest = "0">Accessor to return documents from the agent</class>
+    
+    <!-- Note: Add new supported types here and modify Document to handle then in the factory -->
+    <class name = "secw_snmpv3" selftest = "0">Document parsers for snmpv3 document</class>
+    
     <class name = "fty-security-wallet-server">Security Wallet Server</class>
     <main  name = "fty-security-wallet" service = "1">Security Wallet Binary</main>
 

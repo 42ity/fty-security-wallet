@@ -28,42 +28,170 @@
 
 #include "fty_security_wallet_classes.h"
 
-SecurityWalletPotfolio::SecurityWalletPotfolio(std::string name):
-    m_name(name)
+namespace secw
 {
 
-}
+/*----------------------------------------------------------------------*/
+/*   Portfolio                                                          */
+/*----------------------------------------------------------------------*/
+//Public
+    Portfolio::Portfolio(const std::string & name):
+        m_name(name)
+    {}
 
-SecurityWalletPotfolio SecurityWalletStorage::getPortfolio(std::string name)
-{
-    return m_portfolios[name];
-}
+    void Portfolio::add(const Document & doc)
+    {
+        //make a copy using factory
+        DocumentPtr copyDoc = doc.clone();
 
+        m_documents[copyDoc->getId()] = copyDoc;
+        m_mapTypesToIdDocs[copyDoc->getType()].insert(copyDoc->getId());
+    }
 
-DummyStorage::DummyStorage()
-{
+    void Portfolio::remove(const Id & id)
+    {
+        DocumentPtr doc = m_documents.at(id);
 
-}
-int DummyStorage::load(const char*path)
-{
-    m_path=path;
-    log_info("Loading data from %s",m_path.c_str());
-    SecurityWalletPotfolio _defaultPortfolio("default");
-    DummyDocument _dummyDocument("e3500faa-54c8-11e9-af3e-0800277def58",
-        "myFirstDoc",
-        "\"secLevel\" : \"noAuthNoPriv\",\
-         \"secName\" : \"Dummy\",\
-         \"authProtocol\": \"MD5\",\
-         \"privProtocol\" : \"DES\""
-        ,
-        "\"authPassword\" : \"<CRYPT>authentication password</CRYPT>\",\
-         \"privPassword\" : \"<CRYPT>privacy pass phrase </CRYPT>\"");
-    std::vector<Document> documents;
-    //TODO => use ref    
-    _defaultPortfolio.m_documents.emplace_back(_dummyDocument);
-    m_portfolios["default"]=_defaultPortfolio;
+        //Remove from index for types
+        m_mapTypesToIdDocs[doc->getType()].erase(id);
+    }
+    
+    
+    DocumentPtr Portfolio::getDocument(const Id & id) const
+    {
+        if(m_documents.count(id) < 1)
+        {
+            throw SecwDocumentDoNotExistException("Document with id "+ id +" do not exist");
+        }
+            
+        return m_documents.at(id)->clone();
+    }
 
-    return m_portfolios.size();
-}
+    std::vector<DocumentPtr> Portfolio::getListDocuments(const std::vector<DocumentType> & types, const std::vector<Tag> & tags) const
+    {
+        std::vector<DocumentPtr> returnList;
+
+        for( const DocumentType & type : types)
+        {
+            if(m_mapTypesToIdDocs.count(type) > 0)
+            {
+                log_debug("Listing document in portfolio %s with type %s", m_name.c_str(), type.c_str());
+            
+                for(const Id & id : m_mapTypesToIdDocs.at(type) )
+                {
+                    try
+                    {
+                        DocumentPtr pDoc = m_documents.at(id);
+
+                        if( tags.empty() || Document::hasCommonTag(pDoc->getTags(),tags) )
+                        {
+                            returnList.push_back(pDoc);
+                        }
+                    }
+                    catch(...)
+                    {
+                        log_error("Impossible to find document with the id %s", id.c_str());
+                    }
+                }
+            }
+
+        }
+
+        return returnList;
+    }
+
+    void Portfolio::loadPortfolio(const cxxtools::SerializationInfo& si)
+    {
+        uint8_t version = 0;
+
+        try
+        {
+            si.getMember("version") >>= version;
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data");
+        }
+
+        //remove former content
+        m_documents.clear();
+
+        switch(version)
+        {
+            case 1: loadPortfolioVersion1(si);
+                    break;
+            default: throw SecwImpossibleToLoadPortfolioException("Version "+std::to_string(version)+" not supported");
+        }
+
+        //Create the index for type => map of type pointing to set of Id of Document
+        for(auto & item : m_documents)
+        {
+            const DocumentPtr & doc = item.second;
+            m_mapTypesToIdDocs[doc->getType()].insert(doc->getId());
+            log_debug(" Add document %s with type %s", doc->getId().c_str(), doc->getType().c_str() );
+        }
+        
+    }
+
+    void Portfolio::serializePortfolio(cxxtools::SerializationInfo& si) const
+    {
+        si.addMember("version") <<= PORTFOLIO_VERSION;
+        si.addMember("name") <<= m_name;
+        si.addMember("documents") <<= getListDocuments(Document::getSupportedTypes());
+    }
+
+    void Portfolio::loadPortfolioVersion1(const cxxtools::SerializationInfo& si)
+    {
+        try
+        {
+            si.getMember("name") >>= m_name;
+            const cxxtools::SerializationInfo& documents = si.getMember("documents");
+            
+            size_t count = 0;
+            
+            for(size_t index = 0; index < documents.memberCount(); index++ )
+            {
+                try
+                {
+                    DocumentPtr doc;
+                    documents.getMember(index) >>= doc;
+                    
+                    if(doc->isContainingPrivateData())
+                    {
+                        m_documents[doc->getId()] = doc;
+                        count++;
+                    }
+                    else
+                    {
+                        log_error("Impossible to load the document with the id %s from portfolio because private part is missing", doc->getId().c_str());
+                    }
+
+                }
+                catch(const std::exception& e)
+                {
+                    log_error("Impossible to load a document from portfolio %s: %s", m_name.c_str(), e.what());
+                }
+            }
+            
+            log_debug("Portfolio %s loaded with %i documents",m_name.c_str(), count );
+
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data in portfolio " + m_name);
+        }
+    }
+
+    void operator<<= (cxxtools::SerializationInfo& si, const Portfolio & portfolio)
+    {
+        portfolio.serializePortfolio(si);
+    }
+
+    void operator>>= (const cxxtools::SerializationInfo& si, Portfolio & portfolio)
+    {
+        portfolio.loadPortfolio(si);
+    }
+
+} //namepace secw
 
 

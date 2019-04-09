@@ -28,29 +28,155 @@
 
 #include "fty_security_wallet_classes.h"
 
-std::string Document::toJSON_withSecret()
+namespace secw
 {
-    std::string result="{";
-    result +="\"secw_doc_type\" : \"" + m_type + "\",";
-    result +="\"secw_doc_id\" : \"" + m_id + "\",";
-    result += "\"secw_doc_name\" : \"" + m_name + "\",";
-    result +="\"secw_doc_public\": { ";
-    result +="\"" + m_type + "\" : { " + m_content_public + "}}";
-    result +="\"secw_doc_secret\" :{";
-    result +="\"" + m_type + "\" : { " + m_content_private + "}}";
-    result +="}";
-    return result;
-}
+/*-----------------------------------------------------------------------------*/
+/*   Document                                                                  */
+/*-----------------------------------------------------------------------------*/
+//Here are the supported documents - Need to be update if you want to add some
+std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
+{
+    { Snmpv3::TYPE, []() { return DocumentPtr(new Snmpv3()); }}
+};
 
-std::string Document::toJSON_withoutSecret()
-{
-    std::string result="{";
-    result +="\"secw_doc_type\" : \"" + m_type + "\",";
-    result +="\"secw_doc_id\" : \"" + m_id + "\",";
-    result += "\"secw_doc_name\" : \"" + m_name + "\",";
-    result +="\"secw_doc_public\": { ";
-    result +="\"" + m_type + "\" : { " + m_content_public + "}}";
-    result +="}";
-    return result;
-}
+//Public
+    const std::string & Document::getName() const { return m_name; }
+    std::vector<Tag> Document::getTags() const { return m_tags; }
+    const DocumentType & Document::getType() const { return m_type; }
+    const Id & Document::getId() const { return m_id; }
+
+    bool Document::isContainingPrivateData() const {return m_containPrivateData; }
+
+    bool Document::isSupportedType(const DocumentType & type)
+    {
+        return (m_documentFactoryFuntions.count(type) > 0);
+    }
+
+    std::vector<DocumentType> Document::getSupportedTypes()
+    {
+        std::vector<DocumentType> types;
+
+        for( const auto & item : m_documentFactoryFuntions )
+        {
+            types.push_back(item.first);
+        }
+        
+        return types;
+    }
+
+    void Document::fillSerializationInfoWithoutSecret(cxxtools::SerializationInfo& si) const
+    {
+        fillSerializationInfoHeaderDoc(si);
+        fillSerializationInfoPublicDoc(si.addMember(DOC_PUBLIC_ENTRY));
+    }
+
+    void Document::fillSerializationInfoWithSecret(cxxtools::SerializationInfo& si) const
+    {
+        fillSerializationInfoHeaderDoc(si);
+        fillSerializationInfoPublicDoc(si.addMember(DOC_PUBLIC_ENTRY));
+        fillSerializationInfoPrivateDoc(si.addMember(DOC_PRIVATE_ENTRY));
+    }
+    
+    bool Document::hasCommonTag(const std::vector<Tag> & tags1, const std::vector<Tag> & tags2)
+    {
+        for( const Tag & tag1 : tags1)
+        {
+            for( const Tag & tag2 : tags2)
+            {
+                if(tag2 == tag1)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+//Private 
+    void Document::fillSerializationInfoHeaderDoc(cxxtools::SerializationInfo& si) const
+    {
+        si.addMember(DOC_ID_ENTRY) <<= getId();
+        si.addMember(DOC_NAME_ENTRY) <<= getName();
+        si.addMember(DOC_TYPE_ENTRY) <<= getType();
+        si.addMember(DOC_TAGS_ENTRY) <<= getTags();
+    }
+
+    void Document::UpdateHeaderFromSerializationInfo(const cxxtools::SerializationInfo& si)
+    {
+        try
+        {
+            //We don't read the id because will portfolio insertion process is gonna do it
+            //We don't read the type because it is define by the object type
+            si.getMember(DOC_NAME_ENTRY) >>= m_name;
+            si.getMember(DOC_TAGS_ENTRY) >>= m_tags; 
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwInvalidDocumentFormatException(e.what());
+        }
+
+        //check tags
+        if(m_tags.empty())
+        {
+            throw SecwInvalidDocumentFormatException("Document tag list cannot be empty");
+        }
+        
+    }
+
+    void operator<<= (cxxtools::SerializationInfo& si, const Document & doc)
+    {
+        doc.fillSerializationInfoWithSecret(si);
+    }
+
+    void operator<<= (cxxtools::SerializationInfo& si, const DocumentPtr & doc)
+    {
+        doc->fillSerializationInfoWithSecret(si);
+    }
+
+    void operator>>= (const cxxtools::SerializationInfo& si, DocumentPtr & doc)
+    {
+        try
+        {
+            Id id = "";
+            DocumentType type = "";
+
+            si.getMember(DOC_TYPE_ENTRY) >>= type;
+            si.getMember(DOC_ID_ENTRY) >>= id;
+
+            const cxxtools::SerializationInfo & publicEntry = si.getMember(DOC_PUBLIC_ENTRY);
+            const cxxtools::SerializationInfo * privateEntry = si.findMember(DOC_PRIVATE_ENTRY);
+            
+            doc = Document::m_documentFactoryFuntions.at(type)();
+            
+            //log_debug("Create document '%s' matching with '%s'", doc->getType().c_str(), type.c_str());
+
+            doc->UpdateHeaderFromSerializationInfo(si);
+            doc->UpdatePublicDocFromSerializationInfo(publicEntry);
+            
+            if(privateEntry != nullptr)
+            {
+                doc->UpdatePrivateDocFromSerializationInfo(*privateEntry);
+                doc->m_containPrivateData = true;
+            }
+            else
+            {
+                doc->m_containPrivateData = false;
+            }
+            
+            doc->m_id = id;
+
+        }
+        catch(const SecwException & e)
+        {
+            throw;
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwInvalidDocumentFormatException(e.what());
+        }
+
+    }
+
+} // namespace secw
 

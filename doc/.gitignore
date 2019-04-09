@@ -11,6 +11,14 @@
 *.xml7
 
 # Ignore the source doc texts generated from program sources
+secw_document.txt
+secw_document.doc
+secw_exception.txt
+secw_exception.doc
+secw_client_accessor.txt
+secw_client_accessor.doc
+secw_snmpv3.txt
+secw_snmpv3.doc
 fty_security_wallet_server.txt
 fty_security_wallet_server.doc
 fty-security-wallet.txt

@@ -1,0 +1,24 @@
+{
+	"tags": [
+			{
+					"tag_name": "test_read",
+					"access_list": [
+							{
+									"regex_client": ".*",
+									"access": "_R__"
+							}
+					]
+                                        
+			},
+                        {
+					"tag_name": "test_update",
+					"access_list": [
+							{
+									"regex_client": ".*",
+									"access": "C_UD"
+							}
+					]
+                                        
+			}
+	]
+}

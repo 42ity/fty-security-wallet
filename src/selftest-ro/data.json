@@ -1,0 +1,43 @@
+{
+    "version": 1,
+    "portfolios": [
+            {
+                    "version": 1,
+                    "name": "default",
+                    "documents": [
+                            {
+                                    "secw_doc_id": "id_readable",
+                                    "secw_doc_name": "myFirstDoc",
+                                    "secw_doc_type": "Snmpv3",
+                                    "secw_doc_tags": [ "test_read", "test_update" ],
+                                    "secw_doc_public": {
+                                            "secw_snmpv3_security_level": 2,
+                                            "secw_snmpv3_security_name": "Test",
+                                            "secw_snmpv3_auth_protocol": 0,
+                                            "secw_snmpv3_priv_protocol": 0
+                                    },
+                                    "secw_doc_private": {
+                                            "secw_snmpv3_auth_password": "Fake_auth_password",
+                                            "secw_snmpv3_priv_password": "Fake_priv_password"
+                                    }
+                            },
+                            {
+                                "secw_doc_id": "id_notReadable",
+                                "secw_doc_name": "myFirstDoc",
+                                "secw_doc_type": "Snmpv3",
+                                "secw_doc_tags": [ "test_update" ],
+                                "secw_doc_public": {
+                                        "secw_snmpv3_security_level": 2,
+                                        "secw_snmpv3_security_name": "Test",
+                                        "secw_snmpv3_auth_protocol": 0,
+                                        "secw_snmpv3_priv_protocol": 0
+                                },
+                                "secw_doc_private": {
+                                        "secw_snmpv3_auth_password": "Fake_auth_password",
+                                        "secw_snmpv3_priv_password": "Fake_priv_password"
+                                }
+                        }
+                    ]
+            }
+    ]
+}

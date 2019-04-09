@@ -1,0 +1,57 @@
+/*  =========================================================================
+    secw_security_wallet - Security wallet to manage the storage and access
+
+    Copyright (C) 2019 Eaton
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+    =========================================================================
+*/
+
+#ifndef SECW_SECURITY_WALLET_H_INCLUDED
+#define SECW_SECURITY_WALLET_H_INCLUDED
+
+#include "secw_document.h"
+#include "secw_portfolio.h"
+#include "secw_access.h"
+
+#include <memory>
+
+namespace secw
+{
+    class SecurityWallet
+    {
+    public:
+        explicit SecurityWallet(const std::string & accessPath, const std::string & databasePath);
+        void save() const;
+        Portfolio & getPortfolio(const std::string & name);
+        std::vector<std::string> getPortfolioNames() const;
+        
+        std::vector<Tag> getAvailableTags() const;
+        std::vector<Tag> getAccessibleTags(const std::string & client, AccessMethods method) const;
+        bool checkTagAccess(const Tag & tag, const std::string & client, AccessMethods method) const;
+
+        static constexpr const uint8_t SECW_VERSION = 1;
+
+    private:
+        std::string m_pathDatabase;
+        std::string m_pathAccess;
+        
+        std::vector<Portfolio> m_portfolios;
+        std::map<Tag, TagAccess> m_mapTagAccess;
+    };
+
+} // namepsace secw 
+
+#endif

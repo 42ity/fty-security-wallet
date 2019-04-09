@@ -81,6 +81,14 @@
 //  These classes are stable or legacy and built in all releases
 //  Draft classes are by default not built in stable releases
 #ifdef FTY_SECURITY_WALLET_BUILD_DRAFT_API
+typedef struct _secw_document_t secw_document_t;
+#define SECW_DOCUMENT_T_DEFINED
+typedef struct _secw_exception_t secw_exception_t;
+#define SECW_EXCEPTION_T_DEFINED
+typedef struct _secw_client_accessor_t secw_client_accessor_t;
+#define SECW_CLIENT_ACCESSOR_T_DEFINED
+typedef struct _secw_snmpv3_t secw_snmpv3_t;
+#define SECW_SNMPV3_T_DEFINED
 typedef struct _fty_security_wallet_server_t fty_security_wallet_server_t;
 #define FTY_SECURITY_WALLET_SERVER_T_DEFINED
 #endif // FTY_SECURITY_WALLET_BUILD_DRAFT_API
@@ -88,6 +96,10 @@ typedef struct _fty_security_wallet_server_t fty_security_wallet_server_t;
 
 //  Public classes, each with its own header file
 #ifdef FTY_SECURITY_WALLET_BUILD_DRAFT_API
+#include "secw_document.h"
+#include "secw_exception.h"
+#include "secw_client_accessor.h"
+#include "secw_snmpv3.h"
 #include "fty_security_wallet_server.h"
 #endif // FTY_SECURITY_WALLET_BUILD_DRAFT_API
 

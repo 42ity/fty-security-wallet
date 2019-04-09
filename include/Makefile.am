@@ -8,6 +8,10 @@ include_HEADERS = \
 
 if ENABLE_DRAFTS
 include_HEADERS += \
+    secw_document.h \
+    secw_exception.h \
+    secw_client_accessor.h \
+    secw_snmpv3.h \
     fty_security_wallet_server.h
 
 endif

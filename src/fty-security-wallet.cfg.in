@@ -11,7 +11,8 @@ malamute
     address = security-wallet     #   Agent address
 
 storage
-    path = /var/fty/fty-security-wallet/
+    database = /var/fty/fty-security-wallet/database.json
+    access = /etc/fty/fty-security-wallet/access.json
     
 log
     config = /etc/fty/ftylog.cfg                    # configuration file for fty-common-logging

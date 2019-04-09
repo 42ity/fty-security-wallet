@@ -61,17 +61,13 @@ int main (int argc, char *argv [])
         }
     }
 
-    if (verbose)
-    {
-        ftylog_setVeboseMode(ftylog_getInstance());
-        log_trace("Verbose mode OK");
-    }
-
     // Parse config file
     ZstrGuard actor_name(strdup(SECURITY_WALLET_AGENT));
     ZstrGuard endpoint( strdup(DEFAULT_ENDPOINT));
-    ZstrGuard storage_path( strdup(DEFAULT_STORGAE_PATH));
-    char *log_config = NULL;
+    ZstrGuard storage_database_path( strdup(DEFAULT_STORAGE_DATABASE_PATH));
+    ZstrGuard storage_access_path( strdup(DEFAULT_STORAGE_ACCESS_PATH));
+
+    //char *log_config = NULL;
     if(config_file) {
         log_debug (SECURITY_WALLET_AGENT ": loading configuration file from '%s' ...", config_file);
         ZconfigGuard config(zconfig_load (config_file));
@@ -85,14 +81,23 @@ int main (int argc, char *argv [])
         }
         endpoint = strdup (zconfig_get (config, "malamute/endpoint", DEFAULT_ENDPOINT));
         actor_name = strdup (zconfig_get (config, "malamute/address", DEFAULT_ENDPOINT));
-        storage_path = strdup (zconfig_get (config, "storage/path", DEFAULT_STORGAE_PATH));
+        storage_database_path = strdup (zconfig_get (config, "storage/database", DEFAULT_STORAGE_DATABASE_PATH));
+        storage_access_path = strdup (zconfig_get (config, "storage/access", DEFAULT_STORAGE_DATABASE_PATH));
     }
+
+    if (verbose)
+    {
+        ftylog_setVeboseMode(ftylog_getInstance());
+        log_trace("Verbose mode OK");
+    }
+
     log_info(SECURITY_WALLET_AGENT " starting");
 
     //start broker agent
     zactor_t *server = zactor_new (fty_security_wallet_server, (void *)endpoint);
     //set configuration parameters
-    zstr_sendx (server, "STORAGE_PATH", storage_path.get(), NULL);
+    zstr_sendx (server, "STORAGE_ACCESS_PATH", storage_access_path.get(), NULL);
+    zstr_sendx (server, "STORAGE_DATABASE_PATH", storage_database_path.get(), NULL);
     zstr_sendx (server, "CONNECT", endpoint.get(), actor_name.get(), NULL);
     
     while (true) {

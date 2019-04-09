@@ -63,9 +63,9 @@ EXTRA_DIST += \
 endif
 
 EXTRA_DIST += \
+    src/secw_security_wallet.h \
     src/secw_portfolio.h \
-    src/secw_document.h \
-    src/fty_actor.h \
+    src/secw_access.h \
     README.md \
     src/fty_security_wallet_classes.h
 

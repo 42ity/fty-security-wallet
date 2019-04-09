@@ -1,0 +1,14 @@
+{
+	"tags": [
+			{
+					"tag_name": "unprotected",
+					"access_list": [
+							{
+									"regex_client": ".*",
+									"access": "CRUD"
+							}
+					]
+                                        
+			}
+	]
+}

@@ -33,26 +33,26 @@
 #include "../include/fty_security_wallet.h"
 
 //  Opaque class structures to allow forward references
+#ifndef SECW_SECURITY_WALLET_T_DEFINED
+typedef struct _secw_security_wallet_t secw_security_wallet_t;
+#define SECW_SECURITY_WALLET_T_DEFINED
+#endif
 #ifndef SECW_PORTFOLIO_T_DEFINED
 typedef struct _secw_portfolio_t secw_portfolio_t;
 #define SECW_PORTFOLIO_T_DEFINED
 #endif
-#ifndef SECW_DOCUMENT_T_DEFINED
-typedef struct _secw_document_t secw_document_t;
-#define SECW_DOCUMENT_T_DEFINED
-#endif
-#ifndef FTY_ACTOR_T_DEFINED
-typedef struct _fty_actor_t fty_actor_t;
-#define FTY_ACTOR_T_DEFINED
+#ifndef SECW_ACCESS_T_DEFINED
+typedef struct _secw_access_t secw_access_t;
+#define SECW_ACCESS_T_DEFINED
 #endif
 
 //  Extra headers
 
 //  Internal API
 
+#include "secw_security_wallet.h"
 #include "secw_portfolio.h"
-#include "secw_document.h"
-#include "fty_actor.h"
+#include "secw_access.h"
 
 //  *** To avoid double-definitions, only define if building without draft ***
 #ifndef FTY_SECURITY_WALLET_BUILD_DRAFT_API

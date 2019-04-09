@@ -23,41 +23,54 @@
 #define SECW_PORTFOLIO_H_INCLUDED
 
 #include "secw_document.h"
+#include <memory>
 
 /**
  * \brief portfolio wallet
  */
-class SecurityWalletPotfolio
+namespace secw
 {
-public:
-    SecurityWalletPotfolio(){};
-    SecurityWalletPotfolio(std::string name);
-    std::vector<Document> m_documents;
-protected:
-    std::string m_name;
-};
+    /**
+     * \brief Class to represent a portfolio of documents
+     * 
+     * This class contain the interface description use for action in the portfolio.
+     * Portfolio is keeped in memory and it is the responsability of the owner to 
+     * save it permanently if needed.
+     */
+    class Portfolio
+    {
+    public:
+        explicit Portfolio(const std::string & name = "default");
 
-//Virtual Storage 
-class SecurityWalletStorage
-{
-public:
-    virtual int load(const char*path) = 0;
-    virtual SecurityWalletPotfolio getPortfolio(std::string name);
-protected:
-    std::string m_path;
-    std::map<std::string,SecurityWalletPotfolio> m_portfolios;
-};
+        const std::string & getName() const { return m_name; }
+        
+        void add(const Document & doc);
+        void remove(const Id & id);
+        
+        DocumentPtr getDocument(const Id & id) const;
+        
+        std::vector<DocumentPtr> getListDocuments(const std::vector<DocumentType> & types, const std::vector<Tag> & tag = {}) const;
 
-//Dummy Storage for dev purpouse 
-class DummyStorage final : public SecurityWalletStorage
-{
-public:
-    DummyStorage();
-    int load(const char*path) override;
+        void loadPortfolio(const cxxtools::SerializationInfo& si);
+        void serializePortfolio(cxxtools::SerializationInfo& si) const;
 
-};
+        static constexpr const uint8_t PORTFOLIO_VERSION = 1;
 
+    private:
+        std::string m_name;
 
+        //Map containing all the document of the portfolio
+        std::map<Id, DocumentPtr > m_documents;
 
+        //Indexes by types (to get document faster)
+        std::map<DocumentType, std::set<Id>> m_mapTypesToIdDocs;
+
+        void loadPortfolioVersion1(const cxxtools::SerializationInfo& si);
+    };
+
+    void operator<<= (cxxtools::SerializationInfo& si, const Portfolio & portfolio);
+    void operator>>= (const cxxtools::SerializationInfo& si, Portfolio & portfolio);
+
+} // namepsace secw 
 
 #endif

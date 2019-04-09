@@ -5,7 +5,7 @@ Requires=network.target malamute.service
 PartOf=bios.target
 
 [Service]
-Type=simple
+DocumentType=simple
 User=bios
 EnvironmentFile=-@prefix@/share/fty/etc/default/fty
 EnvironmentFile=-@prefix@/share/fty/etc/default/fty__%n.conf
