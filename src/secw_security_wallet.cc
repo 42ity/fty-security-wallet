@@ -73,7 +73,7 @@ namespace secw
             
             for(const TagAccess & tagAccess : tagList)
             {
-                m_mapTagAccess[tagAccess.getName()] = tagAccess;
+                m_mapTagAccess[tagAccess.getId()] = tagAccess;
             }
             
             log_info("%i tags found", m_mapTagAccess.size());

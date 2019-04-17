@@ -1,5 +1,5 @@
 #
-#    fty-security-wallet - Security Wallet to manage JSON document including a public and secret part
+#    fty-security-wallet - Security Wallet to manage document including a public and secret part
 #
 #    Copyright (C) 2019 Eaton
 #
@@ -44,7 +44,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: fty-security-wallet shared library
  This package contains shared library for fty-security-wallet:
- security wallet to manage json document including a public and secret part
+ security wallet to manage document including a public and secret part
 
 Package: libfty-security-wallet-dev
 Architecture: any
@@ -64,14 +64,14 @@ Depends:
     libfty-security-wallet1 (= ${binary:Version})
 Description: fty-security-wallet development tools
  This package contains development files for fty-security-wallet:
- security wallet to manage json document including a public and secret part
+ security wallet to manage document including a public and secret part
 
 Package: fty-security-wallet
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends},
 Description: runnable binaries from fty-security-wallet
  Main package for fty-security-wallet:
- security wallet to manage json document including a public and secret part
+ security wallet to manage document including a public and secret part
 
 Package: fty-security-wallet-dbg
 Architecture: any
@@ -82,4 +82,4 @@ Depends:
     ${misc:Depends}
 Description: fty-security-wallet debugging symbols
  This package contains the debugging symbols for fty-security-wallet:
- security wallet to manage json document including a public and secret part.
+ security wallet to manage document including a public and secret part.

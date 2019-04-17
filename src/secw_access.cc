@@ -108,9 +108,16 @@ namespace secw
         
         return allowed;
     }
+
+    TagDescription TagAccess::getTagDescriptionObject() const
+    {
+        return TagDescription(m_id, m_name, m_description);
+    }
     
     void operator>>= (const cxxtools::SerializationInfo& si, TagAccess & tagAccess)
     {
+        si.getMember("tag_id") >>= tagAccess.m_id;
+        si.getMember("tag_description") >>= tagAccess.m_description;
         si.getMember("tag_name") >>= tagAccess.m_name;
         si.getMember("access_list") >>= tagAccess.m_accessList;
     }

@@ -137,6 +137,7 @@
     
     <class name = "secw_document" selftest = "0">Document parsers</class>
     <class name = "secw_exception" selftest = "0">secw exception</class>
+    <class name = "secw_tag_description" selftest = "0">Description of a tag</class>
     <class name = "secw_client_accessor" selftest = "0">Accessor to return documents from the agent</class>
     
     <!-- Note: Add new supported types here and modify Document to handle then in the factory -->

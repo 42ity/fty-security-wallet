@@ -22,6 +22,7 @@ if ENABLE_DRAFTS
 src_libfty_security_wallet_la_SOURCES += \
     src/secw_document.cc \
     src/secw_exception.cc \
+    src/secw_tag_description.cc \
     src/secw_client_accessor.cc \
     src/secw_snmpv3.cc \
     src/fty_security_wallet_server.cc

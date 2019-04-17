@@ -24,6 +24,8 @@
 
 #include "cxxtools/serializationinfo.h"
 
+#include "secw_tag_description.h"
+
 namespace secw
 {
     typedef int AllowedAccess_t;
@@ -86,11 +88,17 @@ namespace secw
         bool checkAccess(const std::string & client, AccessMethods method) const;
         
         std::string getName() const { return m_name; }
+        std::string getId() const { return m_id; }
+        std::string getDescription() const { return m_description; }
+
+        TagDescription getTagDescriptionObject() const;
         
         friend void operator>>= (const cxxtools::SerializationInfo& si, TagAccess & access);
         
     private:
         std::string m_name;
+        std::string m_id;
+        std::string m_description;
         std::vector<Access> m_accessList;
     };
     

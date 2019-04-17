@@ -1,7 +1,9 @@
 {
 	"tags": [
 			{
+					"tag_id": "test_read",
 					"tag_name": "test_read",
+					"tag_description": "test_read",
 					"access_list": [
 							{
 									"regex_client": ".*",
@@ -11,7 +13,9 @@
                                         
 			},
                         {
+					"tag_id": "test_update",
 					"tag_name": "test_update",
+					"tag_description": "test_update",
 					"access_list": [
 							{
 									"regex_client": ".*",

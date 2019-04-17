@@ -85,6 +85,8 @@ typedef struct _secw_document_t secw_document_t;
 #define SECW_DOCUMENT_T_DEFINED
 typedef struct _secw_exception_t secw_exception_t;
 #define SECW_EXCEPTION_T_DEFINED
+typedef struct _secw_tag_description_t secw_tag_description_t;
+#define SECW_TAG_DESCRIPTION_T_DEFINED
 typedef struct _secw_client_accessor_t secw_client_accessor_t;
 #define SECW_CLIENT_ACCESSOR_T_DEFINED
 typedef struct _secw_snmpv3_t secw_snmpv3_t;
@@ -98,6 +100,7 @@ typedef struct _fty_security_wallet_server_t fty_security_wallet_server_t;
 #ifdef FTY_SECURITY_WALLET_BUILD_DRAFT_API
 #include "secw_document.h"
 #include "secw_exception.h"
+#include "secw_tag_description.h"
 #include "secw_client_accessor.h"
 #include "secw_snmpv3.h"
 #include "fty_security_wallet_server.h"
