@@ -12,7 +12,7 @@
          mention the expected set-up for it to be consistent just in case -->
     <target name = "debian" />
     <target name = "redhat" />
-<?ignore
+
     <target name = "travis" >
         <!-- option name = "clangformat_implem" value = "autotools" / -->
         <option name = "use_cmake" value = "0" />
@@ -21,7 +21,7 @@
         <option name = "use_pkg_deps_prereqs_source" value = "0" />
         <option name = "require_gitignore" value = "1" />
     </target>
-?>
+
     <target name = "jenkins" >
         <option name = "agent_label" value = "devel-image &amp;&amp; x86_64" />
         <option name = "triggers_pollSCM" value = "H/2 * * * *" />
