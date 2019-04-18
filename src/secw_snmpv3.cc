@@ -33,7 +33,11 @@ namespace secw
 /*-----------------------------------------------------------------------------*/
 /*   Snmpv3 Document                                                           */
 /*-----------------------------------------------------------------------------*/
-//Public    
+//Public
+    Snmpv3::Snmpv3() :
+        Document(Snmpv3::TYPE)
+    {}
+
     Snmpv3::Snmpv3( const std::string & name,
                 Snmpv3SecurityLevel securityLevel,
                 const std::string & securityName,

@@ -69,9 +69,9 @@ namespace secw
     class Snmpv3  final : public Document
     {
     public:
-        Snmpv3() :
-            Document(Snmpv3::TYPE)
-        {}
+        static constexpr const char* TYPE = "Snmpv3";
+
+        Snmpv3();
 
         Snmpv3( const std::string & name,
                 Snmpv3SecurityLevel securityLevel = NO_AUTH_NO_PRIV,
@@ -93,9 +93,6 @@ namespace secw
         //Private elements
         const std::string & getAuthPassword() const { return m_authPassword; }
         const std::string & getPrivPassword() const { return m_privPassword; }
-
-        static constexpr const char* TYPE = "Snmpv3";
-
 
     private:
         //Public elements
