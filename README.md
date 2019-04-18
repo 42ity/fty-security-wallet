@@ -8,6 +8,13 @@ fty-security-wallet solve those problems :
 * Have a different level of access (ACL)
 * SNMPv3, SNMPv1 are some of the potential kind of configuration  we would support
 
+## Naming
+* Document: A payload of the security wallet. It has a public and private part (secret)
+* Portfolio: Pool of documents.
+* Usage: Purpose for which a document can be use.
+* Producer: Client which can create, update and delete Documents. This client can only read the public part. 
+* Consumer: Client which can read documents (public and private part) but which cannot modify any document.
+
 
 ## How to build
 
@@ -38,21 +45,25 @@ For the other options available, refer to the manual page of fty-security-wallet
 systemctl start fty-security-wallet
 ```
 
-
 ## Architecture
 
 ### Overview
 
 fty-security-wallet is composed of 1 agent and 1 client library :
 
+Server side:
 * SecurityWalletServer registers to malamute broker as security-wallet agent 
   and handles mailbox requests
 
-* ClientAccessor registers to malamute broker using a client id (agent name) and then
-  can execute request to the SecurityWalletServer
+Client side:
+* ConsumerAccessor registers to malamute broker using a client id (agent name) and then
+  can execute Consumer requests to the SecurityWalletServer
+
+* ProducerAccessor registers to malamute broker using a client id (agent name) and then
+  can execute Producer requests to the SecurityWalletServer
 
 * SecurityWalletServer need a database file for the data (database.json) and a
-  configuration file for the management of access (access.json)
+  configuration file (configuration.json)
 
 * C++ Namespace for this project is "secw"
 
@@ -60,27 +71,23 @@ fty-security-wallet is composed of 1 agent and 1 client library :
 
 The Security wallet is use to store "Document".
 A document has:
-* 1 header (id, type, name and list of tag)
+* 1 header (id, type, name, list of usage and list of tag)
 * 1 public part
 * 1 private part (secret)
 
-A document should always have at least one "tag"
+A document has a list of "Usage"
+A document has a list of "Tag" which are just a way to organize document
 
 Each document are stored in a "Portfolio".
 
 The SecurityWalletServer has a list of portfolio available.
 
 ### Access control
-
-Access are define in the for tag using:
-* A regex which need to match with the client id (agent name)
-* An access list "CRUD" where
-* * C allow user to create a new document containing this tag
-* * R read the private part of any document with this tag
-* * U update the content of any document with this tag
-* * D remove a document with this tag or remove a tag from a document
+In progress: Will be done using the notion of "Usage" of document
 
 ### Mailbox protocol
+To be Redefined
+
 Protocol between clients and server is define as follow.
 
 Request from client:

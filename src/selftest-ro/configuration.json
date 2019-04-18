@@ -1,0 +1,12 @@
+{
+	"usages": [
+		{
+			"usage_id": "discovery_monitoring",
+			"supported_types": [ "Snmpv3" ]							
+		},
+		{
+			"usage_id": "mass_device_management",
+			"supported_types": [ "Snmpv3" ]							
+		}
+	]
+}

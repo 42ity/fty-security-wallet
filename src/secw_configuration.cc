@@ -27,40 +27,89 @@
 */
 
 #include "fty_security_wallet_classes.h"
-
-//  Structure of our class
-
-struct _secw_configuration_t {
-    int filler;     //  Declare class properties here
-};
-
-
-//  --------------------------------------------------------------------------
-//  Create a new secw_configuration
-
-secw_configuration_t *
-secw_configuration_new (void)
+namespace secw
 {
-    secw_configuration_t *self = (secw_configuration_t *) zmalloc (sizeof (secw_configuration_t));
-    assert (self);
-    //  Initialize class properties here
-    return self;
-}
+/*-----------------------------------------------------------------------------*/
+/*   SecwConfiguration                                                         */
+/*-----------------------------------------------------------------------------*/
+  SecwConfiguration::SecwConfiguration(const cxxtools::SerializationInfo & si)
+  {
+    std::vector<Usage> usages;
+    si.getMember("usages") >>= usages;
 
+    for(const Usage & usage : usages)
+    {
+      m_usages[usage.getUsageId()] = usage;
 
-//  --------------------------------------------------------------------------
-//  Destroy the secw_configuration
-
-void
-secw_configuration_destroy (secw_configuration_t **self_p)
-{
-    assert (self_p);
-    if (*self_p) {
-        secw_configuration_t *self = *self_p;
-        //  Free class properties here
-        //  Free object itself
-        free (self);
-        *self_p = NULL;
+      for(const Type & type : usage.getTypes())
+      {
+        m_supportedTypes.insert(type);
+      }
     }
-}
+
+    //TODO
+    //check that the types are all in the system
+    /*for( const Type & type : m_supportedTypes )
+    {
+      if()
+    }*/
+  }
+
+  std::set<UsageId> SecwConfiguration::getAllUsageId() const
+  {
+    std::set<UsageId> usageIds;
+
+    for( const auto & item : m_usages)
+    {
+      usageIds.insert(item.first);
+    }
+
+    return usageIds;
+  }
+
+  Usage SecwConfiguration::getUsage( const UsageId & usageId ) const
+  {
+    //TODO check error if none existing usageId
+    return m_usages.at(usageId);
+  }
+
+  std::set<UsageId> SecwConfiguration::getUsageIdForConsummer( const ClientId & /*clientId*/ ) const
+  {
+    return getAllUsageId();
+  }
+
+  std::set<UsageId> SecwConfiguration::getUsageIdForProducer( const ClientId & /*clientId*/ ) const
+  {
+    return getAllUsageId();
+  }
+
+/*-----------------------------------------------------------------------------*/
+/*   Usage                                                                     */
+/*-----------------------------------------------------------------------------*/
+//public
+
+  UsageId Usage::getUsageId() const
+  {
+    return m_usageId;
+  }
+
+  std::set<Type> Usage::getTypes() const
+  {
+    return m_types;
+  }
+
+  void operator>>= (const cxxtools::SerializationInfo& si, Usage & usage)
+  {
+    si.getMember("usage_id") >>= usage.m_usageId;
+
+    std::vector<Type> types;
+    si.getMember("supported_types") >>= types;
+
+    std::copy(types.begin(), types.end(),
+        std::inserter(usage.m_types, usage.m_types.end()));
+
+    if(usage.m_usageId.empty()) throw std::runtime_error("usage_id cannot be empty");
+  }
+
+} // namespace secw
 
