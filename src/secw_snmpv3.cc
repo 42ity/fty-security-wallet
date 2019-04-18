@@ -35,7 +35,7 @@ namespace secw
 /*-----------------------------------------------------------------------------*/
 //Public
     Snmpv3::Snmpv3() :
-        Document(Snmpv3::TYPE)
+        Document(SNMPV3_TYPE)
     {}
 
     Snmpv3::Snmpv3( const std::string & name,
@@ -46,7 +46,7 @@ namespace secw
                 Snmpv3PrivProtocol privProtocol,
                 const std::string & privPassword,
                 const Id & id) :
-        Document(Snmpv3::TYPE),
+        Document(SNMPV3_TYPE),
         m_securityLevel(securityLevel),
         m_authProtocol(authProtocol),
         m_privProtocol(privProtocol),

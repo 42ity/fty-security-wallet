@@ -38,7 +38,7 @@ namespace secw
 //Here are the supported documents - Need to be update if you want to add some
 std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
 {
-    { Snmpv3::TYPE, []() { return DocumentPtr(new Snmpv3()); }}
+    { SNMPV3_TYPE, []() { return DocumentPtr(new Snmpv3()); }}
 };
 
 //Public

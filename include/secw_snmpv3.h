@@ -24,6 +24,8 @@
 
 #include "secw_document.h"
 
+#define SNMPV3_TYPE "Snmpv3"
+
 namespace secw
 {
     /**
@@ -69,7 +71,6 @@ namespace secw
     class Snmpv3  final : public Document
     {
     public:
-        static constexpr const char* TYPE = "Snmpv3";
 
         Snmpv3();
 
