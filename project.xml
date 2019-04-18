@@ -1,6 +1,6 @@
 <project
     name = "fty-security-wallet"
-    description = "Security Wallet to manage document including a public and secret part"
+    description = "Security Wallet to manage JSON documents including a public and secret part"
     script = "zproject.gsl"
     email = "EatonIPCOpenSource@eaton.com"
     url = "https://42ity.org"
@@ -8,8 +8,6 @@
     repository = "https://github.com/42ity/fty-security-wallet"
     >
 
-    <!-- Note: Eaton proprietary components do not make Travis recipes, but we
-         mention the expected set-up for it to be consistent just in case -->
     <target name = "debian" />
     <target name = "redhat" />
 
@@ -40,13 +38,6 @@
     <version major = "1" minor = "0" patch = "0" />
     <abi current = "1" revision = "0" age = "0" />
 
-    <use project = "cxxtools"
-        test = "cxxtools::Utf8Codec::Utf8Codec"
-        header = "cxxtools/allocator.h"
-        repository = "https://github.com/42ity/cxxtools.git"
-        release = "2.2-FTY-master"
-    />
-
     <use project = "czmq"
         repository = "https://github.com/42ity/czmq.git"
         release = "v3.0.2-FTY-master"
@@ -68,6 +59,29 @@
         repository = "https://github.com/42ity/malamute.git"
         release = "1.0-FTY-master"
         />
+
+    <use project = "cxxtools"
+        test = "cxxtools::Utf8Codec::Utf8Codec"
+        header = "cxxtools/allocator.h"
+        repository = "https://github.com/42ity/cxxtools.git"
+        release = "2.2-FTY-master"
+        />
+
+    <!-- Note: pure C projects should use fty-log/fty_logger.h, C++ use fty_log.h -->
+    <use project = "fty-common-logging" libname = "libfty_common_logging"
+        header = "fty_log.h"
+        repository = "https://github.com/42ity/fty-common-logging.git"
+        release = "master"
+        test = "fty_common_logging_selftest" >
+
+        <!-- Note: pure C projects should use clogger.h, C++ use logger.h -->
+        <use project = "log4cplus"
+            header = "log4cplus/logger.h"
+            test = "appender_test"
+            repository = "https://github.com/42ity/log4cplus.git"
+            release = "1.1.2-FTY-master"
+            />
+    </use>
 
     <use project = "fty-common-mlm" libname = "libfty_common_mlm" header = "fty_common_mlm.h"
         repository = "https://github.com/42ity/fty-common-mlm.git"

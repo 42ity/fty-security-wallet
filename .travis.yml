@@ -59,11 +59,11 @@ pkg_deps_prereqs_source: &pkg_deps_prereqs_source
     - libzmq3-dev
     - libczmq-dev
     - libmlm-dev
+    - cxxtools-dev
     - log4cplus-dev
     - libfty-common-logging-dev
     - libfty-common-dev
     - libfty-common-mlm-dev
-    - cxxtools-dev
 
 # NOTE: Our forks are checked out and built without pkg dependencies in use
 pkg_deps_prereqs: &pkg_deps_prereqs

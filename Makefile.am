@@ -12,20 +12,20 @@ AM_CXXFLAGS = \
     -std=c++11
 
 AM_CPPFLAGS = \
-    ${cxxtools_CFLAGS} \
     ${libsodium_CFLAGS} \
     ${libzmq_CFLAGS} \
     ${czmq_CFLAGS} \
     ${malamute_CFLAGS} \
-    ${openssl_CFLAGS} \
+    ${cxxtools_CFLAGS} \
     ${log4cplus_CFLAGS} \
     ${fty_common_logging_CFLAGS} \
+    ${openssl_CFLAGS} \
     ${fty_common_CFLAGS} \
     ${fty_common_mlm_CFLAGS} \
     -D__STDC_FORMAT_MACROS \
     -I$(srcdir)/include
 
-project_libs = ${cxxtools_LIBS} ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${openssl_LIBS} ${log4cplus_LIBS} ${fty_common_logging_LIBS} ${fty_common_LIBS} ${fty_common_mlm_LIBS}
+project_libs = ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cxxtools_LIBS} ${log4cplus_LIBS} ${fty_common_logging_LIBS} ${openssl_LIBS} ${fty_common_LIBS} ${fty_common_mlm_LIBS}
 
 SUBDIRS = doc
 SUBDIRS += include
@@ -46,14 +46,14 @@ DISTCLEANFILES =
 
 if ENABLE_DIST_CMAKEFILES
 EXTRA_DIST += \
-    Findcxxtools.cmake \
     Findlibsodium.cmake \
     Findlibzmq.cmake \
     Findczmq.cmake \
     Findmalamute.cmake \
-    Findopenssl.cmake \
+    Findcxxtools.cmake \
     Findlog4cplus.cmake \
     Findfty_common_logging.cmake \
+    Findopenssl.cmake \
     Findfty_common.cmake \
     Findfty_common_mlm.cmake \
     builds/cmake/Modules/ClangFormat.cmake \

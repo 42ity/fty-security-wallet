@@ -1,5 +1,5 @@
 #
-#    fty-security-wallet - Security Wallet to manage document including a public and secret part
+#    fty-security-wallet - Security Wallet to manage JSON documents including a public and secret part
 #
 #    Copyright (C) 2019 Eaton
 #
@@ -32,7 +32,7 @@
 Name:           fty-security-wallet
 Version:        1.0.0
 Release:        1
-Summary:        security wallet to manage document including a public and secret part
+Summary:        security wallet to manage json documents including a public and secret part
 License:        GPL-2.0+
 URL:            https://42ity.org
 Source0:        %{name}-%{version}.tar.gz
@@ -51,27 +51,27 @@ BuildRequires:  systemd
 %{?systemd_requires}
 BuildRequires:  xmlto
 BuildRequires:  gcc-c++
-BuildRequires:  cxxtools-devel
 BuildRequires:  libsodium-devel
 BuildRequires:  zeromq-devel
 BuildRequires:  czmq-devel >= 3.0.2
 BuildRequires:  malamute-devel >= 1.0.0
-BuildRequires:  openssl-devel
+BuildRequires:  cxxtools-devel
 BuildRequires:  log4cplus-devel
 BuildRequires:  fty-common-logging-devel
+BuildRequires:  openssl-devel
 BuildRequires:  fty-common-devel
 BuildRequires:  fty-common-mlm-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
-fty-security-wallet security wallet to manage document including a public and secret part.
+fty-security-wallet security wallet to manage json documents including a public and secret part.
 
 %package -n libfty_security_wallet1
 Group:          System/Libraries
-Summary:        security wallet to manage document including a public and secret part shared library
+Summary:        security wallet to manage json documents including a public and secret part shared library
 
 %description -n libfty_security_wallet1
-This package contains shared library for fty-security-wallet: security wallet to manage document including a public and secret part
+This package contains shared library for fty-security-wallet: security wallet to manage json documents including a public and secret part
 
 %post -n libfty_security_wallet1 -p /sbin/ldconfig
 %postun -n libfty_security_wallet1 -p /sbin/ldconfig
@@ -81,23 +81,23 @@ This package contains shared library for fty-security-wallet: security wallet to
 %{_libdir}/libfty_security_wallet.so.*
 
 %package devel
-Summary:        security wallet to manage document including a public and secret part
+Summary:        security wallet to manage json documents including a public and secret part
 Group:          System/Libraries
 Requires:       libfty_security_wallet1 = %{version}
-Requires:       cxxtools-devel
 Requires:       libsodium-devel
 Requires:       zeromq-devel
 Requires:       czmq-devel >= 3.0.2
 Requires:       malamute-devel >= 1.0.0
-Requires:       openssl-devel
+Requires:       cxxtools-devel
 Requires:       log4cplus-devel
 Requires:       fty-common-logging-devel
+Requires:       openssl-devel
 Requires:       fty-common-devel
 Requires:       fty-common-mlm-devel
 
 %description devel
-security wallet to manage document including a public and secret part development tools
-This package contains development files for fty-security-wallet: security wallet to manage document including a public and secret part
+security wallet to manage json documents including a public and secret part development tools
+This package contains development files for fty-security-wallet: security wallet to manage json documents including a public and secret part
 
 %files devel
 %defattr(-,root,root)
