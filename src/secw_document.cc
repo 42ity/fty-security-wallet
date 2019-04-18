@@ -28,6 +28,8 @@
 
 #include "fty_security_wallet_classes.h"
 
+#include "secw_snmpv3.h"
+
 namespace secw
 {
 /*-----------------------------------------------------------------------------*/
