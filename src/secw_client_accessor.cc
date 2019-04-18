@@ -339,6 +339,7 @@ std::vector<std::pair<std::string,bool>> secw_client_accessor_test ()
     log_debug (" ** secw_client_accessor_tests: ");
 
 //test 1 => getPortfolioList
+    printf("\n-----------------------------------------------------------------------\n");
     {
         log_debug(" *=> secw_client_accessor_test > Test #1 getPortfolioList");
         ClientAccessor clientAccessor(SELFTEST_CLIENT_ID);
@@ -366,6 +367,7 @@ std::vector<std::pair<std::string,bool>> secw_client_accessor_test ()
     }
     
 //test 2 => getPrivateReadableTagList
+    printf("\n-----------------------------------------------------------------------\n");
     {
         log_debug(" *=> secw_client_accessor_test > Test #2 getPrivateReadableTagList ");
         ClientAccessor clientAccessor(SELFTEST_CLIENT_ID);
@@ -391,6 +393,7 @@ std::vector<std::pair<std::string,bool>> secw_client_accessor_test ()
     }
     
 //test 3 => getEditableTagList
+    printf("\n-----------------------------------------------------------------------\n");
     {
         log_debug(" *=> secw_client_accessor_test > Test #3 getEditableTagList");
         ClientAccessor clientAccessor(SELFTEST_CLIENT_ID);
@@ -416,6 +419,7 @@ std::vector<std::pair<std::string,bool>> secw_client_accessor_test ()
     }
     
 //test 4.1 => getDocumentsWithPrivateData
+    printf("\n-----------------------------------------------------------------------\n");
     {
         log_debug(" *=> secw_client_accessor_test > Test #4.1 getDocumentsWithPrivateData");
         ClientAccessor clientAccessor(SELFTEST_CLIENT_ID);
@@ -446,6 +450,7 @@ std::vector<std::pair<std::string,bool>> secw_client_accessor_test ()
     }
 
 //test 4.2 => getDocumentsWithPrivateData tag=test_read
+    printf("\n-----------------------------------------------------------------------\n");
     {
         log_debug(" *=> secw_client_accessor_test > Test #4.2 getDocumentsWithPrivateData tag=test_read");
         ClientAccessor clientAccessor(SELFTEST_CLIENT_ID);
@@ -476,6 +481,7 @@ std::vector<std::pair<std::string,bool>> secw_client_accessor_test ()
     }
     
 //test 4.3  => getDocumentsWithPrivateData SecwIllegalAccess
+    printf("\n-----------------------------------------------------------------------\n");
     {
         log_debug(" *=> secw_client_accessor_test > Test #4.3 getDocumentsWithPrivateData => SecwIllegalAccess");
         ClientAccessor clientAccessor(SELFTEST_CLIENT_ID);
@@ -499,6 +505,7 @@ std::vector<std::pair<std::string,bool>> secw_client_accessor_test ()
     }
     
 //test 5.1 => getDocumentsWithoutPrivateData
+    printf("\n-----------------------------------------------------------------------\n");
     {
         log_debug(" *=> secw_client_accessor_test > Test #5.1 getDocumentsWithoutPrivateData");
         ClientAccessor clientAccessor(SELFTEST_CLIENT_ID);
@@ -529,6 +536,7 @@ std::vector<std::pair<std::string,bool>> secw_client_accessor_test ()
     }
     
 //test 5.2 => getDocumentsWithoutPrivateData => SecwUnknownTagException
+    printf("\n-----------------------------------------------------------------------\n");
     {
         log_debug(" *=> secw_client_accessor_test > Test #5.2 getDocumentsWithoutPrivateData => SecwUnknownTagException");
         ClientAccessor clientAccessor(SELFTEST_CLIENT_ID);
@@ -552,6 +560,7 @@ std::vector<std::pair<std::string,bool>> secw_client_accessor_test ()
     }
     
 //test 6 => getDocumentWithPrivateData
+    printf("\n-----------------------------------------------------------------------\n");
     {
         log_debug(" *=> secw_client_accessor_test > Test #6 getDocumentWithPrivateData");
         ClientAccessor clientAccessor(SELFTEST_CLIENT_ID);
@@ -577,6 +586,7 @@ std::vector<std::pair<std::string,bool>> secw_client_accessor_test ()
     }
     
 //test 7 => getDocumentWithoutPrivateData
+    printf("\n-----------------------------------------------------------------------\n");
     {
         log_debug(" *=> secw_client_accessor_test > Test #7 getDocumentWithoutPrivateData");
         ClientAccessor clientAccessor(SELFTEST_CLIENT_ID);
@@ -602,6 +612,7 @@ std::vector<std::pair<std::string,bool>> secw_client_accessor_test ()
     }
     
 //test 8 => SecwDocumentDoNotExistException 1/2
+    printf("\n-----------------------------------------------------------------------\n");
     {
         log_debug(" *=> secw_client_accessor_test > Test #8 SecwDocumentDoNotExistException 1/2");
         ClientAccessor clientAccessor(SELFTEST_CLIENT_ID);
@@ -625,6 +636,7 @@ std::vector<std::pair<std::string,bool>> secw_client_accessor_test ()
     }
     
 //test 9 => SecwDocumentDoNotExistException 2/2
+    printf("\n-----------------------------------------------------------------------\n");
     {
         log_debug(" *=> secw_client_accessor_test > Test #9 SecwDocumentDoNotExistException 2/2");
         ClientAccessor clientAccessor(SELFTEST_CLIENT_ID);
@@ -648,6 +660,7 @@ std::vector<std::pair<std::string,bool>> secw_client_accessor_test ()
     }
     
 //test 10  => SecwUnknownPortfolioException
+    printf("\n-----------------------------------------------------------------------\n");
     {
         log_debug(" *=> secw_client_accessor_test > Test #10 SecwUnknownPortfolioException");
         ClientAccessor clientAccessor(SELFTEST_CLIENT_ID);

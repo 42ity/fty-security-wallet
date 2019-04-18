@@ -646,6 +646,7 @@ fty_security_wallet_server_test (bool verbose)
     mlm_client_connect (client, endpoint, 1000, "secw-server-test");
 
     //test 1 => Invalid REQUEST command
+    printf("\n-----------------------------------------------------------------------\n");
     try
     {
         log_debug ("*=> fty_security_wallet_server > Test #1 Invalid REQUEST command");
@@ -689,6 +690,8 @@ fty_security_wallet_server_test (bool verbose)
 
     //Tests from the lib
     std::vector<std::pair<std::string,bool>> testLibResults = secw_client_accessor_test();
+
+    printf("\n-----------------------------------------------------------------------\n");
     
     uint32_t testsPassed = 0;
     uint32_t testsFailed = 0;
@@ -723,6 +726,8 @@ fty_security_wallet_server_test (bool verbose)
             testsFailed++;
         }
     }
+
+    printf("\n-----------------------------------------------------------------------\n");
     
     if(testsFailed == 0)
     {
