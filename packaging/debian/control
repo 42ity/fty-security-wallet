@@ -24,6 +24,7 @@ Maintainer:     fty-security-wallet Developers <eatonipcopensource@eaton.com>
 Standards-Version: 4.0.1.0
 Build-Depends: debhelper (>= 9),
     pkg-config,
+    libcxxtools-dev,
     libsodium-dev,
     libzmq3-dev,
     libczmq-dev (>= 3.0.2),
@@ -33,7 +34,6 @@ Build-Depends: debhelper (>= 9),
     libfty-common-logging-dev,
     libfty-common-dev,
     libfty-common-mlm-dev,
-    libcxxtools-dev,
     systemd,
     dh-systemd,
     asciidoc-base | asciidoc, xmlto,
@@ -51,6 +51,7 @@ Architecture: any
 Section: libdevel
 Depends:
     ${misc:Depends},
+    libcxxtools-dev,
     libsodium-dev,
     libzmq3-dev,
     libczmq-dev (>= 3.0.2),
@@ -60,7 +61,6 @@ Depends:
     libfty-common-logging-dev,
     libfty-common-dev,
     libfty-common-mlm-dev,
-    libcxxtools-dev,
     libfty-security-wallet1 (= ${binary:Version})
 Description: fty-security-wallet development tools
  This package contains development files for fty-security-wallet:

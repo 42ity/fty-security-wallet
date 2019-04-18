@@ -51,6 +51,7 @@ BuildRequires:  systemd
 %{?systemd_requires}
 BuildRequires:  xmlto
 BuildRequires:  gcc-c++
+BuildRequires:  cxxtools-devel
 BuildRequires:  libsodium-devel
 BuildRequires:  zeromq-devel
 BuildRequires:  czmq-devel >= 3.0.2
@@ -60,7 +61,6 @@ BuildRequires:  log4cplus-devel
 BuildRequires:  fty-common-logging-devel
 BuildRequires:  fty-common-devel
 BuildRequires:  fty-common-mlm-devel
-BuildRequires:  cxxtools-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -84,6 +84,7 @@ This package contains shared library for fty-security-wallet: security wallet to
 Summary:        security wallet to manage document including a public and secret part
 Group:          System/Libraries
 Requires:       libfty_security_wallet1 = %{version}
+Requires:       cxxtools-devel
 Requires:       libsodium-devel
 Requires:       zeromq-devel
 Requires:       czmq-devel >= 3.0.2
@@ -93,7 +94,6 @@ Requires:       log4cplus-devel
 Requires:       fty-common-logging-devel
 Requires:       fty-common-devel
 Requires:       fty-common-mlm-devel
-Requires:       cxxtools-devel
 
 %description devel
 security wallet to manage document including a public and secret part development tools

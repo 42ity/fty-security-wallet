@@ -181,6 +181,39 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     # or MacOS packages; other OSes are not currently supported by Travis cloud
     [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any)..."
 
+    # Start of recipe for dependency: cxxtools
+    if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list cxxtools-dev >/dev/null 2>&1) || \
+           (command -v brew >/dev/null 2>&1 && brew ls --versions cxxtools >/dev/null 2>&1) \
+    ; then
+        echo ""
+        BASE_PWD=${PWD}
+        echo "`date`: INFO: Building prerequisite 'cxxtools' from Git repository..." >&2
+        cd ./tmp-deps
+        $CI_TIME git clone --quiet --depth 1 -b 2.2-FTY-master https://github.com/42ity/cxxtools.git cxxtools
+        cd ./cxxtools
+        CCACHE_BASEDIR=${PWD}
+        export CCACHE_BASEDIR
+        git --no-pager log --oneline -n1
+        if [ -e autogen.sh ]; then
+            $CI_TIME ./autogen.sh 2> /dev/null
+        fi
+        if [ -e buildconf ]; then
+            $CI_TIME ./buildconf 2> /dev/null
+        fi
+        if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
+            $CI_TIME libtoolize --copy --force && \
+            $CI_TIME aclocal -I . && \
+            $CI_TIME autoheader && \
+            $CI_TIME automake --add-missing --copy && \
+            $CI_TIME autoconf || \
+            $CI_TIME autoreconf -fiv
+        fi
+        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+        $CI_TIME make -j4
+        $CI_TIME make install
+        cd "${BASE_PWD}"
+    fi
+
     # Start of recipe for dependency: libsodium
     if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libsodium-dev >/dev/null 2>&1) || \
            (command -v brew >/dev/null 2>&1 && brew ls --versions libsodium >/dev/null 2>&1) \
@@ -432,39 +465,6 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         cd ./tmp-deps
         $CI_TIME git clone --quiet --depth 1 -b master https://github.com/42ity/fty-common-mlm.git fty-common-mlm
         cd ./fty-common-mlm
-        CCACHE_BASEDIR=${PWD}
-        export CCACHE_BASEDIR
-        git --no-pager log --oneline -n1
-        if [ -e autogen.sh ]; then
-            $CI_TIME ./autogen.sh 2> /dev/null
-        fi
-        if [ -e buildconf ]; then
-            $CI_TIME ./buildconf 2> /dev/null
-        fi
-        if [ ! -e autogen.sh ] && [ ! -e buildconf ] && [ ! -e ./configure ] && [ -s ./configure.ac ]; then
-            $CI_TIME libtoolize --copy --force && \
-            $CI_TIME aclocal -I . && \
-            $CI_TIME autoheader && \
-            $CI_TIME automake --add-missing --copy && \
-            $CI_TIME autoconf || \
-            $CI_TIME autoreconf -fiv
-        fi
-        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
-        $CI_TIME make -j4
-        $CI_TIME make install
-        cd "${BASE_PWD}"
-    fi
-
-    # Start of recipe for dependency: cxxtools
-    if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list cxxtools-dev >/dev/null 2>&1) || \
-           (command -v brew >/dev/null 2>&1 && brew ls --versions cxxtools >/dev/null 2>&1) \
-    ; then
-        echo ""
-        BASE_PWD=${PWD}
-        echo "`date`: INFO: Building prerequisite 'cxxtools' from Git repository..." >&2
-        cd ./tmp-deps
-        $CI_TIME git clone --quiet --depth 1 -b 2.2-FTY-master https://github.com/42ity/cxxtools.git cxxtools
-        cd ./cxxtools
         CCACHE_BASEDIR=${PWD}
         export CCACHE_BASEDIR
         git --no-pager log --oneline -n1

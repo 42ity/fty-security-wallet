@@ -12,6 +12,7 @@ AM_CXXFLAGS = \
     -std=c++11
 
 AM_CPPFLAGS = \
+    ${cxxtools_CFLAGS} \
     ${libsodium_CFLAGS} \
     ${libzmq_CFLAGS} \
     ${czmq_CFLAGS} \
@@ -21,11 +22,10 @@ AM_CPPFLAGS = \
     ${fty_common_logging_CFLAGS} \
     ${fty_common_CFLAGS} \
     ${fty_common_mlm_CFLAGS} \
-    ${cxxtools_CFLAGS} \
     -D__STDC_FORMAT_MACROS \
     -I$(srcdir)/include
 
-project_libs = ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${openssl_LIBS} ${log4cplus_LIBS} ${fty_common_logging_LIBS} ${fty_common_LIBS} ${fty_common_mlm_LIBS} ${cxxtools_LIBS}
+project_libs = ${cxxtools_LIBS} ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${openssl_LIBS} ${log4cplus_LIBS} ${fty_common_logging_LIBS} ${fty_common_LIBS} ${fty_common_mlm_LIBS}
 
 SUBDIRS = doc
 SUBDIRS += include
@@ -46,6 +46,7 @@ DISTCLEANFILES =
 
 if ENABLE_DIST_CMAKEFILES
 EXTRA_DIST += \
+    Findcxxtools.cmake \
     Findlibsodium.cmake \
     Findlibzmq.cmake \
     Findczmq.cmake \
@@ -55,7 +56,6 @@ EXTRA_DIST += \
     Findfty_common_logging.cmake \
     Findfty_common.cmake \
     Findfty_common_mlm.cmake \
-    Findcxxtools.cmake \
     builds/cmake/Modules/ClangFormat.cmake \
     builds/cmake/clang-format-check.sh.in \
     builds/cmake/Config.cmake.in \

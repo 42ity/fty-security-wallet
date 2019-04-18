@@ -30,10 +30,10 @@
 //  Set up environment for the application
 
 //  External dependencies
+#include <cxxtools/allocator.h>
 #include <czmq.h>
 #include <malamute.h>
 #include <fty_common_mlm.h>
-#include <cxxtools/allocator.h>
 
 //  FTY_SECURITY_WALLET version macros for compile-time API detection
 #define FTY_SECURITY_WALLET_VERSION_MAJOR 1
