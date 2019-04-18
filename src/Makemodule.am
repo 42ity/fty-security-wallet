@@ -16,6 +16,7 @@ src_libfty_security_wallet_la_SOURCES = \
     src/secw_security_wallet.cc \
     src/secw_portfolio.cc \
     src/secw_access.cc \
+    src/secw_configuration.cc \
     src/platform.h
 
 if ENABLE_DRAFTS
