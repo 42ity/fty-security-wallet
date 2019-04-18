@@ -9,7 +9,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: libfty_security_wallet
-Description: Security Wallet to manage document including a public and secret part
+Description: Security Wallet to manage JSON documents including a public and secret part
 Version: @VERSION@
 
 Requires.private: @pkg_config_names_private@

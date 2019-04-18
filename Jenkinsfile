@@ -1,5 +1,5 @@
 /*
-    fty-security-wallet - Security Wallet to manage JSON document including a public and secret part
+    fty-security-wallet - Security Wallet to manage JSON documents including a public and secret part
 
     Copyright (C) 2019 Eaton
 
