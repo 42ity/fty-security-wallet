@@ -44,6 +44,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
 //Public
     const std::string & Document::getName() const { return m_name; }
     std::vector<Tag> Document::getTags() const { return m_tags; }
+    std::set<UsageId> Document::getUsageIds() const { return m_usages; }
     const DocumentType & Document::getType() const { return m_type; }
     const Id & Document::getId() const { return m_id; }
 
@@ -78,22 +79,6 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
         fillSerializationInfoPublicDoc(si.addMember(DOC_PUBLIC_ENTRY));
         fillSerializationInfoPrivateDoc(si.addMember(DOC_PRIVATE_ENTRY));
     }
-    
-    bool Document::hasCommonTag(const std::vector<Tag> & tags1, const std::vector<Tag> & tags2)
-    {
-        for( const Tag & tag1 : tags1)
-        {
-            for( const Tag & tag2 : tags2)
-            {
-                if(tag2 == tag1)
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
 
 //Private 
     void Document::fillSerializationInfoHeaderDoc(cxxtools::SerializationInfo& si) const
@@ -102,6 +87,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
         si.addMember(DOC_NAME_ENTRY) <<= getName();
         si.addMember(DOC_TYPE_ENTRY) <<= getType();
         si.addMember(DOC_TAGS_ENTRY) <<= getTags();
+        si.addMember(DOC_USAGES_ENTRY) <<= getUsageIds();
     }
 
     void Document::UpdateHeaderFromSerializationInfo(const cxxtools::SerializationInfo& si)
@@ -111,19 +97,13 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
             //We don't read the id because will portfolio insertion process is gonna do it
             //We don't read the type because it is define by the object type
             si.getMember(DOC_NAME_ENTRY) >>= m_name;
-            si.getMember(DOC_TAGS_ENTRY) >>= m_tags; 
+            si.getMember(DOC_TAGS_ENTRY) >>= m_tags;
+            si.getMember(DOC_USAGES_ENTRY) >>= m_usages;
         }
         catch(const std::exception& e)
         {
             throw SecwInvalidDocumentFormatException(e.what());
         }
-
-        //check tags
-        if(m_tags.empty())
-        {
-            throw SecwInvalidDocumentFormatException("Document tag list cannot be empty");
-        }
-        
     }
 
     void operator<<= (cxxtools::SerializationInfo& si, const Document & doc)

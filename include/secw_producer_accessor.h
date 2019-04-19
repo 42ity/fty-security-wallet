@@ -1,5 +1,5 @@
 /*  =========================================================================
-    secw_security_wallet - Security wallet to manage the storage and configuration
+    secw_producer_accessor - Accessor to return documents from the agent
 
     Copyright (C) 2019 Eaton
 
@@ -19,36 +19,7 @@
     =========================================================================
 */
 
-#ifndef SECW_SECURITY_WALLET_H_INCLUDED
-#define SECW_SECURITY_WALLET_H_INCLUDED
-
-#include "secw_document.h"
-#include "secw_portfolio.h"
-#include "secw_configuration.h"
-
-#include <memory>
-
-namespace secw
-{
-    class SecurityWallet
-    {
-    public:
-        explicit SecurityWallet(const std::string & configurationPath, const std::string & databasePath);
-        void save() const;
-        Portfolio & getPortfolio(const std::string & name);
-        std::vector<std::string> getPortfolioNames() const;
-
-        const SecwConfiguration & getConfiguration() const;
-
-        static constexpr const uint8_t SECW_VERSION = 1;
-
-    private:
-        std::string m_pathDatabase;
-        
-        std::shared_ptr<SecwConfiguration> m_configuration;
-        std::vector<Portfolio> m_portfolios;
-    };
-
-} // namepsace secw 
+#ifndef SECW_PRODUCER_ACCESSOR_H_INCLUDED
+#define SECW_PRODUCER_ACCESSOR_H_INCLUDED
 
 #endif

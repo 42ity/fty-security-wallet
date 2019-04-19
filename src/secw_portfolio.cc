@@ -67,34 +67,13 @@ namespace secw
         return m_documents.at(id)->clone();
     }
 
-    std::vector<DocumentPtr> Portfolio::getListDocuments(const std::vector<DocumentType> & types, const std::vector<Tag> & tags) const
+    std::vector<DocumentPtr> Portfolio::getListDocuments() const
     {
         std::vector<DocumentPtr> returnList;
 
-        for( const DocumentType & type : types)
+        for( const auto & item : m_documents)
         {
-            if(m_mapTypesToIdDocs.count(type) > 0)
-            {
-                log_debug("Listing document in portfolio %s with type %s", m_name.c_str(), type.c_str());
-            
-                for(const Id & id : m_mapTypesToIdDocs.at(type) )
-                {
-                    try
-                    {
-                        DocumentPtr pDoc = m_documents.at(id);
-
-                        if( tags.empty() || Document::hasCommonTag(pDoc->getTags(),tags) )
-                        {
-                            returnList.push_back(pDoc);
-                        }
-                    }
-                    catch(...)
-                    {
-                        log_error("Impossible to find document with the id %s", id.c_str());
-                    }
-                }
-            }
-
+            returnList.push_back(item.second);
         }
 
         return returnList;
@@ -137,7 +116,7 @@ namespace secw
     {
         si.addMember("version") <<= PORTFOLIO_VERSION;
         si.addMember("name") <<= m_name;
-        si.addMember("documents") <<= getListDocuments(Document::getSupportedTypes());
+        si.addMember("documents") <<= getListDocuments();
     }
 
     void Portfolio::loadPortfolioVersion1(const cxxtools::SerializationInfo& si)

@@ -1,5 +1,5 @@
 /*  =========================================================================
-    secw_tag_description - Description of a tag
+    secw_client_accessor - Accessor to return documents from the agent
 
     Copyright (C) 2019 Eaton
 
@@ -19,40 +19,41 @@
     =========================================================================
 */
 
-/*
-@header
-    secw_tag_description - Description of a tag
-@discuss
-@end
-*/
+#ifndef SECW_CLIENT_ACCESSOR_H_INCLUDED
+#define SECW_CLIENT_ACCESSOR_H_INCLUDED
 
-#include "fty_security_wallet_classes.h"
+#include "secw_document.h"
+#include "secw_exception.h"
+
+#include "cxxtools/serializationinfo.h"
 
 namespace secw
 {
+  using ClientId = std::string;
+  
+  class ClientAccessor
+  {
+  public:
+    explicit ClientAccessor(const ClientId & clientId,
+                uint32_t timeout,
+                const std::string & endPoint);
 
-    TagDescription::TagDescription( const std::string & id,
-                const std::string & name,
-                const std::string & description):
-        m_id(id),
-        m_name(name),
-        m_description(description)
-    {}
+    ~ClientAccessor();
 
-    void operator>>= (const cxxtools::SerializationInfo& si, TagDescription & tag)
-    {
-        si.getMember(TAG_ID_ENTRY) >>= tag.m_id;
-        si.getMember(TAG_NAME_ENTRY) >>= tag.m_name;
-        si.getMember(TAG_DESCRIPTION_ENTRY) >>= tag.m_description;
-    }
+    std::vector<std::string> sendCommand(const std::string & command, const std::vector<std::string> & frames) const;
 
-    void operator<<= (cxxtools::SerializationInfo& si, const TagDescription & tag)
-    {
-        si.addMember(TAG_ID_ENTRY) <<= tag.getId();
-        si.addMember(TAG_NAME_ENTRY) <<= tag.getName();
-        si.addMember(TAG_DESCRIPTION_ENTRY) <<= tag.getDescription();
-    }
-
+    static cxxtools::SerializationInfo deserialize(const std::string & json);
+    static std::string serialize(const cxxtools::SerializationInfo & si);
+    
+  private:
+    ClientId m_clientId;
+    uint32_t m_timeout;
+    mutable mlm_client_t * m_client;
+  };
+  
 } //namespace secw
 
+//  @interface
+std::vector<std::pair<std::string,bool>> secw_client_accessor_test();
 
+#endif

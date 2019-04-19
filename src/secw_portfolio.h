@@ -49,7 +49,7 @@ namespace secw
         
         DocumentPtr getDocument(const Id & id) const;
         
-        std::vector<DocumentPtr> getListDocuments(const std::vector<DocumentType> & types, const std::vector<Tag> & tag = {}) const;
+        std::vector<DocumentPtr> getListDocuments() const;
 
         void loadPortfolio(const cxxtools::SerializationInfo& si);
         void serializePortfolio(cxxtools::SerializationInfo& si) const;

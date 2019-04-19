@@ -148,14 +148,17 @@
 
     <class name = "secw_security_wallet" private = "1" selftest = "0">Security wallet to manage the storage and access</class>
     <class name = "secw_portfolio" private = "1" selftest = "0">Portfolio to handle documents in the agent</class>
-    <class name = "secw_access" private = "1" selftest = "0">Handle the access rights on tag for client in the agent</class>
+
+    <class name = "secw_client_accessor" private = "1" selftest = "0">Accessor to return documents from the agent</class>
+    <class name = "secw_helpers" private = "1" selftest = "0">List of helper functions use a bit everywhere</class>
 
     <class name = "secw-configuration" private = "1" selftest = "0">Handle the configuration of a security wallet</class>
     
     <class name = "secw_document" selftest = "0">Document parsers</class>
     <class name = "secw_exception" selftest = "0">Exceptions</class>
-    <class name = "secw_tag_description" selftest = "0">Description of a tag</class>
-    <class name = "secw_client_accessor" selftest = "0">Accessor to return documents from the agent</class>
+    
+    <class name = "secw_producer_accessor" selftest = "0">Accessor to return documents from the agent</class>
+    <class name = "secw_consumer_accessor" selftest = "0">Accessor to return documents from the agent</class>
     
     <!-- Note: Add new supported types here and modify secw_document.cc to handle then in the Document factory -->
     <class name = "secw_snmpv3" selftest = "0">Document parsers for snmpv3 document</class>

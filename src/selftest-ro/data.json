@@ -9,7 +9,8 @@
                                     "secw_doc_id": "id_readable",
                                     "secw_doc_name": "myFirstDoc",
                                     "secw_doc_type": "Snmpv3",
-                                    "secw_doc_tags": [ "test_read", "test_update" ],
+                                    "secw_doc_tags": [],
+                                    "secw_doc_usages": [ "discovery_monitoring" ],
                                     "secw_doc_public": {
                                             "secw_snmpv3_security_level": 2,
                                             "secw_snmpv3_security_name": "Test",
@@ -25,7 +26,8 @@
                                 "secw_doc_id": "id_notReadable",
                                 "secw_doc_name": "myFirstDoc",
                                 "secw_doc_type": "Snmpv3",
-                                "secw_doc_tags": [ "test_update" ],
+                                "secw_doc_tags": [ "test_tag" ],
+                                "secw_doc_usages": [],
                                 "secw_doc_public": {
                                         "secw_snmpv3_security_level": 2,
                                         "secw_snmpv3_security_name": "Test",

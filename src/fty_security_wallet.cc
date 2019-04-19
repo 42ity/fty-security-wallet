@@ -65,7 +65,7 @@ int main (int argc, char *argv [])
     ZstrGuard actor_name(strdup(SECURITY_WALLET_AGENT));
     ZstrGuard endpoint( strdup(DEFAULT_ENDPOINT));
     ZstrGuard storage_database_path( strdup(DEFAULT_STORAGE_DATABASE_PATH));
-    ZstrGuard storage_access_path( strdup(DEFAULT_STORAGE_ACCESS_PATH));
+    ZstrGuard storage_access_path( strdup(DEFAULT_STORAGE_CONFIGURATION_PATH));
 
     //char *log_config = NULL;
     if(config_file) {
@@ -80,9 +80,9 @@ int main (int argc, char *argv [])
             verbose = true;
         }
         endpoint = strdup (zconfig_get (config, "malamute/endpoint", DEFAULT_ENDPOINT));
-        actor_name = strdup (zconfig_get (config, "malamute/address", DEFAULT_ENDPOINT));
+        actor_name = strdup (zconfig_get (config, "malamute/address", SECURITY_WALLET_AGENT));
         storage_database_path = strdup (zconfig_get (config, "storage/database", DEFAULT_STORAGE_DATABASE_PATH));
-        storage_access_path = strdup (zconfig_get (config, "storage/access", DEFAULT_STORAGE_DATABASE_PATH));
+        storage_access_path = strdup (zconfig_get (config, "storage/configuration", DEFAULT_STORAGE_CONFIGURATION_PATH));
     }
 
     if (verbose)
@@ -96,7 +96,7 @@ int main (int argc, char *argv [])
     //start broker agent
     zactor_t *server = zactor_new (fty_security_wallet_server, (void *)endpoint);
     //set configuration parameters
-    zstr_sendx (server, "STORAGE_ACCESS_PATH", storage_access_path.get(), NULL);
+    zstr_sendx (server, "STORAGE_CONFIGURATION_PATH", storage_access_path.get(), NULL);
     zstr_sendx (server, "STORAGE_DATABASE_PATH", storage_database_path.get(), NULL);
     zstr_sendx (server, "CONNECT", endpoint.get(), actor_name.get(), NULL);
     

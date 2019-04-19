@@ -24,17 +24,14 @@
 
 #include "secw_document.h"
 
-using UsageId	= std::string;
-using Type 		= std::string;
-
 namespace secw
 {
   class Usage
   {
   public:
     Usage(){}
-    UsageId getUsageId() const;
-    std::set<Type> getTypes() const;
+    const UsageId & getUsageId() const;
+    const std::set<Type> & getTypes() const;
 
     friend void operator>>= (const cxxtools::SerializationInfo& si, Usage & usage);
 
@@ -45,6 +42,26 @@ namespace secw
 
   void operator>>= (const cxxtools::SerializationInfo& si, Usage & usage);
 
+  class Client
+  {
+  public:
+    Client(){}
+    bool isMatchingClient( const ClientId & clientId) const;
+    const std::set<UsageId> & getUsageIds() const;
+
+    friend void operator>>= (const cxxtools::SerializationInfo& si, Client & client);
+
+  private:
+    std::string m_clientRegex;
+    std::set<UsageId> m_usages;
+  };
+
+  void operator>>= (const cxxtools::SerializationInfo& si, Client & client);
+
+
+  using Consumer = Client;
+  using Producer = Client;
+
   class SecwConfiguration
   {
   public:
@@ -53,14 +70,17 @@ namespace secw
     Usage getUsage( const UsageId & usageId ) const;
 
     std::set<UsageId> getAllUsageId() const;
-    std::set<UsageId> getUsageIdForConsummer( const ClientId & clientId ) const;
-    std::set<UsageId> getUsageIdForProducer( const ClientId & clientId ) const;
+    std::set<UsageId> getUsageIdsForConsummer( const ClientId & clientId ) const;
+    std::set<UsageId> getUsageIdsForProducer( const ClientId & clientId ) const;
 
-    std::set<Type> getSupportedTypes() const;
+    std::set<Type> & getSupportedTypes() const;
 
   private:
     std::map<UsageId, Usage> m_usages;
     std::set<Type> m_supportedTypes;
+
+    std::vector<Consumer> m_consumers;
+    std::vector<Producer> m_producers;
   };
 
 
@@ -72,7 +92,7 @@ namespace secw
 
   };
 
-  class Consumer
+  class Client
   {
   public:
 

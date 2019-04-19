@@ -27,6 +27,9 @@
 */
 
 #include "fty_security_wallet_classes.h"
+
+#include <regex>
+
 namespace secw
 {
 /*-----------------------------------------------------------------------------*/
@@ -46,6 +49,9 @@ namespace secw
         m_supportedTypes.insert(type);
       }
     }
+
+    si.getMember("consumers") >>= m_consumers;
+    si.getMember("producers") >>= m_producers;
 
     //TODO
     //check that the types are all in the system
@@ -73,14 +79,40 @@ namespace secw
     return m_usages.at(usageId);
   }
 
-  std::set<UsageId> SecwConfiguration::getUsageIdForConsummer( const ClientId & /*clientId*/ ) const
+  std::set<UsageId> SecwConfiguration::getUsageIdsForConsummer( const ClientId & clientId ) const
   {
-    return getAllUsageId();
+    std::set<UsageId> usages;
+
+    for(const Consumer & consumer : m_consumers)
+    {
+      //if it match we add all the usage id into the set
+      if(consumer.isMatchingClient(clientId))
+      {
+        const std::set<UsageId> & consumerUsages(consumer.getUsageIds());
+
+        std::copy(consumerUsages.begin(), consumerUsages.end(),
+          std::inserter(usages, usages.end()));
+      }
+    }
+    return usages;
   }
 
-  std::set<UsageId> SecwConfiguration::getUsageIdForProducer( const ClientId & /*clientId*/ ) const
+  std::set<UsageId> SecwConfiguration::getUsageIdsForProducer( const ClientId & clientId ) const
   {
-    return getAllUsageId();
+    std::set<UsageId> usages;
+
+    for(const Producer & producer : m_producers)
+    {
+      //if it match we add all the usage id into the set
+      if(producer.isMatchingClient(clientId))
+      {
+        const std::set<UsageId> & producerUsages(producer.getUsageIds());
+
+        std::copy(producerUsages.begin(), producerUsages.end(),
+          std::inserter(usages, usages.end()));
+      }
+    }
+    return usages;
   }
 
 /*-----------------------------------------------------------------------------*/
@@ -88,12 +120,12 @@ namespace secw
 /*-----------------------------------------------------------------------------*/
 //public
 
-  UsageId Usage::getUsageId() const
+  const UsageId & Usage::getUsageId() const
   {
     return m_usageId;
   }
 
-  std::set<Type> Usage::getTypes() const
+  const std::set<Type> & Usage::getTypes() const
   {
     return m_types;
   }
@@ -109,6 +141,26 @@ namespace secw
         std::inserter(usage.m_types, usage.m_types.end()));
 
     if(usage.m_usageId.empty()) throw std::runtime_error("usage_id cannot be empty");
+  }
+
+/*-----------------------------------------------------------------------------*/
+/*   Client                                                                  */
+/*-----------------------------------------------------------------------------*/
+//public
+  bool Client::isMatchingClient( const ClientId & clientId) const
+  {
+    return std::regex_match(clientId, std::regex("^"+m_clientRegex+"$"));
+  }
+
+  const std::set<UsageId> & Client::getUsageIds() const
+  {
+    return m_usages;
+  }
+
+  void operator>>= (const cxxtools::SerializationInfo& si, Client & client)
+  {
+    si.getMember("client_regex") >>= client.m_clientRegex;
+    si.getMember("usages") >>= client.m_usages;
   }
 
 } // namespace secw

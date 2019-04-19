@@ -1,5 +1,5 @@
 /*  =========================================================================
-    secw_security_wallet - Security wallet to manage the storage and access
+    secw_security_wallet - Security wallet to manage the storage and configuration
 
     Copyright (C) 2019 Eaton
 
@@ -21,7 +21,7 @@
 
 /*
 @header
-    secw_security_wallet - Security wallet to manage the storage and access
+    secw_security_wallet - Security wallet to manage the storage and configuration
 @discuss
 @end
 */
@@ -42,17 +42,16 @@ namespace secw
 /*   SecurityWallet                                                            */
 /*-----------------------------------------------------------------------------*/
 //Public
-    SecurityWallet::SecurityWallet(const std::string & accessPath, const std::string & databasePath):
-        m_pathDatabase(databasePath),
-        m_pathAccess(accessPath)
+    SecurityWallet::SecurityWallet(const std::string & configurationPath, const std::string & databasePath):
+        m_pathDatabase(databasePath)
     { 
-        //Load Access and then Database
+        //Load Config and then Database
         
-        //Load Access
+        //Load Config
         try
         {
             struct stat buffer;   
-            bool fileExist =  (stat (m_pathAccess.c_str(), &buffer) == 0);
+            bool fileExist =  (stat (configurationPath.c_str(), &buffer) == 0);
         
             if(!fileExist)
             {
@@ -61,26 +60,18 @@ namespace secw
             
             std::ifstream input;
 
-            input.open(m_pathAccess);
+            input.open(configurationPath);
 
             cxxtools::SerializationInfo rootSi;
             cxxtools::JsonDeserializer deserializer(input);
             deserializer.deserialize(rootSi);
 
-            std::vector<TagAccess> tagList;
+            m_configuration = std::make_shared<SecwConfiguration>(rootSi);
 
-            rootSi.getMember("tags") >>= tagList;
-            
-            for(const TagAccess & tagAccess : tagList)
-            {
-                m_mapTagAccess[tagAccess.getId()] = tagAccess;
-            }
-            
-            log_info("%i tags found", m_mapTagAccess.size());
         }
         catch(const std::exception& e)
         {
-            log_error("Error while loading Access file %s\n %s",m_pathAccess.c_str(), e.what());
+            log_error("Error while loading configuration file %s\n %s",configurationPath.c_str(), e.what());
             exit(EXIT_FAILURE);
         }
         
@@ -163,6 +154,11 @@ namespace secw
         return list;
     }
 
+    const SecwConfiguration & SecurityWallet::getConfiguration() const
+    {
+        return *(m_configuration);
+    }
+
     Portfolio & SecurityWallet::getPortfolio(const std::string & name)
     {
         for( Portfolio & portfolio : m_portfolios)
@@ -176,43 +172,4 @@ namespace secw
         throw SecwUnknownPortfolioException(" Portfolio "+name+" does not exist");
     }
     
-    std::vector<Tag> SecurityWallet::getAvailableTags() const
-    {
-        std::vector<Tag> tags;
-        
-        for(const auto & item : m_mapTagAccess)
-        {
-            tags.push_back(item.first);
-        }
-        
-        return tags;
-    }
-
-    std::vector<Tag> SecurityWallet::getAccessibleTags(const std::string & client, AccessMethods method) const
-    {
-        std::vector<Tag> setOfTags;
-
-        for(const auto & item : m_mapTagAccess)
-        {
-            log_info("Check the tag %s", item.first.c_str());
-            if(item.second.checkAccess(client,method))
-            {
-                setOfTags.push_back(item.first);
-                log_info("  >> Add the tag %s", item.first.c_str());
-            }
-        }
-
-        return setOfTags;
-    }
-    
-    bool SecurityWallet::checkTagAccess(const Tag & tag, const std::string & client, AccessMethods method) const
-    {
-        if(m_mapTagAccess.count(tag) < 1)
-        {
-            throw SecwUnknownTagException("Tag "+tag+" is unknown");
-        }
-        
-        return m_mapTagAccess.at(tag).checkAccess(client, method);
-    }
-
 } //namepace secw

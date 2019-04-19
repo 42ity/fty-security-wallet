@@ -8,5 +8,17 @@
 			"usage_id": "mass_device_management",
 			"supported_types": [ "Snmpv3" ]							
 		}
+	],
+    "consumers": [
+		{
+			"client_regex": ".*",
+			"usages": [ "discovery_monitoring" ]							
+		}
+	],
+	"producers": [
+		{
+			"client_regex": ".*",
+			"usages": [ "discovery_monitoring", "mass_device_management" ]							
+		}
 	]
 }

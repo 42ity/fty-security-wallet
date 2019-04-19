@@ -1,5 +1,5 @@
 /*  =========================================================================
-    secw_security_wallet - Security wallet to manage the storage and configuration
+    secw_helpers - List of helper functions use a bit everywhere
 
     Copyright (C) 2019 Eaton
 
@@ -19,36 +19,17 @@
     =========================================================================
 */
 
-#ifndef SECW_SECURITY_WALLET_H_INCLUDED
-#define SECW_SECURITY_WALLET_H_INCLUDED
-
-#include "secw_document.h"
-#include "secw_portfolio.h"
-#include "secw_configuration.h"
-
-#include <memory>
+#ifndef SECW_HELPERS_H_INCLUDED
+#define SECW_HELPERS_H_INCLUDED
 
 namespace secw
 {
-    class SecurityWallet
-    {
-    public:
-        explicit SecurityWallet(const std::string & configurationPath, const std::string & databasePath);
-        void save() const;
-        Portfolio & getPortfolio(const std::string & name);
-        std::vector<std::string> getPortfolioNames() const;
+  cxxtools::SerializationInfo deserialize(const std::string & json);
+  
+  std::string serialize(const cxxtools::SerializationInfo & si);
 
-        const SecwConfiguration & getConfiguration() const;
+  bool hasCommonUsageIds( const std::set<std::string> &  usages1, const std::set<std::string> &  usages2);
 
-        static constexpr const uint8_t SECW_VERSION = 1;
-
-    private:
-        std::string m_pathDatabase;
-        
-        std::shared_ptr<SecwConfiguration> m_configuration;
-        std::vector<Portfolio> m_portfolios;
-    };
-
-} // namepsace secw 
+} //namespace secw
 
 #endif

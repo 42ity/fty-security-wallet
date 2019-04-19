@@ -30,6 +30,7 @@
 
 #include "secw_exception.h"
 #include "secw_security_wallet.h"
+#include "secw_helpers.h"
 
 #include <sstream>
 #include <cxxtools/jsonserializer.h>
@@ -44,13 +45,13 @@ SecurityWalletServer::SecurityWalletServer(zsock_t *pipe)
     //initiate the commands handlers
     m_supportedCommands[GET_PORTFOLIO_LIST] = handleGetListPortfolio;
 
+    m_supportedCommands[GET_CONSUMER_USAGES] = handleGetConsumerUsages;
+    m_supportedCommands[GET_PRODUCER_USAGES] = handleGetProducerUsages;
+
     m_supportedCommands[GET_LIST_WITH_SECRET] = handleGetListDocumentsWithSecret;
-    m_supportedCommands[GET_LIST_WITHOUT_SECRET] = handleGetListDocumentsWithoutSecret;
+    m_supportedCommands[GET_LIST_WITHOUT_SECRET] = handleNotImplementedCmd;
 
-    m_supportedCommands[GET_EDITABLE_TAGS] = handleGetListEditableTags;
-    m_supportedCommands[GET_READABLE_TAGS] = handleGetListReadableTags;
-
-    m_supportedCommands[GET_WITHOUT_SECRET] = handleGetDocumentWithoutSecret;
+    m_supportedCommands[GET_WITHOUT_SECRET] = handleNotImplementedCmd;
     m_supportedCommands[GET_WITH_SECRET] = handleGetDocumentWithSecret;
     
     m_supportedCommands[CREATE] = handleNotImplementedCmd;
@@ -80,7 +81,33 @@ std::string SecurityWalletServer::handleGetListPortfolio(const Sender & /*sender
     cxxtools::SerializationInfo si;
     si <<= m_activeWallet->getPortfolioNames();
     
-    return toJsonFromSerializationInfo(si);
+    return serialize(si);
+}
+
+std::string SecurityWalletServer::handleGetConsumerUsages(const Sender & sender, const std::vector<std::string> & /*params*/)
+{
+    /*
+     * No parameters for this command.
+     * 
+     */
+    
+    cxxtools::SerializationInfo si;
+    si <<= m_activeWallet->getConfiguration().getUsageIdsForConsummer(sender);
+    
+    return serialize(si);
+}
+
+std::string SecurityWalletServer::handleGetProducerUsages(const Sender & sender, const std::vector<std::string> & /*params*/)
+{
+    /*
+     * No parameters for this command.
+     * 
+     */
+    
+    cxxtools::SerializationInfo si;
+    si <<= m_activeWallet->getConfiguration().getUsageIdsForProducer(sender);
+    
+    return serialize(si);
 }
 
 
@@ -92,6 +119,14 @@ std::string SecurityWalletServer::handleGetDocumentWithSecret(const Sender & sen
      * 0. name of the portfolio
      * 1. document id
      */
+
+    //check global access
+    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration().getUsageIdsForConsummer(sender);
+
+    if( allowedUsageIds.size() == 0)
+    {
+        throw SecwIllegalAccess("You do not have access to this command");
+    }
     
     if(params.size() != 2)
     {
@@ -103,19 +138,14 @@ std::string SecurityWalletServer::handleGetDocumentWithSecret(const Sender & sen
     
     DocumentPtr doc  = m_activeWallet->getPortfolio(portfolioName).getDocument(id);
     
-    //check if we have the access
-    if( ! Document::hasCommonTag(doc->getTags(), m_activeWallet->getAccessibleTags(sender, READ_ACCESS)))
-    {
-        throw SecwIllegalAccess("Access to private date of "+id+" is not available for "+sender);
-    }
-    
     cxxtools::SerializationInfo si;
     
     doc->fillSerializationInfoWithSecret(si);
     
-    return toJsonFromSerializationInfo(si);
+    return serialize(si);
 }
-std::string SecurityWalletServer::handleGetDocumentWithoutSecret(const Sender & /*sender*/, const std::vector<std::string> & params)
+
+/*std::string SecurityWalletServer::handleGetDocumentWithoutSecret(const Sender & sender, const std::vector<std::string> & params)
 {
     /*
      * Parameters for this command:
@@ -123,7 +153,7 @@ std::string SecurityWalletServer::handleGetDocumentWithoutSecret(const Sender & 
      * 0. name of the portfolio
      * 1. document id
      */
-    if(params.size() != 2)
+    /*if(params.size() != 2)
     {
         throw SecwBadCommandArgumentException("Command need at 2 arguments");
     }
@@ -137,35 +167,8 @@ std::string SecurityWalletServer::handleGetDocumentWithoutSecret(const Sender & 
     
     doc->fillSerializationInfoWithoutSecret(si);
     
-    return toJsonFromSerializationInfo(si);
-}
-        
-std::string SecurityWalletServer::handleGetListReadableTags(const Sender & sender, const std::vector<std::string> & /*params*/)
-{
-    /*
-     * No parameters for this command.
-     * 
-     */
-    
-    cxxtools::SerializationInfo si;
-    si <<= m_activeWallet->getAccessibleTags(sender, READ_ACCESS);
-    
-    return toJsonFromSerializationInfo(si);
-}
-
-std::string SecurityWalletServer::handleGetListEditableTags(const Sender & sender, const std::vector<std::string> & /*params*/)
-{
-    /*
-     * No parameters for this command.
-     * 
-     */
-
-    cxxtools::SerializationInfo si;
-    si <<= m_activeWallet->getAccessibleTags(sender, UPDATE_ACCESS);
-    
-    return toJsonFromSerializationInfo(si);
-}
-
+    return serialize(si);
+}*/
 
 std::string SecurityWalletServer::handleGetListDocumentsWithSecret(const Sender & sender, const std::vector<std::string> & params)
 {
@@ -173,9 +176,17 @@ std::string SecurityWalletServer::handleGetListDocumentsWithSecret(const Sender 
      * Parameters for this command:
      * 
      * 0. name of the portfolio
-     * 1. tag of documents (optional)
-     * 2. type of documents (optional)
+     * 1. Usage of documents (optional)
      */
+
+    //check global access
+    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration().getUsageIdsForConsummer(sender);
+
+    if( allowedUsageIds.size() == 0)
+    {
+        throw SecwIllegalAccess("You do not have access to this command");
+    }
+
     
     if(params.size() < 1)
     {
@@ -184,150 +195,50 @@ std::string SecurityWalletServer::handleGetListDocumentsWithSecret(const Sender 
 
     const std::string & portfolioName = params[0];
 
-    std::string debugInfo = "DO GetListDocumentsWithSecret on portfolio <"+portfolioName+">";
+    std::string debugInfo = "Do GetListDocumentsWithSecret on portfolio <"+portfolioName+">";
     
-    Tag tag = ""; //by default all the tag
-    DocumentType type = ""; //by default all the type
+    UsageId usage = ""; //by default all the available usage for this consumer
 
     if(params.size() >= 2)
     {
-        tag = params[1];
-    }
- 
-    if(params.size() >= 3)
-    {
-        type = params[2];
+        usage = params[1];
     }
 
-    if(!tag.empty())
+    if(!usage.empty())
     {
-        debugInfo += " with the tag '"+tag+"'";
+        debugInfo+= " with the specific usage '"+usage+"'";
     }
     else
     {
-        debugInfo+= " without specific tag";
-    }
-
-    if(!type.empty())
-    {
-        debugInfo+= " with the type '"+type+"'";
-    }
-    else
-    {
-        debugInfo += " without specific type";
+        debugInfo += " without specific usage";
     }
 
     log_debug("%s",debugInfo.c_str());
 
     //prepare request
-    std::vector<DocumentType> types;
-    std::vector<Tag> tags;
+    std::string result;
 
-    //check if the type is supported
-    if(!type.empty())
+    //check if the usage is accessible
+    if(!usage.empty())
     {
-        if(!Document::isSupportedType(type)) throw SecwUnknownPortfolioException("Document type "+type+" is not supported");
-        types = {type};
-    }
-    else
-    {
-        types = Document::getSupportedTypes();
-    }
-
-    //Check if we are allow to request
-    if(tag.empty())
-    {
-        tags = m_activeWallet->getAccessibleTags(sender, READ_ACCESS);
-    }
-    else
-    {
-        if(!m_activeWallet->checkTagAccess(tag, sender, READ_ACCESS))
+        if(allowedUsageIds.count(usage) == 0)
         {
-            throw SecwIllegalAccess("Forbidden to retrieve private data from the tag "+tag);
-        }
-
-        tags = {tag};
-
-    }
-    
-    return serializeListDocumentsPrivate(portfolioName, types, tags);
-}
-
-std::string SecurityWalletServer::handleGetListDocumentsWithoutSecret(const Sender & /*sender*/, const std::vector<std::string> & params)
-{
-    /*
-     * Parameters for this command:
-     * 
-     * 0. name of the portfolio
-     * 1. tag of documents (optional) => default all
-     * 2. type of documents (optional) => default all 
-     */
-    
-    if(params.size() < 1)
-    {
-        throw SecwBadCommandArgumentException("Command need at least argument");
-    }
-
-    const std::string & portfolioName = params[0];
-    Tag tag = ""; //by default all the tag
-    DocumentType type = ""; //by default all the type
-
-    std::string debugInfo = "DO GetListDummyDocumentsWithoutSecret on portfolio <"+portfolioName+">";
-    
-    if(params.size() >= 2)
-    {
-        tag = params[1];
-        debugInfo += " with the tag '"+tag+"'";
+            throw SecwIllegalAccess("You do not have access to this command");
+        } 
+        
+        result = serializeListDocumentsPrivate(portfolioName, {usage});
     }
     else
     {
-        debugInfo+= " without specific tag";
+        result = serializeListDocumentsPrivate(portfolioName, allowedUsageIds);
     }
     
-    
-    if(params.size() >= 3)
-    {
-        //type has been specified
-        type = params[2];
-        debugInfo+= " with the type '"+type+"'";
-    }
-    else
-    {
-        debugInfo += " without specific type";
-    }
-
-    log_debug("%s",debugInfo.c_str());
-
-    //prepare request
-    std::vector<DocumentType> types;
-    std::vector<Tag> tags;
-
-    if(type.empty())
-    {
-        types = Document::getSupportedTypes();
-    }
-    else
-    {
-        if(!Document::isSupportedType(type)) throw SecwUnknownPortfolioException("Document type "+type+" is not supported");
-        types = {type};
-    }
-    
-    if(!tag.empty())
-    {
-        if(! Document::hasCommonTag({tag},m_activeWallet->getAvailableTags()))
-        {
-            throw SecwUnknownTagException("Tag "+tag+" is unknown");
-        }
-
-        tags = {tag};
-    }
-    
-    return serializeListDocumentsPublic(portfolioName, types, tags);
+    return result;
 }
 
 /* Agents methods*/
 
-static std::string g_storageAccessPath = DEFAULT_STORAGE_ACCESS_PATH;
+static std::string g_storageconfigurationPath = DEFAULT_STORAGE_CONFIGURATION_PATH;
 static std::string g_storageDatabasePath = DEFAULT_STORAGE_DATABASE_PATH;
 
 bool SecurityWalletServer::handlePipe(zmsg_t *message)
@@ -342,7 +253,7 @@ bool SecurityWalletServer::handlePipe(zmsg_t *message)
     }
     else if (streq (actor_command, "CONNECT"))
     {
-        m_activeWallet = std::make_shared<SecurityWallet>(g_storageAccessPath, g_storageDatabasePath);
+        m_activeWallet = std::make_shared<SecurityWallet>(g_storageconfigurationPath, g_storageDatabasePath);
         
         log_debug("Wallet found in %s",g_storageDatabasePath.c_str());
 
@@ -352,10 +263,10 @@ bool SecurityWalletServer::handlePipe(zmsg_t *message)
             connect(endpoint,name);
         }
     }
-    else if (streq (actor_command, "STORAGE_ACCESS_PATH"))
+    else if (streq (actor_command, "STORAGE_CONFIGURATION_PATH"))
     {
         ZstrGuard storage_access_path(zmsg_popstr(message));
-        g_storageAccessPath = std::string(storage_access_path.get());
+        g_storageconfigurationPath = std::string(storage_access_path.get());
     }
     else if (streq (actor_command, "STORAGE_DATABASE_PATH"))
     {
@@ -536,17 +447,8 @@ zmsg_t * SecurityWalletServer::generateErrorMsg( const std::string & correlation
     return error;
 }
 
-std::string SecurityWalletServer::toJsonFromSerializationInfo(const cxxtools::SerializationInfo& si)
-{
-    std::stringstream output;
-    cxxtools::JsonSerializer serializer(output);
-    serializer.beautify(true);
-    serializer.serialize(si);
-    
-    return output.str();
-}
 
-std::string SecurityWalletServer::serializeListDocumentsPublic(const std::string & portfolioName, const std::vector<DocumentType> & types, const std::vector<Tag> & tags)
+/*std::string SecurityWalletServer::serializeListDocumentsPublic(const std::string & portfolioName, const std::vector<DocumentType> & types, const std::vector<Tag> & tags)
 {
     Portfolio & portfolio = m_activeWallet->getPortfolio(portfolioName);
 
@@ -561,25 +463,28 @@ std::string SecurityWalletServer::serializeListDocumentsPublic(const std::string
 
     si.setCategory(cxxtools::SerializationInfo::Array);
 
-    return toJsonFromSerializationInfo(si);
+    return serialize(si);
 
-}
+}*/
 
-std::string SecurityWalletServer::serializeListDocumentsPrivate(const std::string & portfolioName, const std::vector<DocumentType> & types, const std::vector<Tag> & tags)
+std::string SecurityWalletServer::serializeListDocumentsPrivate(const std::string & portfolioName, const std::set<UsageId> & usages)
 {
     Portfolio & portfolio = m_activeWallet->getPortfolio(portfolioName);
 
     //get the documents
     cxxtools::SerializationInfo si;
     
-    for (const auto pDoc : portfolio.getListDocuments(types, tags) )
+    for (const auto pDoc : portfolio.getListDocuments() )
     {
-        pDoc->fillSerializationInfoWithSecret(si.addMember(""));  
+        if(hasCommonUsageIds(pDoc->getUsageIds(), usages))
+        {
+            pDoc->fillSerializationInfoWithSecret(si.addMember("")); 
+        }
     }
 
     si.setCategory(cxxtools::SerializationInfo::Array);
 
-    return toJsonFromSerializationInfo(si);
+    return serialize(si);
 }
 
 
@@ -598,6 +503,14 @@ std::string SecurityWalletServer::serializeListDocumentsPrivate(const std::strin
 // This way the same "filename" variable can be reused for many subtests.
 #define SELFTEST_DIR_RO "src/selftest-ro"
 #define SELFTEST_DIR_RW "src/selftest-rw"
+
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
 
 #include <fstream>
 
@@ -621,10 +534,10 @@ fty_security_wallet_server_test (bool verbose)
         source.close();
     }
 
-    //Copy the access file
+    //Copy the configuration file
     {
-        std::ifstream source(SELFTEST_DIR_RO"/access.json", std::ios::binary);
-        std::ofstream dest(SELFTEST_DIR_RW"/access.json", std::ios::binary | std::ofstream::trunc );
+        std::ifstream source(SELFTEST_DIR_RO"/configuration.json", std::ios::binary);
+        std::ofstream dest(SELFTEST_DIR_RW"/configuration.json", std::ios::binary | std::ofstream::trunc );
         dest << source.rdbuf();
 
         dest.close();
@@ -638,7 +551,7 @@ fty_security_wallet_server_test (bool verbose)
     
     zactor_t *server = zactor_new (fty_security_wallet_server, (void *)endpoint);
     //set configuration parameters
-    zstr_sendx (server, "STORAGE_ACCESS_PATH", SELFTEST_DIR_RO"/access.json", NULL);
+    zstr_sendx (server, "STORAGE_CONFIGURATION_PATH", SELFTEST_DIR_RO"/configuration.json", NULL);
     zstr_sendx (server, "STORAGE_DATABASE_PATH", SELFTEST_DIR_RW"/data.json", NULL);
     zstr_sendx (server, "CONNECT", endpoint, SECURITY_WALLET_AGENT, NULL);
 
@@ -649,7 +562,7 @@ fty_security_wallet_server_test (bool verbose)
     printf("\n-----------------------------------------------------------------------\n");
     try
     {
-        log_debug ("*=> fty_security_wallet_server > Test #1 Invalid REQUEST command");
+        log_debug ("*=> Test #1 Invalid REQUEST command");
             
         zmsg_t *request = zmsg_new();
         ZuuidGuard  zuuid(zuuid_new ());
@@ -674,22 +587,22 @@ fty_security_wallet_server_test (bool verbose)
             throw std::runtime_error("Bad message type received: "+std::string(str));
         }
 
-        testsServerResults.emplace_back("fty_security_wallet_server > Test #1 Invalid REQUEST command",true);
+        testsServerResults.emplace_back("Test #1 Invalid REQUEST command",true);
 
     }
     catch(const std::exception& e)
     {
-        log_debug(" *<= secw_client_accessor_test > Test #1 > Failed");
+        log_debug(" *<= Test #1 > Failed");
         log_debug("Error: %s\n\n",e.what());
 
-        testsServerResults.emplace_back("fty_security_wallet_server > Test #1 Invalid REQUEST command",false);
+        testsServerResults.emplace_back("Test #1 Invalid REQUEST command",false);
     }
     
     //end of the server tests
     mlm_client_destroy(&client);
 
     //Tests from the lib
-    std::vector<std::pair<std::string,bool>> testLibResults = secw_client_accessor_test();
+    std::vector<std::pair<std::string,bool>> testLibResults = secw_consumer_accessor_test();
 
     printf("\n-----------------------------------------------------------------------\n");
     
@@ -702,12 +615,12 @@ fty_security_wallet_server_test (bool verbose)
     {
         if(result.second)
         {
-            printf("\tOK \t%s\n",result.first.c_str());
+            printf(ANSI_COLOR_GREEN"\tOK " ANSI_COLOR_RESET "\t%s\n",result.first.c_str());
             testsPassed++;
         }
         else
         {
-            printf("\tNOK\t%s\n",result.first.c_str());
+            printf(ANSI_COLOR_RED"\tNOK" ANSI_COLOR_RESET "\t%s\n",result.first.c_str());
             testsFailed++;
         }
     }
@@ -717,12 +630,12 @@ fty_security_wallet_server_test (bool verbose)
     {
         if(result.second)
         {
-            printf("\tOK \t%s\n",result.first.c_str());
+            printf(ANSI_COLOR_GREEN"\tOK " ANSI_COLOR_RESET "\t%s\n",result.first.c_str());
             testsPassed++;
         }
         else
         {
-            printf("\tNOK\t%s\n",result.first.c_str());
+            printf(ANSI_COLOR_RED"\tNOK" ANSI_COLOR_RESET "\t%s\n",result.first.c_str());
             testsFailed++;
         }
     }
@@ -731,11 +644,11 @@ fty_security_wallet_server_test (bool verbose)
     
     if(testsFailed == 0)
     {
-        printf("\n %i tests passed, everything is ok\n\n",testsPassed);
+        printf(ANSI_COLOR_GREEN"\n %i tests passed, everything is ok\n" ANSI_COLOR_RESET "\n",testsPassed);
     }
     else
     {
-        printf("\n!!!!!!!! At %i/%i tests did not pass !!!!!!!! \n\n",testsFailed,(testsPassed+testsFailed));
+        printf(ANSI_COLOR_RED"\n!!!!!!!! %i/%i tests did not pass !!!!!!!! \n" ANSI_COLOR_RESET "\n",testsFailed,(testsPassed+testsFailed));
         assert(false);
     }
 

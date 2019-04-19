@@ -57,34 +57,37 @@ namespace secw
         
         //Handler for all supported commands
         static std::string handleGetListDocumentsWithSecret(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleGetListDocumentsWithoutSecret(const Sender & sender, const std::vector<std::string> & params);
+        //static std::string handleGetListDocumentsWithoutSecret(const Sender & sender, const std::vector<std::string> & params);
         
         static std::string handleGetDocumentWithSecret(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleGetDocumentWithoutSecret(const Sender & sender, const std::vector<std::string> & params);
-        
-        static std::string handleGetListReadableTags(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleGetListEditableTags(const Sender & sender, const std::vector<std::string> & params);
+        //static std::string handleGetDocumentWithoutSecret(const Sender & sender, const std::vector<std::string> & params);
         
         static std::string handleGetListPortfolio(const Sender & sender, const std::vector<std::string> & params);
+
+        static std::string handleGetConsumerUsages(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleGetProducerUsages(const Sender & sender, const std::vector<std::string> & params);
         
         static std::string handleNotImplementedCmd(const Sender & sender, const std::vector<std::string> & params);
         
         //Helpers
         static zmsg_t *generateErrorMsg(const std::string & correlationId, const std::string & errPayload);
-        static std::string toJsonFromSerializationInfo(const cxxtools::SerializationInfo & si);
         
-        static std::string serializeListDocumentsPublic(const std::string & portfolioName, const std::vector<DocumentType> & types, const std::vector<Tag> & tags = {});
-        static std::string serializeListDocumentsPrivate(const std::string & portfolioName, const std::vector<DocumentType> & types, const std::vector<Tag> & tags);
+        //static std::string serializeListDocumentsPublic(const std::string & portfolioName, const std::vector<DocumentType> & types);
+        static std::string serializeListDocumentsPrivate(const std::string & portfolioName, const std::set<UsageId> & usages);
     
     public:
         //Command list
         static constexpr const char* GET_PORTFOLIO_LIST = "GET_PORTFOLIO_LIST";
+
+        static constexpr const char* GET_CONSUMER_USAGES = "GET_CONSUMER_USAGES";
+        static constexpr const char* GET_PRODUCER_USAGES = "GET_PRODUCER_USAGES";
+
         static constexpr const char* GET_LIST_WITH_SECRET = "GET_LIST_WITH_SECRET";
         static constexpr const char* GET_LIST_WITHOUT_SECRET = "GET_LIST_WITHOUT_SECRET";
-        static constexpr const char* GET_READABLE_TAGS = "GET_READABLE_TAGS";
-        static constexpr const char* GET_EDITABLE_TAGS = "GET_EDITABLE_TAGS";
+
         static constexpr const char* GET_WITHOUT_SECRET = "GET_WITHOUT_SECRET";
         static constexpr const char* GET_WITH_SECRET = "GET_WITH_SECRET";
+
         static constexpr const char* CREATE = "CREATE";
         static constexpr const char* DELETE = "DELETE";
         static constexpr const char* UPDATE = "UPDATE";        

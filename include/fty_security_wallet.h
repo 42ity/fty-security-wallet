@@ -28,7 +28,7 @@
 //  Add your own public definitions here, if you need them
 #define SECURITY_WALLET_AGENT "security-wallet"
 #define DEFAULT_STORAGE_DATABASE_PATH  "/var/lib/fty/fty-security-wallet/database.json"
-#define DEFAULT_STORAGE_ACCESS_PATH  "/etc/fty/fty-security-wallet/access.json"
+#define DEFAULT_STORAGE_CONFIGURATION_PATH  "/etc/fty/fty-security-wallet/configuration.json"
 #define DEFAULT_ENDPOINT      "ipc://@/malamute"
 #define DEFAULT_LOG_CONFIG    "/etc/fty/ftylog.cfg"
 
