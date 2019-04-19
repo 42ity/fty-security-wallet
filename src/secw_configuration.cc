@@ -151,9 +151,9 @@ namespace secw
 //public
   bool Client::isMatchingClient( const ClientId & clientId) const
   {
-    log_debug(" Client=%s", clientId.c_str());
+    log_debug(" Client=%s try to match with regex '^%s$'", clientId.c_str(), m_clientRegex.c_str());
 
-    return true;//std::regex_match(clientId, std::regex("^"+m_clientRegex+"$"));
+    return std::regex_match(clientId, std::regex("^"+m_clientRegex+"$"));
   }
 
   const std::set<UsageId> & Client::getUsageIds() const
