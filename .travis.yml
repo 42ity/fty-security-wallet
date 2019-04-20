@@ -99,13 +99,12 @@ matrix:
   include:
   #try to force gcc 4.9
   - os: linux
-    dist: trusty
-    addons:
-      apt:
-        sources:
-          - ubuntu-toolchain-r-test
-        packages:
-          - g++-4.9
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
       env:
          - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
 
@@ -158,6 +157,7 @@ matrix:
   - env: BUILD_TYPE=clang-format-check CLANG_FORMAT=clang-format-5.0
 
 before_install:
+- eval "${MATRIX_EVAL}"
 - if [ "$TRAVIS_OS_NAME" == "osx" -a "$BUILD_TYPE" == "android" ] ; then brew install binutils ; fi
 - if [ "$TRAVIS_OS_NAME" == "osx" -a "$BUILD_TYPE" == "valgrind" ] ; then brew install valgrind ; fi
 
