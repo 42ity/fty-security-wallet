@@ -81,7 +81,6 @@ namespace secw
 
   std::set<UsageId> SecwConfiguration::getUsageIdsForConsummer( const ClientId & clientId ) const
   {
-    log_debug("Request usages of %s",clientId.c_str());
     std::set<UsageId> usages;
 
     for(const Consumer & consumer : m_consumers)
@@ -89,7 +88,6 @@ namespace secw
       //if it match we add all the usage id into the set
       if(consumer.isMatchingClient(clientId))
       {
-        log_debug(" One match!");
         const std::set<UsageId> & consumerUsages(consumer.getUsageIds());
 
         std::copy(consumerUsages.begin(), consumerUsages.end(),
@@ -153,18 +151,7 @@ namespace secw
   {
     log_debug(" Client='%s' try to match with regex '%s'", clientId.c_str(), m_clientRegex.c_str());
 
-    bool match = std::regex_match(clientId, std::regex(m_clientRegex));
-
-    if(match)
-    {
-      log_debug("  => matching");
-    }
-    else
-    {
-      log_debug("  => not matching");
-    }
-    
-    return match;
+    return std::regex_match(clientId, std::regex("^"+m_clientRegex+"$"));
   }
 
   const std::set<UsageId> & Client::getUsageIds() const
