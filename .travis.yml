@@ -30,6 +30,7 @@ env:
     - CI_REQUIRE_GOOD_GITIGNORE=true
     - CI_REQUIRE_GOOD_CLANG_FORMAT=true
     - CI_TEST_DISTCHECK=true
+    - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
     # tokens to deploy releases on OBS and create/delete temporary branch on Github.
     # 1) Create a token on https://github.com/settings/tokens/new with "public_repo"
     #    capability and encrypt it with travis encrypt --org -r <org>/<repo> GH_TOKEN="<token>"
@@ -94,20 +95,11 @@ addons:
     packages: &pkg_deps_common
     - *pkg_deps_devtools
     - *pkg_deps_prereqs
+    sources: ubuntu-toolchain-r-test
+    packages: g++-4.9
 
 matrix:
   include:
-  #try to force gcc 4.9
-  - os: linux
-    addons:
-      apt:
-        sources:
-          - ubuntu-toolchain-r-test
-        packages:
-          - g++-4.9
-    env:
-        - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
-
   - env: BUILD_TYPE=default-with-docs
     os: linux
     addons:
