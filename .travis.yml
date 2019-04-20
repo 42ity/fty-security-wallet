@@ -97,6 +97,18 @@ addons:
 
 matrix:
   include:
+  #try to force gcc 4.9
+  - os: linux
+    dist: trusty
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - g++-4.9
+      env:
+         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+
   - env: BUILD_TYPE=default-with-docs
     os: linux
     addons:
@@ -122,18 +134,7 @@ matrix:
         sources: *pkg_src_zeromq_ubuntu16
         packages:
         - *pkg_deps_common
-        
-#try to force gcc 4.9
-  - os: linux
-    dist: xenial
-    addons:
-      apt:
-        sources:
-          - ubuntu-toolchain-r-test
-        packages:
-          - g++-4.9
-      env:
-         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+
 ### Note: we don't use CMake
 #  - env: BUILD_TYPE=cmake DO_CLANG_FORMAT_CHECK=1 CLANG_FORMAT=clang-format-5.0
 # For non-cmake users, there is an autotools solution with a bit more overhead
