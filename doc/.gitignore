@@ -21,6 +21,10 @@ secw_consumer_accessor.txt
 secw_consumer_accessor.doc
 secw_snmpv3.txt
 secw_snmpv3.doc
+secw_snmpv1.txt
+secw_snmpv1.doc
+secw_user_and_password.txt
+secw_user_and_password.doc
 fty_security_wallet_server.txt
 fty_security_wallet_server.doc
 fty-security-wallet.txt

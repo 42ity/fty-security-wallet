@@ -98,7 +98,7 @@ namespace secw
             {
                 uint8_t tmp = MAX_SECURITY_LEVEL;
                 si.getMember(DOC_SNMPV3_SECURITY_LEVEL) >>= tmp;
-                if(tmp >= MAX_SECURITY_LEVEL) throw SecwInvalidDocumentFormatException("TRANSLATE_ME(Security level invalid value)");
+                if(tmp >= MAX_SECURITY_LEVEL) throw SecwInvalidDocumentFormatException("Security level invalid value)");
                 m_securityLevel = static_cast<Snmpv3SecurityLevel>(tmp);
             }
 

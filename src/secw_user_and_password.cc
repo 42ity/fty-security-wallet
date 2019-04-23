@@ -1,0 +1,92 @@
+/*  =========================================================================
+    secw_user_and_password - Document parsers for user and password document
+
+    Copyright (C) 2019 Eaton
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+    =========================================================================
+*/
+
+/*
+@header
+    secw_user_and_password - Document parsers for user and password document
+@discuss
+@end
+*/
+
+#include "fty_security_wallet_classes.h"
+namespace secw
+{
+/*-----------------------------------------------------------------------------*/
+/*   UserAndPassword Document                                                           */
+/*-----------------------------------------------------------------------------*/
+//Public
+    UserAndPassword::UserAndPassword() :
+        Document(USER_AND_PASSWORD_TYPE)
+    {}
+
+    UserAndPassword::UserAndPassword( const std::string & name,
+                const std::string & username,
+                const std::string & password,
+                const Id & id) :
+        Document(USER_AND_PASSWORD_TYPE),
+        m_username(username),
+        m_password(password)
+    {
+        m_name=name;
+        m_id=id;
+    }
+
+    DocumentPtr UserAndPassword::clone() const
+    {
+        return std::dynamic_pointer_cast<Document>(std::make_shared<UserAndPassword>(*this));
+    }
+
+//Private
+    void UserAndPassword::fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const
+    {
+        si.addMember(DOC_USER_AND_PASSWORD_USERNAME) <<= m_username;
+    }
+
+    void UserAndPassword::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const
+    {
+        si.addMember(DOC_USER_AND_PASSWORD_PASSWORD) <<= m_password;
+    }
+
+    void UserAndPassword::UpdatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
+    {
+        try
+        {
+            si.getMember(DOC_USER_AND_PASSWORD_USERNAME) >>= m_username;
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwInvalidDocumentFormatException(e.what());
+        }
+    }
+
+    void UserAndPassword::UpdatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
+    {
+        try
+        {
+            si.getMember(DOC_USER_AND_PASSWORD_PASSWORD) >>= m_password;
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwInvalidDocumentFormatException(e.what());
+        }
+    }
+
+} // namespace secw

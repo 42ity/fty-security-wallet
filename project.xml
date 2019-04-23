@@ -162,6 +162,8 @@
     
     <!-- Note: Add new supported types here and modify secw_document.cc to handle then in the Document factory -->
     <class name = "secw_snmpv3" selftest = "0">Document parsers for snmpv3 document</class>
+    <class name = "secw_snmpv1" selftest = "0">Document parsers for snmpv1 document</class>
+    <class name = "secw_user_and_password" selftest = "0">Document parsers for user and password document</class>
     
     <class name = "fty-security-wallet-server">Security Wallet Server</class>
     <main  name = "fty-security-wallet" service = "1">Security Wallet Binary</main>

@@ -85,6 +85,8 @@ namespace secw
 
         DocumentPtr clone() const override;
 
+        void validate() const override {} //TODO fill this function
+
         //Public elements
         Snmpv3SecurityLevel getSecurityLevel() const { return m_securityLevel; }
         Snmpv3AuthProtocol getAuthProtocol() const { return m_authProtocol; }

@@ -69,8 +69,17 @@ namespace secw
     const DocumentType & getType() const;
     const Id & getId() const;
 
+    /**
+     * \brief Clone any document - usefull to apply modification before to update
+     * 
+     * \return shared ptr on a document
+     */
     virtual DocumentPtr clone() const = 0;
     
+    /**
+     * \brief Destructor
+     * 
+     */
     virtual ~Document(){/*log_debug("Cleaning document %s", m_name.c_str());*/}
 
     /**
@@ -83,14 +92,14 @@ namespace secw
     /**
      * \brief Append the serialization of the document with header, public and private (secret) part.
      * 
-     * \param cxxtools::SerializationInfo
+     * \param[in|out] cxxtools::SerializationInfo
      */
     void fillSerializationInfoWithSecret(cxxtools::SerializationInfo& si) const;
 
     /**
      * \brief Append the serialization of the document with header and public.
      * 
-     * \param cxxtools::SerializationInfo
+     * \param[in|out] cxxtools::SerializationInfo
      */
     void fillSerializationInfoWithoutSecret(cxxtools::SerializationInfo& si) const;
 
@@ -105,11 +114,24 @@ namespace secw
     /**
      * \brief return if we supported the Type
      * 
-     * \param Type for check
+     * \param[in] Type for check
      * \return true if we support the type
      */
     static bool isSupportedType(const DocumentType & type);
 
+    /**
+     * \brief Tell if the data in the document are valid: for example password cannot be empty.
+     * 
+     * \exceptions: In case it's not valid.
+     */
+    virtual void validate() const = 0;
+
+    /**
+     * \brief friend stream operator use to load data from data base
+     * 
+     * \param[in] serialization info
+     * \param[out] sharred pointer on document 
+     */
     friend void operator>>= (const cxxtools::SerializationInfo& si, DocumentPtr & doc);
     
   protected:

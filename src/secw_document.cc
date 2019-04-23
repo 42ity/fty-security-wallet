@@ -29,6 +29,8 @@
 #include "fty_security_wallet_classes.h"
 
 #include "secw_snmpv3.h"
+#include "secw_snmpv1.h"
+#include "secw_user_and_password.h"
 
 namespace secw
 {
@@ -38,7 +40,9 @@ namespace secw
 //Here are the supported documents - Need to be update if you want to add some
 std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
 {
-    { SNMPV3_TYPE, []() { return DocumentPtr(new Snmpv3()); }}
+    { SNMPV3_TYPE, []() { return DocumentPtr(new Snmpv3()); }},
+    { SNMPV1_TYPE, []() { return DocumentPtr(new Snmpv1()); }},
+    { USER_AND_PASSWORD_TYPE, []() { return DocumentPtr(new UserAndPassword()); }}
 };
 
 //Public
