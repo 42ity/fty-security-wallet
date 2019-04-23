@@ -57,10 +57,10 @@ namespace secw
         
         //Handler for all supported commands
         static std::string handleGetListDocumentsWithSecret(const Sender & sender, const std::vector<std::string> & params);
-        //static std::string handleGetListDocumentsWithoutSecret(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleGetListDocumentsWithoutSecret(const Sender & sender, const std::vector<std::string> & params);
         
         static std::string handleGetDocumentWithSecret(const Sender & sender, const std::vector<std::string> & params);
-        //static std::string handleGetDocumentWithoutSecret(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleGetDocumentWithoutSecret(const Sender & sender, const std::vector<std::string> & params);
         
         static std::string handleGetListPortfolio(const Sender & sender, const std::vector<std::string> & params);
 
@@ -72,8 +72,8 @@ namespace secw
         //Helpers
         static zmsg_t *generateErrorMsg(const std::string & correlationId, const std::string & errPayload);
         
-        //static std::string serializeListDocumentsPublic(const std::string & portfolioName, const std::vector<DocumentType> & types);
         static std::string serializeListDocumentsPrivate(const std::string & portfolioName, const std::set<UsageId> & usages);
+        static std::string serializeListDocumentsPublic(const std::string & portfolioName, const std::set<UsageId> & usages);
     
     public:
         //Command list

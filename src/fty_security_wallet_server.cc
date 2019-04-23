@@ -49,9 +49,9 @@ SecurityWalletServer::SecurityWalletServer(zsock_t *pipe)
     m_supportedCommands[GET_PRODUCER_USAGES] = handleGetProducerUsages;
 
     m_supportedCommands[GET_LIST_WITH_SECRET] = handleGetListDocumentsWithSecret;
-    m_supportedCommands[GET_LIST_WITHOUT_SECRET] = handleNotImplementedCmd;
+    m_supportedCommands[GET_LIST_WITHOUT_SECRET] = handleGetListDocumentsWithoutSecret;
 
-    m_supportedCommands[GET_WITHOUT_SECRET] = handleNotImplementedCmd;
+    m_supportedCommands[GET_WITHOUT_SECRET] = handleGetDocumentWithoutSecret;
     m_supportedCommands[GET_WITH_SECRET] = handleGetDocumentWithSecret;
     
     m_supportedCommands[CREATE] = handleNotImplementedCmd;
@@ -125,9 +125,40 @@ std::string SecurityWalletServer::handleGetDocumentWithSecret(const Sender & sen
 
     if( allowedUsageIds.size() == 0)
     {
-        throw SecwIllegalAccess("You do not have access to this command");
+        throw SecwIllegalAccess("You do not have access to this document");
     }
     
+    if(params.size() != 2)
+    {
+        throw SecwBadCommandArgumentException("Command need at 2 arguments");
+    }
+
+    const std::string & portfolioName = params[0];
+    const Id & id = params[1];
+    
+    DocumentPtr doc  = m_activeWallet->getPortfolio(portfolioName).getDocument(id);
+
+    if(!hasCommonUsageIds(allowedUsageIds, doc->getUsageIds()))
+    {
+        throw SecwIllegalAccess("You do not have access to this document");
+    }
+    
+    cxxtools::SerializationInfo si;
+    
+    doc->fillSerializationInfoWithSecret(si);
+    
+    return serialize(si);
+}
+
+std::string SecurityWalletServer::handleGetDocumentWithoutSecret(const Sender & sender, const std::vector<std::string> & params)
+{
+    /*
+     * Parameters for this command:
+     * 
+     * 0. name of the portfolio
+     * 1. document id
+     */
+
     if(params.size() != 2)
     {
         throw SecwBadCommandArgumentException("Command need at 2 arguments");
@@ -140,35 +171,10 @@ std::string SecurityWalletServer::handleGetDocumentWithSecret(const Sender & sen
     
     cxxtools::SerializationInfo si;
     
-    doc->fillSerializationInfoWithSecret(si);
-    
-    return serialize(si);
-}
-
-/*std::string SecurityWalletServer::handleGetDocumentWithoutSecret(const Sender & sender, const std::vector<std::string> & params)
-{
-    /*
-     * Parameters for this command:
-     * 
-     * 0. name of the portfolio
-     * 1. document id
-     */
-    /*if(params.size() != 2)
-    {
-        throw SecwBadCommandArgumentException("Command need at 2 arguments");
-    }
-    
-    const std::string & portfolioName = params[0];
-    const Id & id = params[1];
-    
-    DocumentPtr doc  = m_activeWallet->getPortfolio(portfolioName).getDocument(id);
-    
-    cxxtools::SerializationInfo si;
-    
     doc->fillSerializationInfoWithoutSecret(si);
     
     return serialize(si);
-}*/
+}
 
 std::string SecurityWalletServer::handleGetListDocumentsWithSecret(const Sender & sender, const std::vector<std::string> & params)
 {
@@ -231,6 +237,58 @@ std::string SecurityWalletServer::handleGetListDocumentsWithSecret(const Sender 
     else
     {
         result = serializeListDocumentsPrivate(portfolioName, allowedUsageIds);
+    }
+    
+    return result;
+}
+
+std::string SecurityWalletServer::handleGetListDocumentsWithoutSecret(const Sender & sender, const std::vector<std::string> & params)
+{
+    /*
+     * Parameters for this command:
+     * 
+     * 0. name of the portfolio
+     * 1. Usage of documents (optional)
+     */
+    
+    if(params.size() < 1)
+    {
+        throw SecwBadCommandArgumentException("Command need at least argument");
+    }
+
+    const std::string & portfolioName = params[0];
+
+    std::string debugInfo = "Do GetListDocumentsWithoutSecret on portfolio <"+portfolioName+">";
+    
+    UsageId usage = ""; //by default all the available usage for this consumer
+
+    if(params.size() >= 2)
+    {
+        usage = params[1];
+    }
+
+    if(!usage.empty())
+    {
+        debugInfo+= " with the specific usage '"+usage+"'";
+    }
+    else
+    {
+        debugInfo += " without specific usage";
+    }
+
+    log_debug("%s",debugInfo.c_str());
+
+    //prepare request
+    std::string result;
+
+    //check if the usage we specify a usage
+    if(!usage.empty())
+    {   
+        result = serializeListDocumentsPublic(portfolioName, {usage});
+    }
+    else
+    {
+        result = serializeListDocumentsPublic(portfolioName, {});
     }
     
     return result;
@@ -448,24 +506,26 @@ zmsg_t * SecurityWalletServer::generateErrorMsg( const std::string & correlation
 }
 
 
-/*std::string SecurityWalletServer::serializeListDocumentsPublic(const std::string & portfolioName, const std::vector<DocumentType> & types, const std::vector<Tag> & tags)
+std::string SecurityWalletServer::serializeListDocumentsPublic(const std::string & portfolioName, const std::set<UsageId> & usages)
 {
     Portfolio & portfolio = m_activeWallet->getPortfolio(portfolioName);
 
     //get the documents
     cxxtools::SerializationInfo si;
     
-    for (const auto pDoc : portfolio.getListDocuments(types, tags) )
+    for (const auto pDoc : portfolio.getListDocuments() )
     {
-        pDoc->fillSerializationInfoWithoutSecret(si.addMember(""));
-  
+        if((usages.empty() ) || (hasCommonUsageIds(pDoc->getUsageIds(), usages)))
+        {
+            pDoc->fillSerializationInfoWithoutSecret(si.addMember("")); 
+        }
     }
 
     si.setCategory(cxxtools::SerializationInfo::Array);
 
     return serialize(si);
 
-}*/
+}
 
 std::string SecurityWalletServer::serializeListDocumentsPrivate(const std::string & portfolioName, const std::set<UsageId> & usages)
 {
@@ -602,7 +662,8 @@ fty_security_wallet_server_test (bool verbose)
     mlm_client_destroy(&client);
 
     //Tests from the lib
-    std::vector<std::pair<std::string,bool>> testLibResults = secw_consumer_accessor_test();
+    std::vector<std::pair<std::string,bool>> testLibConsumerResults = secw_consumer_accessor_test();
+    std::vector<std::pair<std::string,bool>> testLibProducerResults = secw_producer_accessor_test();
 
     printf("\n-----------------------------------------------------------------------\n");
     
@@ -625,8 +686,23 @@ fty_security_wallet_server_test (bool verbose)
         }
     }
     
-    printf("\n\tTests from the lib:\n");
-    for(const auto & result : testLibResults)
+    printf("\n\tTests from the lib: Consumer part\n");
+    for(const auto & result : testLibConsumerResults)
+    {
+        if(result.second)
+        {
+            printf(ANSI_COLOR_GREEN"\tOK " ANSI_COLOR_RESET "\t%s\n",result.first.c_str());
+            testsPassed++;
+        }
+        else
+        {
+            printf(ANSI_COLOR_RED"\tNOK" ANSI_COLOR_RESET "\t%s\n",result.first.c_str());
+            testsFailed++;
+        }
+    }
+
+    printf("\n\tTests from the lib: Producer part\n");
+    for(const auto & result : testLibProducerResults)
     {
         if(result.second)
         {
