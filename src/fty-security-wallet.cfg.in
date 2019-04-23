@@ -12,7 +12,7 @@ malamute
 
 storage
     database = /var/fty/fty-security-wallet/database.json
-    access = /etc/fty/fty-security-wallet/configuration.json
+    configuration = /etc/fty/fty-security-wallet/configuration.json
     
 log
     config = /etc/fty/ftylog.cfg                    # configuration file for fty-common-logging

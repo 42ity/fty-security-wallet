@@ -9,5 +9,5 @@ Installation model
 
 <install>
     <item type = "systemd-tmpfiles" />
-    <item path = "/etc/fty/fty-security-wallet" name = "access.json" />
+    <item path = "/etc/fty/fty-security-wallet" name = "configuration.json" />
 </install>
