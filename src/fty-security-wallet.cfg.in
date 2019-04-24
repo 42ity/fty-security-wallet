@@ -11,7 +11,7 @@ malamute
     address = security-wallet     #   Agent address
 
 storage
-    database = /var/fty/fty-security-wallet/database.json
+    database = /var/lib/fty/fty-security-wallet/database.json
     configuration = /etc/fty/fty-security-wallet/configuration.json
     
 log

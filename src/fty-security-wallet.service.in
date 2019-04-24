@@ -7,14 +7,12 @@ PartOf=bios.target
 [Service]
 Type=simple
 User=bios
-Restart=always
 EnvironmentFile=-@prefix@/share/fty/etc/default/fty
 EnvironmentFile=-@prefix@/share/fty/etc/default/fty__%n.conf
-EnvironmentFile=-@CONFPATH@/default/fty
-EnvironmentFile=-@CONFPATH@/default/fty__%n.conf
+EnvironmentFile=-@sysconfdir@/default/fty
+EnvironmentFile=-@sysconfdir@/default/fty__%n.conf
 Environment="prefix=@prefix@"
-Environment='SYSTEMD_UNIT_FULLNAME=%n'
-ExecStart=@prefix@/bin/fty-security-wallet  -c @CONFPATH@/@PACKAGE@/fty-security-wallet.cfg
+ExecStart=@prefix@/bin/fty-metric-ambient-location @sysconfdir@/@PACKAGE@/fty-security-wallet.cfg
 Restart=always
 
 [Install]

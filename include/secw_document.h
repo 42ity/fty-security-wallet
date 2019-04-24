@@ -70,7 +70,7 @@ namespace secw
     const Id & getId() const;
 
     /**
-     * \brief Clone any document - usefull to apply modification before to update
+     * \brief Clone any document - useful to apply modification before to update
      * 
      * \return shared ptr on a document
      */
@@ -130,7 +130,7 @@ namespace secw
      * \brief friend stream operator use to load data from data base
      * 
      * \param[in] serialization info
-     * \param[out] sharred pointer on document 
+     * \param[out] shared pointer on document 
      */
     friend void operator>>= (const cxxtools::SerializationInfo& si, DocumentPtr & doc);
     
