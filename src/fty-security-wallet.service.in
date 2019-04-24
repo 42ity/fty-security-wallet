@@ -12,7 +12,7 @@ EnvironmentFile=-@prefix@/share/fty/etc/default/fty__%n.conf
 EnvironmentFile=-@sysconfdir@/default/fty
 EnvironmentFile=-@sysconfdir@/default/fty__%n.conf
 Environment="prefix=@prefix@"
-ExecStart=@prefix@/bin/fty-metric-ambient-location @sysconfdir@/@PACKAGE@/fty-security-wallet.cfg
+ExecStart=@prefix@/bin/fty-security-wallet -c @sysconfdir@/@PACKAGE@/fty-security-wallet.cfg
 Restart=always
 
 [Install]
