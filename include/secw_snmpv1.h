@@ -29,6 +29,9 @@ namespace secw
     /**
      * \brief snmpv1 implementation
      */
+    class Snmpv1;
+    
+    using Snmpv1Ptr   = std::shared_ptr<Snmpv1>;
 
     /**
      * Some key definition for serialization
@@ -55,6 +58,13 @@ namespace secw
 
         //Private elements
         //no private
+
+        /**
+         * \brief try to cast a document to a Snmpv1 shared ptr
+         * 
+         * \return shared ptr on snmpv1 or null shared ptr in case of error
+         */
+        static Snmpv1Ptr tryToCast(DocumentPtr doc);
 
     private:
         //Public elements

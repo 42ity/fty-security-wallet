@@ -89,4 +89,16 @@ namespace secw
         }
     }
 
+    UserAndPasswordPtr UserAndPassword::tryToCast(DocumentPtr doc)
+    {
+        UserAndPasswordPtr ptr(nullptr);
+
+        if((doc != nullptr) && (doc->getType() == USER_AND_PASSWORD_TYPE))
+        {
+            ptr = std::dynamic_pointer_cast<UserAndPassword>(doc);
+        }
+
+        return ptr;
+    }
+
 } // namespace secw

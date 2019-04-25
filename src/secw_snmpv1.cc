@@ -80,5 +80,17 @@ namespace secw
     {
     }
 
+    Snmpv1Ptr Snmpv1::tryToCast(DocumentPtr doc)
+    {
+        Snmpv1Ptr ptr(nullptr);
+
+        if((doc != nullptr) && (doc->getType() == SNMPV1_TYPE))
+        {
+            ptr = std::dynamic_pointer_cast<Snmpv1>(doc);
+        }
+
+        return ptr;
+    }
+
 } // namespace secw
 

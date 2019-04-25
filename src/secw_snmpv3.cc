@@ -126,4 +126,16 @@ namespace secw
         }
     }
 
+    Snmpv3Ptr Snmpv3::tryToCast(DocumentPtr doc)
+    {
+        Snmpv3Ptr ptr(nullptr);
+
+        if((doc != nullptr) && (doc->getType() == SNMPV3_TYPE))
+        {
+            ptr = std::dynamic_pointer_cast<Snmpv3>(doc);
+        }
+
+        return ptr;
+    }
+
 } // namespace secw

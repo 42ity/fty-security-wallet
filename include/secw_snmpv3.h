@@ -28,6 +28,9 @@
 
 namespace secw
 {
+    class Snmpv3;
+    
+    using Snmpv3Ptr = std::shared_ptr<Snmpv3>;
     /**
      * \brief snmpv3 implementation
      */
@@ -96,6 +99,13 @@ namespace secw
         //Private elements
         const std::string & getAuthPassword() const { return m_authPassword; }
         const std::string & getPrivPassword() const { return m_privPassword; }
+
+         /**
+         * \brief try to cast a document to a Snmpv3 shared ptr
+         * 
+         * \return shared ptr on Snmpv3 or null shared ptr in case of error
+         */
+        static Snmpv3Ptr tryToCast(DocumentPtr doc);
 
     private:
         //Public elements

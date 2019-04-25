@@ -25,6 +25,9 @@
 
 namespace secw
 {
+    class UserAndPassword;
+    
+    using UserAndPasswordPtr   = std::shared_ptr<UserAndPassword>;
     
     /**
      * Some key definition for serialization
@@ -55,6 +58,12 @@ namespace secw
         //Private elements
         const std::string & getPassword() const { return m_password; }
 
+        /**
+         * \brief try to cast a document to a UserAndPassword shared ptr
+         * 
+         * \return shared ptr on UserAndPassword or null shared ptr in case of error
+         */
+        static UserAndPasswordPtr tryToCast(DocumentPtr doc);
 
     private:
         //Public elements
