@@ -53,6 +53,8 @@ namespace secw
         
         const char* what() const noexcept override;
 
+        inline ErrorCode getErrorCode() const { return m_code; }
+
         //return an error payload from an exception
         std::string toJson() const;
 

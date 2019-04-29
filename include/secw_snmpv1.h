@@ -30,7 +30,7 @@ namespace secw
      * \brief snmpv1 implementation
      */
     class Snmpv1;
-    
+
     using Snmpv1Ptr   = std::shared_ptr<Snmpv1>;
 
     /**
@@ -46,12 +46,11 @@ namespace secw
         Snmpv1();
 
         Snmpv1( const std::string & name,
-                const std::string & communityName = "",
-                const Id & id = "");
+                const std::string & communityName = "");
 
         DocumentPtr clone() const override;
 
-        void validate() const override {} //TODO fill this function
+        void validate() const override {}
 
         //Public elements
         const std::string & getCommunityName() const { return m_communityName; }

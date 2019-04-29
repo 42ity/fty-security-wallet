@@ -39,13 +39,11 @@ namespace secw
     {}
 
     Snmpv1::Snmpv1( const std::string & name,
-                const std::string & communityName,
-                const Id & id) :
+                const std::string & communityName) :
         Document(SNMPV1_TYPE),
         m_communityName(communityName)
     {
         m_name=name;
-        m_id=id;
     }
 
     DocumentPtr Snmpv1::clone() const
@@ -56,12 +54,12 @@ namespace secw
 //Private
     void Snmpv1::fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const
     {
-        si.addMember(DOC_SNMPV1_COMMUNITY_NAME) <<= m_communityName;
+        
     }
 
     void Snmpv1::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const
     {
-
+        si.addMember(DOC_SNMPV1_COMMUNITY_NAME) <<= m_communityName;
     }
 
     void Snmpv1::UpdatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)

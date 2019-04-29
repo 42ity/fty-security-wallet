@@ -25,9 +25,11 @@
 #include "cxxtools/serializationinfo.h"
 #include <memory>
 #include <functional>
+#include <iostream>
 
 namespace secw
 {
+  class Portfolio;
   class Document;
   
   /**
@@ -60,10 +62,21 @@ namespace secw
    */
   class Document
   {
+
+  friend class Portfolio; //give the friendship to be able to set an id to new document.
+
   public:
-    const std::string & getName() const;
     bool isContainingPrivateData() const;
-    std::vector<Tag> getTags() const;
+
+    const std::string & getName() const;
+    void setName(const std::string & name); 
+
+    void addTag(const Tag & tag);
+    void removeTag(const Tag & tag);
+    std::set<Tag> getTags() const;
+
+    void addUsage(const UsageId & id);
+    void removeUsage(const UsageId & id);
     std::set<UsageId> getUsageIds() const;
 
     const DocumentType & getType() const;
@@ -142,7 +155,7 @@ namespace secw
     std::string m_name = "";
     DocumentType m_type = "";
     Id m_id = "";
-    std::vector<Tag> m_tags;
+    std::set<Tag> m_tags;
     std::set<UsageId> m_usages;
 
     //This map is use to define the supported type and how to build them
@@ -167,6 +180,10 @@ namespace secw
   void operator<<= (cxxtools::SerializationInfo& si, const Document & doc);
   void operator<<= (cxxtools::SerializationInfo& si, const DocumentPtr & doc);
   void operator>>= (const cxxtools::SerializationInfo& si, DocumentPtr & doc);
+
+  //add a stream operator to dyplay the document in debug for example
+  std::ostream& operator<< (std::ostream& os, const DocumentPtr & doc);
+  std::ostream& operator<< (std::ostream& os, const Document & doc);
 
 } // namepsace secw
 

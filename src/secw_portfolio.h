@@ -44,8 +44,9 @@ namespace secw
 
         const std::string & getName() const { return m_name; }
         
-        void add(const Document & doc);
+        Id add(const DocumentPtr & doc);
         void remove(const Id & id);
+        void update(const DocumentPtr & doc);
         
         DocumentPtr getDocument(const Id & id) const;
         
@@ -61,9 +62,6 @@ namespace secw
 
         //Map containing all the document of the portfolio
         std::map<Id, DocumentPtr > m_documents;
-
-        //Indexes by types (to get document faster)
-        std::map<DocumentType, std::set<Id>> m_mapTypesToIdDocs;
 
         void loadPortfolioVersion1(const cxxtools::SerializationInfo& si);
     };

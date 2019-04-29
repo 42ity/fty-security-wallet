@@ -44,8 +44,7 @@ namespace secw
                 Snmpv3AuthProtocol authProtocol,
                 const std::string & authPassword,
                 Snmpv3PrivProtocol privProtocol,
-                const std::string & privPassword,
-                const Id & id) :
+                const std::string & privPassword) :
         Document(SNMPV3_TYPE),
         m_securityLevel(securityLevel),
         m_authProtocol(authProtocol),
@@ -55,7 +54,6 @@ namespace secw
         m_privPassword(privPassword)
     {
         m_name=name;
-        m_id=id;
     }
 
     DocumentPtr Snmpv3::clone() const
@@ -63,11 +61,46 @@ namespace secw
         return std::dynamic_pointer_cast<Document>(std::make_shared<Snmpv3>(*this));
     }
 
+    void Snmpv3::setAuthPassword(const std::string & authPassword)
+    {
+        m_authPassword = authPassword;
+        m_containPrivateData = true;
+    }
+
+    void Snmpv3::setPrivPassword(const std::string & privPassword)
+    { 
+        m_privPassword = privPassword;
+        m_containPrivateData = true;
+    }
+
+    void Snmpv3::validate() const
+    {
+        if(!m_containPrivateData) throw SecwInvalidDocumentFormatException("Private part is missing");
+        if(m_securityName.empty()) throw SecwInvalidDocumentFormatException("Security name is empty");
+
+        if(m_securityLevel == Snmpv3SecurityLevel::AUTH_PRIV)
+        {
+            if(m_authPassword.empty()) throw SecwInvalidDocumentFormatException("Auth password is empty");
+            if(m_privPassword.empty()) throw SecwInvalidDocumentFormatException("Priv password is empty");
+        }
+        else if(m_securityLevel == Snmpv3SecurityLevel::AUTH_NO_PRIV)
+        {
+            if(m_authPassword.empty()) throw SecwInvalidDocumentFormatException("Auth password is empty");
+        }
+    }
+
 //Private
     void Snmpv3::fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const
     {
-        si.addMember(DOC_SNMPV3_AUTH_PASSWORD) <<= m_authPassword;
-        si.addMember(DOC_SNMPV3_PRIV_PASSWORD) <<= m_privPassword;
+        if(!m_authPassword.empty())
+        {
+            si.addMember(DOC_SNMPV3_AUTH_PASSWORD) <<= m_authPassword;
+        }
+        
+        if(!m_privPassword.empty())
+        {
+            si.addMember(DOC_SNMPV3_PRIV_PASSWORD) <<= m_privPassword;
+        }   
     }
 
     void Snmpv3::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const
@@ -82,8 +115,17 @@ namespace secw
     {
         try
         {
-            si.getMember(DOC_SNMPV3_AUTH_PASSWORD) >>= m_authPassword;
-            si.getMember(DOC_SNMPV3_PRIV_PASSWORD) >>= m_privPassword;
+            const cxxtools::SerializationInfo * authPassword = si.findMember(DOC_SNMPV3_AUTH_PASSWORD);
+            if(authPassword != nullptr)
+            {
+                *authPassword >>= m_authPassword;
+            }
+
+            const cxxtools::SerializationInfo * authPriv = si.findMember(DOC_SNMPV3_PRIV_PASSWORD);
+            if(authPriv != nullptr)
+            {
+                *authPriv >>= m_privPassword;
+            }
         }
         catch(const std::exception& e)
         {

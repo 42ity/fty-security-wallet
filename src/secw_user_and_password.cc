@@ -39,14 +39,12 @@ namespace secw
 
     UserAndPassword::UserAndPassword( const std::string & name,
                 const std::string & username,
-                const std::string & password,
-                const Id & id) :
+                const std::string & password) :
         Document(USER_AND_PASSWORD_TYPE),
         m_username(username),
         m_password(password)
     {
         m_name=name;
-        m_id=id;
     }
 
     DocumentPtr UserAndPassword::clone() const
@@ -54,22 +52,36 @@ namespace secw
         return std::dynamic_pointer_cast<Document>(std::make_shared<UserAndPassword>(*this));
     }
 
+    void UserAndPassword::validate() const
+    {
+        if(!m_containPrivateData) throw SecwInvalidDocumentFormatException("Private part is missing");
+        if(m_username.empty()) throw SecwInvalidDocumentFormatException("Username is empty");
+        if(m_password.empty()) throw SecwInvalidDocumentFormatException("Password is empty");
+    }
+
 //Private
     void UserAndPassword::fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const
     {
-        si.addMember(DOC_USER_AND_PASSWORD_USERNAME) <<= m_username;
+        if(!m_password.empty())
+        {
+            si.addMember(DOC_USER_AND_PASSWORD_PASSWORD) <<= m_password;
+        }
     }
 
     void UserAndPassword::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const
     {
-        si.addMember(DOC_USER_AND_PASSWORD_PASSWORD) <<= m_password;
+        si.addMember(DOC_USER_AND_PASSWORD_USERNAME) <<= m_username;
     }
 
     void UserAndPassword::UpdatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
     {
         try
         {
-            si.getMember(DOC_USER_AND_PASSWORD_USERNAME) >>= m_username;
+            const cxxtools::SerializationInfo * password = si.findMember(DOC_USER_AND_PASSWORD_PASSWORD);
+            if(password != nullptr)
+            {
+                *password >>= m_password;
+            }
         }
         catch(const std::exception& e)
         {
@@ -81,7 +93,7 @@ namespace secw
     {
         try
         {
-            si.getMember(DOC_USER_AND_PASSWORD_PASSWORD) >>= m_password;
+            si.getMember(DOC_USER_AND_PASSWORD_USERNAME) >>= m_username;
         }
         catch(const std::exception& e)
         {

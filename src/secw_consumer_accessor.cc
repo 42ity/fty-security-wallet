@@ -77,9 +77,9 @@ namespace secw
 
   std::vector<DocumentPtr> ConsumerAccessor::getListDocumentsWithPrivateData(
     const std::string & portfolio,
-    const DocumentType & type) const
+    const UsageId & usageId) const
   {
-    std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_LIST_WITH_SECRET, {portfolio,type});
+    std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_LIST_WITH_SECRET, {portfolio,usageId});
     
     //the first frame should contain the data
     if(frames.size() < 1)
@@ -94,6 +94,31 @@ namespace secw
     si >>= documents;
     
     return documents;
+  }
+
+  std::vector<DocumentPtr> ConsumerAccessor::getListDocumentsWithPrivateData(
+      const std::string & portfolio,
+      const std::vector<Id> & ids) const
+  {
+    std::vector<DocumentPtr> docs;
+
+    for(const Id & id : ids)
+    {
+      try
+      {
+        docs.push_back(getDocumentWithPrivateData(portfolio, id));
+      }
+      catch(const SecwException &e)
+      {
+        //filter exceptions => ID not found and noit access to this id
+        if( (e.getErrorCode() != DOCUMENT_DO_NOT_EXIST) && (e.getErrorCode() != ILLEGAL_ACCESS) )
+        {
+          throw e; //throw 
+        }
+      }
+    }
+
+    return docs;
   }
 
   DocumentPtr ConsumerAccessor::getDocumentWithPrivateData(

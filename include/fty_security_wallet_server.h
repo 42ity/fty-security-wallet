@@ -67,6 +67,10 @@ namespace secw
         static std::string handleGetConsumerUsages(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleGetProducerUsages(const Sender & sender, const std::vector<std::string> & params);
         
+        static std::string handleCreate(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleDelete(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleUpdate(const Sender & sender, const std::vector<std::string> & params);
+
         static std::string handleNotImplementedCmd(const Sender & sender, const std::vector<std::string> & params);
         
         //Helpers

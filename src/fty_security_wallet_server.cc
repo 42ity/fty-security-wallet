@@ -54,9 +54,9 @@ SecurityWalletServer::SecurityWalletServer(zsock_t *pipe)
     m_supportedCommands[GET_WITHOUT_SECRET] = handleGetDocumentWithoutSecret;
     m_supportedCommands[GET_WITH_SECRET] = handleGetDocumentWithSecret;
     
-    m_supportedCommands[CREATE] = handleNotImplementedCmd;
-    m_supportedCommands[DELETE] = handleNotImplementedCmd;
-    m_supportedCommands[UPDATE] = handleNotImplementedCmd;
+    m_supportedCommands[CREATE] = handleCreate;
+    m_supportedCommands[DELETE] = handleDelete;
+    m_supportedCommands[UPDATE] = handleUpdate;
 }
 
 /* Commands implementation section*/
@@ -221,7 +221,7 @@ std::string SecurityWalletServer::handleGetListDocumentsWithSecret(const Sender 
 
     log_debug("%s",debugInfo.c_str());
 
-    //prepare request
+    //prepare result
     std::string result;
 
     //check if the usage is accessible
@@ -294,7 +294,180 @@ std::string SecurityWalletServer::handleGetListDocumentsWithoutSecret(const Send
     return result;
 }
 
-/* Agents methods*/
+std::string SecurityWalletServer::handleCreate(const Sender & sender, const std::vector<std::string> & params)
+{
+    /*
+     * Parameters for this command:
+     * 
+     * 0. name of the portfolio
+     * 1. Document to be create
+     */
+    
+    if(params.size() < 2)
+    {
+        throw SecwBadCommandArgumentException("Command need 2 arguments");
+    }
+
+    //check global access
+    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration().getUsageIdsForProducer(sender);
+
+    if(allowedUsageIds.size() == 0)
+    {
+        throw SecwIllegalAccess("You do not have access to this command");
+    }
+    
+    const std::string & portfolioName = params[0];
+    const std::string & document = params[1];
+    
+    log_debug("Do Create on portfolio <%s>", portfolioName.c_str());
+    
+    Portfolio & portfolio = m_activeWallet->getPortfolio(portfolioName);
+    
+    //deserialize
+    const cxxtools::SerializationInfo si(deserialize(document));
+    DocumentPtr doc;
+    si >>= doc;
+    
+    //check if the document is valid
+    doc->validate();
+
+    //check if we are allow to insert
+    for(const UsageId & usage : doc->getUsageIds())
+    {
+        //if on document usage do not belong to the user, reject the insert
+        if(allowedUsageIds.count(usage) != 1)
+        {
+            throw SecwIllegalAccess("You do not have access to usage <"+usage+">");
+        }
+    }
+    
+    //prepare result
+    std::string result = portfolio.add(doc);
+    
+    m_activeWallet->save();
+
+    return result;
+}
+
+std::string SecurityWalletServer::handleDelete(const Sender & sender, const std::vector<std::string> & params)
+{
+    /*
+     * Parameters for this command:
+     * 
+     * 0. name of the portfolio
+     * 1. id of Document to be delete
+     */
+    
+    if(params.size() < 2)
+    {
+        throw SecwBadCommandArgumentException("Command need 2 arguments");
+    }
+
+    //check global access
+    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration().getUsageIdsForProducer(sender);
+
+    if(allowedUsageIds.size() == 0)
+    {
+        throw SecwIllegalAccess("You do not have access to this command");
+    } 
+
+    const std::string & portfolioName = params[0];
+    const std::string & id = params[1];
+    
+    log_debug("Do Delete on portfolio <%s> for id <%s>", portfolioName.c_str(), id.c_str());
+    
+    Portfolio & portfolio = m_activeWallet->getPortfolio(portfolioName);
+    
+    //get the document
+    DocumentPtr doc = portfolio.getDocument(id);
+    
+    //check if we are allow to remove
+    for(const UsageId & usage : doc->getUsageIds())
+    {
+        //if on document usage do not belong to the user, reject the insert
+        if(allowedUsageIds.count(usage) != 1)
+        {
+            throw SecwIllegalAccess("You do not have access to usage <"+usage+">");
+        }
+    }
+    
+    //remove and save
+    portfolio.remove(id);
+    
+    m_activeWallet->save();
+    
+    return "OK";
+}
+
+std::string SecurityWalletServer::handleUpdate(const Sender & sender, const std::vector<std::string> & params)
+{
+    /*
+     * Parameters for this command:
+     * 
+     * 0. name of the portfolio
+     * 1. Document to be update
+     */
+    
+    if(params.size() < 2)
+    {
+        throw SecwBadCommandArgumentException("Command need 2 arguments");
+    }
+
+    //check global access
+    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration().getUsageIdsForProducer(sender);
+
+    if(allowedUsageIds.size() == 0)
+    {
+        throw SecwIllegalAccess("You do not have access to this command");
+    }
+    
+    const std::string & portfolioName = params[0];
+    const std::string & document = params[1];
+    
+    log_debug("Do Update on portfolio <%s>", portfolioName.c_str());
+    
+    Portfolio & portfolio = m_activeWallet->getPortfolio(portfolioName);
+    
+    //de-serialize
+    const cxxtools::SerializationInfo si(deserialize(document));
+    DocumentPtr doc;
+    si >>= doc;
+
+    //std::cerr << "Received data:\n" << doc << std::endl;
+    
+    //recover the existing
+    DocumentPtr copyOfExistingDoc = portfolio.getDocument(doc->getId());
+
+    //std::cerr << "Existing data:\n" << copyOfExistingDoc << std::endl;
+    
+    //check that we can do this kind of update
+    std::set<UsageId> diff = differenceBetween2UsagesIdSet(doc->getUsageIds(), copyOfExistingDoc->getUsageIds());
+    
+    for(const UsageId & usage : diff )
+    {
+        //if on document usage do not belong to the user, reject the update
+        if(allowedUsageIds.count(usage) != 1)
+        {
+            throw SecwIllegalAccess("You do not have access to usage <"+usage+">");
+        }
+    }
+    
+    //override the copy of existing doc
+    si >>= copyOfExistingDoc;
+
+    //std::cerr << "Updated data:\n" << copyOfExistingDoc << std::endl;
+    
+    copyOfExistingDoc->validate();
+    
+    //do the update
+    portfolio.update(copyOfExistingDoc);
+    
+    return "OK";
+}
+
+/*
+ * Agents methods
+ */
 
 static std::string g_storageconfigurationPath = DEFAULT_STORAGE_CONFIGURATION_PATH;
 static std::string g_storageDatabasePath = DEFAULT_STORAGE_DATABASE_PATH;

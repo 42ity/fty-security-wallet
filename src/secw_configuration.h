@@ -82,23 +82,8 @@ namespace secw
     std::vector<Consumer> m_consumers;
     std::vector<Producer> m_producers;
   };
-
-
-  /*class Producer
-  {
-  public:
-
-  private:
-
-  };
-
-  class Client
-  {
-  public:
-
-  private:
-
-  };*/
+  
+  std::set<UsageId> differenceBetween2UsagesIdSet(const std::set<UsageId> & a, const std::set<UsageId> & b);
 
 } // namespace secw
 

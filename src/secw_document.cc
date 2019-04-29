@@ -32,6 +32,8 @@
 #include "secw_snmpv1.h"
 #include "secw_user_and_password.h"
 
+#include <cxxtools/jsonserializer.h>
+
 namespace secw
 {
 /*-----------------------------------------------------------------------------*/
@@ -46,10 +48,54 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
 };
 
 //Public
-    const std::string & Document::getName() const { return m_name; }
-    std::vector<Tag> Document::getTags() const { return m_tags; }
-    std::set<UsageId> Document::getUsageIds() const { return m_usages; }
+    const std::string & Document::getName() const
+    { 
+        return m_name;
+    }
+
+    void Document::setName(const std::string & name)
+    {
+        m_name = name;
+    }
+
+    void Document::addTag(const Tag & tag)
+    {
+        m_tags.insert(tag);
+    }
+
+    void Document::removeTag(const Tag & tag)
+    {
+        if(m_tags.count(tag) > 0)
+        {
+            m_tags.erase(tag);
+        }
+    }
+
+    std::set<Tag> Document::getTags() const
+    { 
+        return m_tags;
+    }
+
+    void Document::addUsage(const UsageId & id)
+    {
+        m_usages.insert(id);
+    }
+
+    void Document::removeUsage(const UsageId & id)
+    {
+        if(m_usages.count(id) > 0)
+        {
+            m_usages.erase(id);
+        }
+    }
+
+    std::set<UsageId> Document::getUsageIds() const
+    { 
+        return m_usages;
+    }
+
     const DocumentType & Document::getType() const { return m_type; }
+
     const Id & Document::getId() const { return m_id; }
 
     bool Document::isContainingPrivateData() const {return m_containPrivateData; }
@@ -126,6 +172,8 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
         {
             Id id = "";
             DocumentType type = "";
+            
+            bool documentExist = (doc != nullptr);
 
             si.getMember(DOC_TYPE_ENTRY) >>= type;
             si.getMember(DOC_ID_ENTRY) >>= id;
@@ -133,7 +181,25 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
             const cxxtools::SerializationInfo & publicEntry = si.getMember(DOC_PUBLIC_ENTRY);
             const cxxtools::SerializationInfo * privateEntry = si.findMember(DOC_PRIVATE_ENTRY);
             
-            doc = Document::m_documentFactoryFuntions.at(type)();
+            //if we override and existing document, check that we have the same type and same id 
+            if(documentExist)
+            {
+               if(doc->getType() != type)
+               {
+                   throw SecwInvalidDocumentFormatException("The override cannot happened due to mismatch of type");
+               }
+               
+               if(doc->getId() != id)
+               {
+                   throw SecwInvalidDocumentFormatException("The override cannot happened due to mismatch of id");
+               }
+            }
+            else
+            {
+                //document do not exist, so create one
+                doc = Document::m_documentFactoryFuntions.at(type)();
+                doc->m_id = id;
+            }
             
             //log_debug("Create document '%s' matching with '%s'", doc->getType().c_str(), type.c_str());
 
@@ -143,14 +209,19 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
             if(privateEntry != nullptr)
             {
                 doc->UpdatePrivateDocFromSerializationInfo(*privateEntry);
-                doc->m_containPrivateData = true;
+                
+                if(!documentExist)
+                {
+                    doc->m_containPrivateData = true;
+                }
             }
             else
             {
-                doc->m_containPrivateData = false;
-            }
-            
-            doc->m_id = id;
+                if(!documentExist)
+                {
+                    doc->m_containPrivateData = false;
+                }
+            } 
 
         }
         catch(const SecwException & e)
@@ -162,6 +233,24 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
             throw SecwInvalidDocumentFormatException(e.what());
         }
 
+    }
+
+    std::ostream& operator<< (std::ostream& os, const DocumentPtr & doc)
+    {
+        os << *(doc);
+        return os;
+    }
+
+    std::ostream& operator<< (std::ostream& os, const Document & doc)
+    {
+        cxxtools::SerializationInfo si;
+        si <<= doc;
+
+        cxxtools::JsonSerializer serializer(os);
+        serializer.beautify(true);
+        serializer.serialize(si).finish();
+
+        return os;
     }
 
 } // namespace secw

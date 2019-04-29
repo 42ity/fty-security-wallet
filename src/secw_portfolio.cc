@@ -39,21 +39,41 @@ namespace secw
         m_name(name)
     {}
 
-    void Portfolio::add(const Document & doc)
+    Id Portfolio::add(const DocumentPtr & doc)
     {
         //make a copy using factory
-        DocumentPtr copyDoc = doc.clone();
+        DocumentPtr copyDoc = doc->clone();
 
-        m_documents[copyDoc->getId()] = copyDoc;
-        m_mapTypesToIdDocs[copyDoc->getType()].insert(copyDoc->getId());
+        //create an id
+        Id id;
+        do
+        {
+            ZuuidGuard zuuid(zuuid_new ());
+            id = std::string( zuuid_str_canonical(zuuid.get()) );
+        }
+        while(m_documents.count(id) != 0); //the id already exist, so we get a new one
+
+        copyDoc->m_id = id;
+        
+        m_documents[id] = copyDoc;
+
+        return id;
     }
 
     void Portfolio::remove(const Id & id)
     {
-        DocumentPtr doc = m_documents.at(id);
-
-        //Remove from index for types
-        m_mapTypesToIdDocs[doc->getType()].erase(id);
+        m_documents.erase(id);
+    }
+    
+    void Portfolio::update(const DocumentPtr & doc)
+    {
+        //Check if document exist
+        if(m_documents.count(doc->getId()) < 1)
+        {
+            throw SecwDocumentDoNotExistException("Document with id "+ doc->getId() +" do not exist");
+        }
+        
+         m_documents[doc->getId()] = doc->clone();
     }
     
     
@@ -100,14 +120,6 @@ namespace secw
             case 1: loadPortfolioVersion1(si);
                     break;
             default: throw SecwImpossibleToLoadPortfolioException("Version "+std::to_string(version)+" not supported");
-        }
-
-        //Create the index for type => map of type pointing to set of Id of Document
-        for(auto & item : m_documents)
-        {
-            const DocumentPtr & doc = item.second;
-            m_mapTypesToIdDocs[doc->getType()].insert(doc->getId());
-            log_debug(" Add document %s with type %s", doc->getId().c_str(), doc->getType().c_str() );
         }
         
     }

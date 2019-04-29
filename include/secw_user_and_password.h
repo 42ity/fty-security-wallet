@@ -26,7 +26,7 @@
 namespace secw
 {
     class UserAndPassword;
-    
+
     using UserAndPasswordPtr   = std::shared_ptr<UserAndPassword>;
     
     /**
@@ -45,18 +45,19 @@ namespace secw
 
         UserAndPassword( const std::string & name,
                 const std::string & username = "",
-                const std::string & password = "",
-                const Id & id = "");
+                const std::string & password = "");
 
         DocumentPtr clone() const override;
 
-        void validate() const override {} //TODO fill this function
+        void validate() const override;
 
         //Public elements
         const std::string & getUsername() const { return m_username; }
+        void setUsername(const std::string & username) { m_username = username; }
 
         //Private elements
         const std::string & getPassword() const { return m_password; }
+        void setPassword(const std::string & password) { m_password = password; m_containPrivateData = true; }
 
         /**
          * \brief try to cast a document to a UserAndPassword shared ptr

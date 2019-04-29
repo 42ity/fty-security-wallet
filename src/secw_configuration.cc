@@ -144,7 +144,7 @@ namespace secw
   }
 
 /*-----------------------------------------------------------------------------*/
-/*   Client                                                                  */
+/*   Client                                                                    */
 /*-----------------------------------------------------------------------------*/
 //public
   bool Client::isMatchingClient( const ClientId & clientId) const
@@ -163,6 +163,34 @@ namespace secw
   {
     si.getMember("client_regex") >>= client.m_clientRegex;
     si.getMember("usages") >>= client.m_usages;
+  }
+
+/*-----------------------------------------------------------------------------*/
+/*   Others                                                                    */
+/*-----------------------------------------------------------------------------*/
+  std::set<UsageId> differenceBetween2UsagesIdSet(const std::set<UsageId> & a, const std::set<UsageId> & b)
+  {
+      std::set<UsageId> diff;
+      
+      //check if all a are in b
+      for(const UsageId & usage : a)
+      {
+          if(b.count(usage) == 0)
+          {
+              diff.insert(usage);
+          }
+      }
+      
+      //check if all b are in a
+      for(const UsageId & usage : b)
+      {
+        if(a.count(usage) == 0)
+        {
+            diff.insert(usage);
+        }
+      }
+      
+      return diff;
   }
 
 } // namespace secw

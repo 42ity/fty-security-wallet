@@ -83,12 +83,11 @@ namespace secw
                 Snmpv3AuthProtocol authProtocol = MD5,
                 const std::string & authPassword = "",
                 Snmpv3PrivProtocol privProtocol = DES,
-                const std::string & privPassword = "",
-                const Id & id = "");
+                const std::string & privPassword = "");
 
         DocumentPtr clone() const override;
 
-        void validate() const override {} //TODO fill this function
+        void validate() const override;
 
         //Public elements
         Snmpv3SecurityLevel getSecurityLevel() const { return m_securityLevel; }
@@ -96,9 +95,17 @@ namespace secw
         Snmpv3PrivProtocol getPrivProtocol() const { return m_privProtocol; }
         const std::string & getSecurityName() const { return m_securityName; }
 
+        void setSecurityLevel(Snmpv3SecurityLevel securityLevel) { m_securityLevel = securityLevel; }
+        void setAuthProtocol(Snmpv3AuthProtocol authProtocol)  {  m_authProtocol = authProtocol; }
+        void setPrivProtocol(Snmpv3PrivProtocol privProtocol)  {  m_privProtocol = privProtocol; }
+        void setSecurityName(const std::string & securityName)  {  m_securityName = securityName; }
+
         //Private elements
         const std::string & getAuthPassword() const { return m_authPassword; }
         const std::string & getPrivPassword() const { return m_privPassword; }
+
+        void setAuthPassword(const std::string & authPassword);
+        void setPrivPassword(const std::string & privPassword);
 
          /**
          * \brief try to cast a document to a Snmpv3 shared ptr

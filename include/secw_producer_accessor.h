@@ -41,13 +41,17 @@ namespace secw
     
     std::vector<DocumentPtr> getListDocumentsWithoutPrivateData(
       const std::string & portfolio,
-      const DocumentType & type = "") const;
+      const UsageId & usageId = "") const;
+
+    std::vector<DocumentPtr> getListDocumentsWithoutPrivateData(
+      const std::string & portfolio,
+      const std::vector<Id> & ids ) const;
     
     DocumentPtr getDocumentWithoutPrivateData(
       const std::string & portfolio,
       const Id & id) const;
 
-    void insertNewDocument(
+    Id insertNewDocument(
       const std::string & portfolio,
       const DocumentPtr & doc) const;
 
