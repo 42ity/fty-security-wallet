@@ -181,9 +181,15 @@ namespace secw
   void operator<<= (cxxtools::SerializationInfo& si, const DocumentPtr & doc);
   void operator>>= (const cxxtools::SerializationInfo& si, DocumentPtr & doc);
 
-  //add a stream operator to dyplay the document in debug for example
+  void operator<<= (std::string& str, const Document & doc);
+  void operator<<= (std::string& str, const DocumentPtr & doc);
+  void operator<<= (std::string& str, const std::vector<DocumentPtr> & docs);
+  void operator>>= (const std::string& str, DocumentPtr & doc);
+
+  //add a stream operator to display the document in debug for example
   std::ostream& operator<< (std::ostream& os, const DocumentPtr & doc);
   std::ostream& operator<< (std::ostream& os, const Document & doc);
+  std::ostream& operator<< (std::ostream& os, const std::vector<DocumentPtr> & docs);
 
 } // namepsace secw
 

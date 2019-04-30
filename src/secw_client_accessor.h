@@ -41,9 +41,6 @@ namespace secw
     ~ClientAccessor();
 
     std::vector<std::string> sendCommand(const std::string & command, const std::vector<std::string> & frames) const;
-
-    static cxxtools::SerializationInfo deserialize(const std::string & json);
-    static std::string serialize(const cxxtools::SerializationInfo & si);
     
   private:
     ClientId m_clientId;

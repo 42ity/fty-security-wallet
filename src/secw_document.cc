@@ -33,6 +33,7 @@
 #include "secw_user_and_password.h"
 
 #include <cxxtools/jsonserializer.h>
+#include <cxxtools/jsondeserializer.h>
 
 namespace secw
 {
@@ -235,6 +236,70 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
 
     }
 
+    void operator<<= (std::string& str, const Document & doc)
+    {
+        cxxtools::SerializationInfo si;
+        si <<= doc;
+
+        try
+        {
+            std::stringstream output;
+
+            cxxtools::JsonSerializer serializer(output);
+            serializer.serialize(si);
+
+            str = output.str();
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwException("Error while creating json "+std::string(e.what()));
+        }
+    }
+
+    void operator<<= (std::string& str, const DocumentPtr & doc)
+    {
+        str <<= *doc;
+    }
+
+    void operator>>= (const std::string& str, DocumentPtr & doc)
+    {
+        cxxtools::SerializationInfo si;
+
+        try
+        {
+            std::stringstream input;
+            input << str;
+            cxxtools::JsonDeserializer deserializer(input);
+            deserializer.deserialize(si);
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwProtocolErrorException("Error in json: "+std::string(e.what()));
+        }
+
+        si >>= doc;
+    }
+
+    void operator<<= (std::string& str, const std::vector<DocumentPtr> & docs)
+    {
+        cxxtools::SerializationInfo si;
+        si <<= docs;
+
+        try
+        {
+            std::stringstream output;
+
+            cxxtools::JsonSerializer serializer(output);
+            serializer.serialize(si);
+
+            str = output.str();
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwException("Error while creating json "+std::string(e.what()));
+        }
+    }
+
     std::ostream& operator<< (std::ostream& os, const DocumentPtr & doc)
     {
         os << *(doc);
@@ -243,12 +308,18 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
 
     std::ostream& operator<< (std::ostream& os, const Document & doc)
     {
-        cxxtools::SerializationInfo si;
-        si <<= doc;
+        std::string data;
+        data <<= doc;
+        os << data << std::endl;
 
-        cxxtools::JsonSerializer serializer(os);
-        serializer.beautify(true);
-        serializer.serialize(si).finish();
+        return os;
+    }
+
+    std::ostream& operator<< (std::ostream& os, const std::vector<DocumentPtr> & docs)
+    {
+        std::string data;
+        data <<= docs;
+        os << data << std::endl;
 
         return os;
     }

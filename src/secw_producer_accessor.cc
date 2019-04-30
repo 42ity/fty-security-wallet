@@ -1021,7 +1021,62 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
     }
   }
 
-  
+std::string document;
+//test 8.1 => test serialization in string of doc
+  testNumber = "8.1";
+  testName = "serialization in string of doc";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+    printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    try
+    {
+      Snmpv3Ptr snmpv3Doc = std::make_shared<Snmpv3>("Test insert snmpv3",
+                Snmpv3SecurityLevel::AUTH_PRIV,
+                "test security name",
+                Snmpv3AuthProtocol::MD5,
+                "test auth password",
+                Snmpv3PrivProtocol::AES,
+                "test priv password");
+      
+      snmpv3Doc->validate();
+
+      document <<= snmpv3Doc;
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 8.2 => test deserialization of doc from string
+  testNumber = "8.2";
+  testName = "deserialization of doc from string";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+    printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    try
+    {
+      DocumentPtr doc;
+
+      document >>= doc;
+      
+      doc->validate();
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
 
   return testsResults;
   
