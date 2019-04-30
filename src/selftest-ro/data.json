@@ -38,6 +38,30 @@
                                         "secw_snmpv3_auth_password": "Fake_auth_password",
                                         "secw_snmpv3_priv_password": "Fake_priv_password"
                                 }
+                        },
+                        {
+                                "secw_doc_id": "snmpv1-test",
+                                "secw_doc_name": "myFirstDocSnmpv1",
+                                "secw_doc_type": "Snmpv1",
+                                "secw_doc_tags": [],
+                                "secw_doc_usages": [ "nobody_access" ],
+                                "secw_doc_public": {
+                                        "secw_snmpv1_community_name": "Test"
+                                },
+                                "secw_doc_private": null
+                        },
+                        {
+                                "secw_doc_id": "password-test",
+                                "secw_doc_name": "myFirstDoc password",
+                                "secw_doc_type": "UserAndPassword",
+                                "secw_doc_tags": [],
+                                "secw_doc_usages": [ "nobody_access" ],
+                                "secw_doc_public": {
+                                        "secw_user_and_password_username": "username"
+                                },
+                                "secw_doc_private": {
+                                        "secw_user_and_password_password": "password"
+                                }
                         }
                     ]
             }

@@ -291,9 +291,9 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
     {
       std::vector<DocumentPtr> doc = producerAccessor.getListDocumentsWithoutPrivateData("default");
 
-      if(doc.size() != 2)
+      if(doc.size() != 4)
       {
-        throw std::runtime_error("Not the good number of documents: expected 2, received "+std::to_string(doc.size()));
+        throw std::runtime_error("Not the good number of documents: expected 4, received "+std::to_string(doc.size()));
       }
       
       if(doc[0]->isContainingPrivateData())
@@ -631,7 +631,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
     }
   }
 
-  //test 6.1 => insertNewDocument User and Password
+//test 6.1 => insertNewDocument User and Password
   testNumber = "6.1";
   testName = "insertNewDocument User and Password";
   printf("\n-----------------------------------------------------------------------\n");
@@ -825,6 +825,203 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
       testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
     }
   }
+
+
+//test 7.1 => insertNewDocument Snmpv1
+  testNumber = "7.1";
+  testName = "insertNewDocument Snmpv1";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+    printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    try
+    {
+      Snmpv1Ptr doc = std::make_shared<Snmpv1>("Test insert snmpv1","community");
+
+      doc->addUsage("discovery_monitoring");
+
+      id = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<Document>(doc));
+
+      //check that the doc is inserted
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 7.2 => insertNewDocument Snmpv1 -> retrieve data
+  testNumber = "7.2";
+  testName = "insertNewDocument Snmpv1 -> retrieve data";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    try
+    {
+      DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+      Snmpv1Ptr doc = Snmpv1::tryToCast(insertedDoc);
+
+      if(doc == nullptr) throw std::runtime_error("No document retrieved");
+
+      if(doc->getUsageIds().count("discovery_monitoring") == 0) throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
+      if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
+
+      if(doc->getName() != "Test insert snmpv1") throw std::runtime_error("Bad document retrieved: name do not match");
+      
+      if(doc->getCommunityName() != "community") throw std::runtime_error("Bad document retrieved: community do not match");
+
+      //doc is valid
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 7.3 => updateDocument Snmpv1
+  testNumber = "7.3";
+  testName = "updateDocument Snmpv1";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    try
+    {
+      DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+      Snmpv1Ptr doc = Snmpv1::tryToCast(insertedDoc);
+
+      if(doc == nullptr) throw std::runtime_error("No document retrieved");
+
+      //update
+      doc->setName("Test update snmpv1");
+      doc->setCommunityName("new_community");
+
+      //update
+      producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(doc));
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 7.4 => updateDocument Snmpv1 -> retrieve data
+  testNumber = "7.4";
+  testName = "updateDocument Snmpv1 -> retrieve data";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    try
+    {
+      DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+      Snmpv1Ptr doc = Snmpv1::tryToCast(insertedDoc);
+
+      if(doc == nullptr) throw std::runtime_error("No document retrieved");
+
+      if(doc->getUsageIds().count("discovery_monitoring") == 0) throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
+      if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
+
+      
+      if(doc->getName() != "Test update snmpv1") throw std::runtime_error("Bad document retrieved: name do not match");
+      if(doc->getCommunityName() != "new_community") throw std::runtime_error("Bad document retrieved: community do not match");
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+
+//test 7.5 => updateDocument Snmpv1 -> bad format
+  testNumber = "7.5";
+  testName = "updateDocument Snmpv1 -> bad format";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    try
+    {
+     DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+      Snmpv1Ptr doc = Snmpv1::tryToCast(insertedDoc);
+
+      if(doc == nullptr) throw std::runtime_error("No document retrieved");
+
+      //update with wrong data
+      doc->setCommunityName("");
+
+      //update
+      producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(doc));
+
+      throw std::runtime_error("Document has been updated");
+    }
+    catch(const SecwInvalidDocumentFormatException &)
+    {
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 7.6 => deleteDocument Snmpv1
+  testNumber = "7.6";
+  testName = "deleteDocument Snmpv1";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    try
+    {
+      producerAccessor.deleteDocument("default", id);
+
+      //check that the document is removed
+      if(producerAccessor.getListDocumentsWithoutPrivateData("default", {id}).size() != 0)
+      {
+        throw std::runtime_error("Document is not removed");
+      }
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+  
 
   return testsResults;
   

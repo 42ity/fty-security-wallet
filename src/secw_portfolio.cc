@@ -147,16 +147,10 @@ namespace secw
                     DocumentPtr doc;
                     documents.getMember(index) >>= doc;
                     
-                    if(doc->isContainingPrivateData())
-                    {
-                        m_documents[doc->getId()] = doc;
-                        count++;
-                    }
-                    else
-                    {
-                        log_error("Impossible to load the document with the id %s from portfolio because private part is missing", doc->getId().c_str());
-                    }
+                    doc->validate();
 
+                    m_documents[doc->getId()] = doc;
+                    count++;
                 }
                 catch(const std::exception& e)
                 {

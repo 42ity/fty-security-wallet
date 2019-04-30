@@ -90,5 +90,10 @@ namespace secw
         return ptr;
     }
 
+    void Snmpv1::validate() const
+    {
+        if(m_communityName.empty()) throw SecwInvalidDocumentFormatException("Community name is empty");
+    }
+
 } // namespace secw
 

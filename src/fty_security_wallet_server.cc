@@ -898,6 +898,16 @@ fty_security_wallet_server_test (bool verbose)
     else
     {
         printf(ANSI_COLOR_RED"\n!!!!!!!! %i/%i tests did not pass !!!!!!!! \n" ANSI_COLOR_RESET "\n",testsFailed,(testsPassed+testsFailed));
+
+        printf("Content of the database at the end of tests: \n");
+        printf("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+
+        std::ifstream database(SELFTEST_DIR_RW"/data.json", std::ios::binary);
+        std::cerr << database.rdbuf() << std::endl;
+
+        database.close();
+        printf("\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+
         assert(false);
     }
 

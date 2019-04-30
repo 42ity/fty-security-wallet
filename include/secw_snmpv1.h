@@ -50,10 +50,11 @@ namespace secw
 
         DocumentPtr clone() const override;
 
-        void validate() const override {}
+        void validate() const override;
 
         //Public elements
         const std::string & getCommunityName() const { return m_communityName; }
+        void setCommunityName(const std::string & community) { m_communityName = community; }
 
         //Private elements
         //no private
