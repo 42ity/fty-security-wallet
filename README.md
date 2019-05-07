@@ -85,61 +85,12 @@ The SecurityWalletServer has a list of portfolio available.
 ### Access control
 In progress: Will be done using the notion of "Usage" of document
 
-### Mailbox protocol
-To be Redefined
+### Available Api
 
-Protocol between clients and server is define as follow.
+Api is available for producer and consumer. See secw_producer_accessor.h and secw_consumer_accessor.h
 
-Request from client:
-* Message subject "REQUEST"
-* Frame 1: Correlation id
-* Frame 2: Command
-* frame 3-n : Parameters for the command
-
-Normal Reply
-* Message subject "REPLY"
-* Frame 1: Correlation id
-* Frame 2: Data in Json format or "OK" if no data where needed
-
-Error Reply
-* Message subject "REPLY"
-* Frame 1: Correlation id
-* Frame 2: "ERROR"
-* Frame 3: Error description in Json if the error belong to SecwException
-
-#### Available Command
-To be Redefined
-
-The library is using this command. Please avoid to use mailbox directly.
-Prefer to use the library and the class ClientAccess
-It is possible to request the agent security-wallet for:
-
-* GET_PORTFOLIO_LIST: Return list of portfolio on the server
-* GET_LIST_WITH_SECRET: Return the list of document from the server without private part
-* GET_LIST_WITHOUT_SECRET: Return the list of document which can be access by the client from the server with private part
-* GET_EDITABLE_TAGS: Return list of tag which can be use to edit document
-* GET_READABLE_TAGS: Return list of tag which can be use to read private data
-* GET_WITHOUT_SECRET: Get a document without private data
-* GET_WITH_SECRET: Get a document with private data
-
-```bash
-bmsg request security-wallet REQUEST 1234 GET_LIST_WITH_SECRET  default 
-bmsg request security-wallet REQUEST 1234 GET_LIST_WITHOUT_SECRET  default
-``` 
 
 ### Published Document modification
 
 To be Defined
 
-Document update/creation/deletion are published on the 'SECURITY_WALLET' stream.
-
-To be Defined
-
-Example of alert message:
-
-```bash
-stream=SECURITY_WALLET
-sender=security-wallet
-subject=<TBD>
-TBD
-```

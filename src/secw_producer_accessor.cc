@@ -108,7 +108,7 @@ namespace secw
         //filter exceptions => ID not found and no access to this id
         if( (e.getErrorCode() != DOCUMENT_DO_NOT_EXIST) && (e.getErrorCode() != ILLEGAL_ACCESS) )
         {
-          throw e; //throw
+          throw; //throw
         }
       }
     }
