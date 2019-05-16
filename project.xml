@@ -146,6 +146,16 @@
         </use>
     </use>
 
+    <!-- Note: Credential asset mapping -->
+    <class name = "cam_credential_asset_mapping_storage" private = "1" selftest = "0">Credential asset mapping class to manage the storage</class>
+    
+    <class name = "cam_credential_asset_mapping" selftest = "0">Credential asset mapping class</class>
+    <class name = "cam_accessor" selftest = "0">Accessor to Credential asset mapping</class>
+    <class name = "cam_exception" selftest = "0">Credential asset mapping exceptions</class>
+
+    <class name = "fty-credential-asset-mapping-server">Credential Asset Mapping Server</class>
+
+    <!-- Note: Secw class -->
     <class name = "secw_security_wallet" private = "1" selftest = "0">Security wallet to manage the storage and access</class>
     <class name = "secw_portfolio" private = "1" selftest = "0">Portfolio to handle documents in the agent</class>
 
