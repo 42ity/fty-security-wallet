@@ -75,6 +75,7 @@ namespace secw
             case UNKNOWN_TAG:                   throw SecwUnknownTagException(whatArg);
             case DOCUMENT_DO_NOT_EXIST:         throw SecwDocumentDoNotExistException(whatArg);
             case ILLEGAL_ACCESS:                throw SecwIllegalAccess(whatArg);
+            case UNKNOWN_USAGE_ID:              throw SecwUnknownUsageIDException(whatArg);
             default: throw SecwException(whatArg);
         }
     }
