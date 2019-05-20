@@ -22,6 +22,8 @@
 #ifndef SECW_PRODUCER_ACCESSOR_H_INCLUDED
 #define SECW_PRODUCER_ACCESSOR_H_INCLUDED
 
+#include "secw_document.h"
+
 namespace secw
 {
   using ClientId = std::string;
