@@ -169,7 +169,7 @@ namespace secw
             }
         }
        
-        throw SecwUnknownPortfolioException(" Portfolio "+name+" does not exist");
+        throw SecwUnknownPortfolioException(name);
     }
     
 } //namepace secw

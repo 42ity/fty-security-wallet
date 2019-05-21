@@ -61,15 +61,14 @@ namespace secw
         }
         catch(...)
         {}
-        
-
+              
         switch(errorCode)
         {
             case UNSUPPORTED_COMMAND:           throw SecwUnsupportedCommandException(whatArg);
             case PROTOCOL_ERROR:                throw SecwProtocolErrorException(whatArg);
             case BAD_COMMAND_ARGUMENT:          throw SecwBadCommandArgumentException(whatArg);
             case UNKNOWN_DOCUMENT_TYPE:         throw SecwUnknownDocumentTypeException(whatArg);
-            case UNKNOWN_PORTFOLIO:             throw SecwUnknownPortfolioException(whatArg);
+            case UNKNOWN_PORTFOLIO:             throw SecwUnknownPortfolioException(extraData, whatArg);
             case INVALID_DOCUMENT_FORMAT:       throw SecwInvalidDocumentFormatException(whatArg);
             case IMPOSSIBLE_TO_LOAD_PORTFOLIO:  throw SecwImpossibleToLoadPortfolioException(whatArg);
             case UNKNOWN_TAG:                   throw SecwUnknownTagException(whatArg);
@@ -112,6 +111,8 @@ namespace secw
 //Protected 
     void SecwException::fillSerializationInfo(cxxtools::SerializationInfo& /*si*/) const
     {}
+
+
 
 } // namespace secw
 

@@ -114,10 +114,27 @@ namespace secw
 // Portfolio is unknown
     class SecwUnknownPortfolioException : public SecwException
     {
+    private:
+        std::string m_portfolioName;
+
+        void fillSerializationInfo(cxxtools::SerializationInfo& si) const override
+        {
+            si.addMember("portfolioName") <<= m_portfolioName;
+        }
+
     public:
-        explicit SecwUnknownPortfolioException(const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::UNKNOWN_PORTFOLIO)
+        explicit SecwUnknownPortfolioException(const std::string & portfolioName) :
+            SecwException("Unknown portfolio '"+portfolioName+"'", ErrorCode::UNKNOWN_PORTFOLIO),
+            m_portfolioName(portfolioName)
         {}
+
+        SecwUnknownPortfolioException(cxxtools::SerializationInfo& extraData, const std::string & whatArg) :
+            SecwException(whatArg, ErrorCode::UNKNOWN_PORTFOLIO)
+        {
+            extraData.getMember("portfolioName") >>= m_portfolioName;
+        }
+
+        inline std::string getPortfolioName() const { return m_portfolioName; }
     };
 
 // Invalid format of document

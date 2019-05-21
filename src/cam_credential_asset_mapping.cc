@@ -21,12 +21,19 @@
 
 #include "cam_credential_asset_mapping.h"
 
+#include <iostream>
+
 #include <cxxtools/jsonserializer.h>
 #include <cxxtools/jsondeserializer.h>
 
 namespace cam
 {
-  CredentialAssetMapping::CredentialAssetMapping()
+  CredentialAssetMapping::CredentialAssetMapping():
+  m_assetId(),
+  m_usageId(),
+  m_credentialId(),
+  m_credentialStatus(CredentialStatus::UNKNOWN),
+  m_extendedInfo()
   {}
 
   void CredentialAssetMapping::fillSerializationInfo(cxxtools::SerializationInfo& si) const

@@ -39,6 +39,7 @@ namespace cam
         BAD_COMMAND_ARGUMENT,
         MAPPING_DO_NOT_EXIST,
         MAPPING_ALREADY_EXIST,
+        MAPPING_INVALID,
     };
 
     class CamException : public std::exception
@@ -114,6 +115,15 @@ namespace cam
     public:
         explicit CamMappingAlreadyExistException(const std::string & whatArg) :
             CamException(whatArg, ErrorCode::MAPPING_ALREADY_EXIST)
+        {}
+    };
+
+// Mapping invalid
+    class CamMappingInvalidException : public CamException
+    {
+    public:
+        explicit CamMappingInvalidException(const std::string & whatArg) :
+            CamException(whatArg, ErrorCode::MAPPING_INVALID)
         {}
     };
 

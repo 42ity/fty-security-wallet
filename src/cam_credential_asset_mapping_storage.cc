@@ -41,7 +41,7 @@ namespace cam
         {
             struct stat buffer;   
             bool fileExist =  (stat (m_pathDatabase.c_str(), &buffer) == 0);
-        
+
             //try to open portfolio if exist
             if(fileExist)
             {
@@ -58,7 +58,20 @@ namespace cam
 
                 if(version == 1)
                 {
-                    rootSi.getMember("mappings") >>= m_mappings;
+                    std::vector<CredentialAssetMapping> listOfmapping;
+                    rootSi.getMember("mappings") >>= listOfmapping;
+                    
+                    for( const CredentialAssetMapping &  mapping : listOfmapping)
+                    {
+                        try
+                        {
+                            setMapping(mapping);
+                        }
+                        catch(const std::exception& e) //show must go on
+                        {
+                            log_error("Error on one element: %s",e.what());
+                        }
+                    }
                 }
                 else
                 {
@@ -69,6 +82,13 @@ namespace cam
             {
                 log_info(" No mapping %s. Creating default mapping...", m_pathDatabase.c_str());
             }
+
+            /*CredentialAssetMapping mapping;
+            mapping.m_usageId = "test-usage";
+            mapping.m_assetId = "asset-1";
+            mapping.m_credentialId = "cred-1";
+
+            setMapping(mapping);*/
         }
         catch(const std::exception& e)
         {
@@ -94,7 +114,15 @@ namespace cam
         cxxtools::SerializationInfo rootSi;
 
         rootSi.addMember("version") <<= MAPPING_VERSION;
-        rootSi.addMember("mappings") <<= m_mappings;
+
+        std::vector<CredentialAssetMapping> list;
+
+        for( const auto item : m_mappings)
+        {
+            list.push_back(item.second);
+        }
+
+        rootSi.addMember("mappings") <<= list;
 
         //open the file
         std::ofstream output(m_pathDatabase.c_str());
@@ -120,6 +148,11 @@ namespace cam
 
     void CredentialAssetMappingStorage::setMapping(const CredentialAssetMapping & mapping)
     {
+        if( mapping.m_assetId.empty() || mapping.m_usageId.empty() || mapping.m_credentialId.empty() )
+        {
+            throw CamException("Bad format");
+        }
+
         Hash hash = computeHash(mapping.m_assetId, mapping.m_usageId);
         m_mappings[hash] = mapping;
     }

@@ -316,7 +316,7 @@ fty_credential_asset_mapping_server_test (bool verbose)
     if (verbose)
         zstr_send (broker, "VERBOSE");
     
-    zactor_t *server = zactor_new (fty_security_wallet_server, (void *)endpoint);
+    zactor_t *server = zactor_new (fty_credential_asset_mapping_server, (void *)endpoint);
     //set configuration parameters
     zstr_sendx (server, "STORAGE_MAPPING_PATH", SELFTEST_DIR_RO"/mapping.json", NULL);
     zstr_sendx (server, "CONNECT", endpoint, MAPPING_AGENT, NULL);
@@ -411,6 +411,11 @@ fty_credential_asset_mapping_server_test (bool verbose)
     if(testsFailed == 0)
     {
         printf(ANSI_COLOR_GREEN"\n %i tests passed, everything is ok\n" ANSI_COLOR_RESET "\n",testsPassed);
+        
+        /*std::ifstream database(SELFTEST_DIR_RW"/mapping.json", std::ios::binary);
+        std::cerr << database.rdbuf() << std::endl;
+
+        database.close();*/
     }
     else
     {
