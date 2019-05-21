@@ -20,6 +20,16 @@
 */
 #include "cam_credential_asset_mapping_storage.h"
 
+#include <fty_log.h>
+
+#include <fstream>
+#include <iostream>
+#include <cxxtools/jsonserializer.h>
+#include <cxxtools/jsondeserializer.h>
+
+#include <sys/stat.h>
+#include <unistd.h>
+
 namespace cam
 {
 
@@ -58,7 +68,6 @@ namespace cam
             else
             {
                 log_info(" No mapping %s. Creating default mapping...", m_pathDatabase.c_str());
-                m_portfolios.emplace_back(Portfolio("default"));
             }
         }
         catch(const std::exception& e)
@@ -103,15 +112,15 @@ namespace cam
         {
             return m_mappings.at(hash);
         }
-        catch(const std::exception&)
+        catch(const std::exception& e)
         {
-            throw CamMappingDoNotExistException();
+            throw CamMappingDoNotExistException("Error: "+std::string(e.what()));
         }
     }
 
     void CredentialAssetMappingStorage::setMapping(const CredentialAssetMapping & mapping)
     {
-        Hash hash = computeHash(mappings.m_assetId, mappings.m_usageId);
+        Hash hash = computeHash(mapping.m_assetId, mapping.m_usageId);
         m_mappings[hash] = mapping;
     }
 
@@ -123,7 +132,7 @@ namespace cam
 
         if(deleted == 0)
         {
-            throw CamMappingDoNotExistException();
+            throw CamMappingDoNotExistException(hash);
         }
 
     }
@@ -145,50 +154,50 @@ namespace cam
         return isMappingExisting;
     }
 
-    std::vector<const CredentialAssetMapping &> CredentialAssetMappingStorage::getCredentialMappingsForUsage( const CredentialId & credentialId,
+    std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getCredentialMappingsForUsage( const CredentialId & credentialId,
                                                                         const UsageId & usageId) const
     {
-        std::vector<const CredentialAssetMapping &> list;
+        std::vector<CredentialAssetMapping> list;
 
         for( const auto item : m_mappings)
         {
             if( (item.second.m_usageId == usageId) && (item.second.m_credentialId == credentialId) )
             {
-                list.emplace_back(item.second);
+                list.push_back(item.second);
             }
         }
 
-        return  m_mappings;   
+        return  list;   
     }
 
-    std::vector<const CredentialAssetMapping &> CredentialAssetMappingStorage::getCredentialMappings(const CredentialId & credentialId) const
+    std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getCredentialMappings(const CredentialId & credentialId) const
     {
-        std::vector<const CredentialAssetMapping &> list;
+        std::vector<CredentialAssetMapping> list;
 
         for( const auto item : m_mappings)
         {
             if( item.second.m_credentialId == credentialId )
             {
-                list.emplace_back(item.second);
+                list.push_back(item.second);
             }
         }
 
-        return  m_mappings;  
+        return list;  
     }
 
-    std::vector<const CredentialAssetMapping &> CredentialAssetMappingStorage::getAssetMappings(const AssetId & assetId) const
+    std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getAssetMappings(const AssetId & assetId) const
     {
-        std::vector<const CredentialAssetMapping &> list;
+        std::vector<CredentialAssetMapping> list;
 
         for( const auto item : m_mappings)
         {
             if( item.second.m_assetId == assetId )
             {
-                list.emplace_back(item.second);
+                list.push_back(item.second);
             }
         }
 
-        return  m_mappings; 
+        return  list; 
     }
 
     Hash CredentialAssetMappingStorage::computeHash(const AssetId & assetId, const UsageId & usageId)

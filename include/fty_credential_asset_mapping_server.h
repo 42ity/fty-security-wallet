@@ -22,9 +22,11 @@
 #ifndef FTY_CREDENTIAL_ASSET_MAPPING_SERVER_H_INCLUDED
 #define FTY_CREDENTIAL_ASSET_MAPPING_SERVER_H_INCLUDED
 
-#include "fty_common_mlm_agent.h"
-
 #include "cam_credential_asset_mapping.h"
+
+#include <czmq.h>
+#include <malamute.h>
+#include <fty_common_mlm.h>
 
 #include <functional>
 
@@ -65,8 +67,8 @@ namespace cam
     
     public:
         //Command list
-        static constexpr const char* GET_PORTFOLIO_LIST = "GET_MAPPING";
-        static constexpr const char* GET_PORTFOLIO_LIST = "SET_MAPPING";
+        static constexpr const char* GET_MAPPING = "GET_MAPPING";
+        static constexpr const char* CREATE_MAPPING = "CREATE_MAPPING";
 
     };
     

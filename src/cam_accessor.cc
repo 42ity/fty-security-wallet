@@ -21,6 +21,14 @@
 
 #include "cam_accessor.h"
 
+#include "cam_helpers.h"
+
+#include <fty_common_mlm.h>
+
+#include "fty_credential_asset_mapping_server.h"
+
+#include "fty_security_wallet.h"
+
 namespace cam
 {
   Accessor::Accessor(const ClientId & clientId,
@@ -37,6 +45,48 @@ namespace cam
   {
     mlm_client_destroy(&m_client);
   }
+
+  void Accessor::createMapping( const AssetId & assetId, const UsageId & usageId,
+                      const CredentialId & credentialId, CredentialStatus status,
+                      const MapExtendedInfo & extendedInfo)
+  {
+    CredentialAssetMapping mapping;
+
+    mapping.m_assetId = assetId;
+    mapping.m_usageId = usageId;
+    mapping.m_credentialId = credentialId;
+    mapping.m_credentialStatus = status;
+    mapping.m_extendedInfo = extendedInfo;
+
+    cxxtools::SerializationInfo si;
+
+    si <<= mapping;
+
+    sendCommand(CredentialAssetMappingServer::CREATE_MAPPING, {serialize(si)} );
+  }
+
+  const CredentialAssetMapping Accessor::getMapping(const AssetId & assetId, const UsageId & usageId) const
+  {
+    CredentialAssetMapping mapping;
+
+    std::vector<std::string> payload;
+
+    payload = sendCommand(CredentialAssetMappingServer::GET_MAPPING, {assetId, usageId} );
+
+    cxxtools::SerializationInfo si = deserialize(payload.at(0));
+
+    si >>= mapping;
+
+    return mapping;
+  }
+
+  /*bool isMappingExisting(const AssetId & assetId, const UsageId & usageId) const;
+  
+  void updateCredentialId(const AssetId & assetId, const UsageId & usageId, const CredentialId & credentialId);
+  void updateCredentialStatus(const AssetId & assetId, const UsageId & usageId, CredentialStatus status);
+  void updateExtendedInfo(const AssetId & assetId, const UsageId & usageId, const MapExtendedInfo & extendedInfo);
+
+  void removeMapping(const AssetId & assetId, const UsageId & usageId);*/
 
   std::vector<std::string> Accessor::sendCommand(const std::string & command, const std::vector<std::string> & frames) const
   {
@@ -55,7 +105,7 @@ namespace cam
     }
 
     //send the message
-    mlm_client_sendto (m_client, SECURITY_WALLET_AGENT, "REQUEST", NULL, m_timeout, &request);
+    mlm_client_sendto (m_client, MAPPING_AGENT, "REQUEST", NULL, m_timeout, &request);
 
     //Get the reply
     ZmsgGuard recv(mlm_client_recv (m_client));
@@ -103,3 +153,49 @@ namespace cam
   }
 
 } //namespace cam
+
+
+//  --------------------------------------------------------------------------
+//  Test of this class => This is used by fty_credential_asset_mapping_server_test
+//  --------------------------------------------------------------------------
+
+
+#define CAM_SELFTEST_CLIENT_ID "cam-client-test"
+
+std::vector<std::pair<std::string,bool>> cam_accessor_test()
+{
+  std::vector<std::pair<std::string,bool>> testsResults;
+
+  static const char* endpoint = "inproc://fty-credential-asset-mapping-test";
+  
+  using namespace cam;
+
+  printf(" ** cam_accessor_test: \n");
+
+  std::string testNumber, testName;
+
+  //test 1.1 => test retrieve a mapping
+  testNumber = "1.1";
+  testName = "Retrieve a mapping";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+    printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    try
+    {
+      Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+
+
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+
+
+  return testsResults;
+  
+}

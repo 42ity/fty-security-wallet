@@ -22,17 +22,10 @@
 #ifndef CAM_ACCESSOR_H_INCLUDED
 #define CAM_ACCESSOR_H_INCLUDED
 
-    /*CredentialId getCredentialId(const AssetId & assetId, const UsageId & usageId) const;
-    Status getCredentialStatus(const AssetId & assetId, const UsageId & usageId) const;
-    MapExtendedInfo getExtendedInfo(const AssetId & assetId, const UsageId & usageId) const;
+#include "cam_credential_asset_mapping.h"
 
-    bool isMAppingExisting(const AssetId & assetId, const UsageId & usageId) const;
-    
-    void updateCredentialId(const AssetId & assetId, const UsageId & usageId, const CredentialId & credentialId);
-    void updateCredentialStatus(const AssetId & assetId, const UsageId & usageId, Status status);
-    void updateExtendedInfo(const AssetId & assetId, const UsageId & usageId, const MapExtendedInfo & extendedInfo);
-
-    void removeMapping(const AssetId & assetId, const UsageId & usageId);*/
+#include <czmq.h>
+#include <malamute.h>
 
 namespace cam
 {
@@ -45,10 +38,10 @@ namespace cam
   public:
     /**
      * @brief Construct a new Accessor object
-     * 
-     * @param clientId 
-     * @param timeout 
-     * @param endPoint 
+     *
+     * @param clientId
+     * @param timeout
+     * @param endPoint
      */
     explicit Accessor(const ClientId & clientId,
                 uint32_t timeout,
@@ -56,22 +49,25 @@ namespace cam
     
     ~Accessor();
 
-    const CredentialAssetMapping getMapping(const AssetId & assetId, const UsageId & usageId) const;
-
     /*CredentialId getCredentialId(const AssetId & assetId, const UsageId & usageId) const;
     CredentialId getCredentialId(const AssetId & assetId, const UsageId & usageId) const;
-    Status getCredentialStatus(const AssetId & assetId, const UsageId & usageId) const;
+    CredentialStatus getCredentialStatus(const AssetId & assetId, const UsageId & usageId) const;
     MapExtendedInfo getExtendedInfo(const AssetId & assetId, const UsageId & usageId) const;*/
 
-    bool isMAppingExisting(const AssetId & assetId, const UsageId & usageId) const;
+    void createMapping( const AssetId & assetId, const UsageId & usageId,
+                        const CredentialId & credentialId, CredentialStatus status = UNKNOWN,
+                        const MapExtendedInfo & extendedInfo = {});
+
+    const CredentialAssetMapping getMapping(const AssetId & assetId, const UsageId & usageId) const;
+
+    /*bool isMappingExisting(const AssetId & assetId, const UsageId & usageId) const;
     
     void updateCredentialId(const AssetId & assetId, const UsageId & usageId, const CredentialId & credentialId);
-    void updateCredentialStatus(const AssetId & assetId, const UsageId & usageId, Status status);
+    void updateCredentialStatus(const AssetId & assetId, const UsageId & usageId, CredentialStatus status);
     void updateExtendedInfo(const AssetId & assetId, const UsageId & usageId, const MapExtendedInfo & extendedInfo);
 
-    void removeMapping(const AssetId & assetId, const UsageId & usageId);
+    void removeMapping(const AssetId & assetId, const UsageId & usageId);*/
   
-    
   private:
     ClientId m_clientId;
     uint32_t m_timeout;

@@ -23,6 +23,8 @@
 #include <cxxtools/jsondeserializer.h>
 #include <cxxtools/jsonserializer.h>
 
+#include "cam_exception.h"
+
 namespace cam
 {
 /*-----------------------------------------------------------------------------*/

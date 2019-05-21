@@ -35,7 +35,7 @@ namespace cam
     si.addMember(ASSET_ID_ENTRY) <<= m_assetId;
     si.addMember(CREDENTIAL_ID_ENTRY) <<= m_credentialId;
     si.addMember(CREDENTIAL_STATUS_ENTRY) <<= m_credentialStatus;
-    si.addMember(EXTENDED_INFO_ENTRY) <<= m_exendedInfo;
+    si.addMember(EXTENDED_INFO_ENTRY) <<= m_extendedInfo;
   }
 
   void CredentialAssetMapping::fromSerializationInfo(const cxxtools::SerializationInfo& si)
@@ -45,8 +45,12 @@ namespace cam
       si.getMember(USAGE_ID_ENTRY) >>= m_usageId;
       si.getMember(ASSET_ID_ENTRY) >>= m_assetId;
       si.getMember(CREDENTIAL_ID_ENTRY) >>= m_credentialId;
-      si.getMember(CREDENTIAL_STATUS_ENTRY) >>= m_credentialStatus;
-      si.getMember(EXTENDED_INFO_ENTRY) >>= m_exendedInfo;
+      
+      uint8_t status = 0;
+      si.getMember(CREDENTIAL_STATUS_ENTRY) >>= status;
+      m_credentialStatus = static_cast<CredentialStatus>(status);
+      
+      si.getMember(EXTENDED_INFO_ENTRY) >>= m_extendedInfo;
     }
     /*catch(const std::exception& e)
     {
@@ -61,7 +65,7 @@ namespace cam
     //try
     {
       cxxtools::SerializationInfo si;
-      fromSerializationInfo(si);
+      fillSerializationInfo(si);
 
       std::stringstream output;
       cxxtools::JsonSerializer serializer(output);

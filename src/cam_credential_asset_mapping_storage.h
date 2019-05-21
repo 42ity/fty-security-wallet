@@ -43,12 +43,12 @@ namespace cam
 
     bool isMappingExisting(const AssetId & assetId, const UsageId & usageId) const;
 
-    std::vector<const CredentialAssetMapping &> getCredentialMappingsForUsage( const CredentialId & credentialId,
+    std::vector<CredentialAssetMapping> getCredentialMappingsForUsage( const CredentialId & credentialId,
                                                                         const UsageId & usageId) const;
 
-    std::vector<const CredentialAssetMapping &> getCredentialMappings(const CredentialId & credentialId) const;
+    std::vector<CredentialAssetMapping> getCredentialMappings(const CredentialId & credentialId) const;
 
-    std::vector<const CredentialAssetMapping &> getAssetMappings(const AssetId & assetId) const;
+    std::vector<CredentialAssetMapping> getAssetMappings(const AssetId & assetId) const;
 
     static constexpr const uint8_t MAPPING_VERSION = 1;
 

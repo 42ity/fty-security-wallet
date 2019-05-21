@@ -14,6 +14,7 @@ pkgconfig_DATA = src/libfty_security_wallet.pc
 
 src_libfty_security_wallet_la_SOURCES = \
     src/cam_credential_asset_mapping_storage.cc \
+    src/cam_helpers.cc \
     src/secw_security_wallet.cc \
     src/secw_portfolio.cc \
     src/secw_client_accessor.cc \

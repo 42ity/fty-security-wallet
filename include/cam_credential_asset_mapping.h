@@ -27,6 +27,8 @@
 #include <functional>
 #include <iostream>
 
+#include "cam_exception.h"
+
 namespace cam
 {
   
@@ -74,6 +76,7 @@ namespace cam
     UsageId m_usageId;
     AssetId m_assetId;
     CredentialId m_credentialId;
+    CredentialStatus m_credentialStatus;
     MapExtendedInfo m_extendedInfo;
 
   };

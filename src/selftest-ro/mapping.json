@@ -1,0 +1,13 @@
+{
+	"version": 1,
+    "mappings": [
+            {
+                    "cam_asset": "asset-1",
+					"cam_usage": "test-usage",
+					"cam_credential": "ABCD",
+					"cam_status": 0,
+					"cam_extended_info":
+					[]
+			}
+    ]
+}

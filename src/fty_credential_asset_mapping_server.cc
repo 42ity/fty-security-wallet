@@ -25,6 +25,8 @@
 #include "cam_credential_asset_mapping_storage.h"
 #include "cam_exception.h"
 
+#include "fty_security_wallet.h"
+
 #include <sstream>
 #include <cxxtools/jsonserializer.h>
 
@@ -38,7 +40,7 @@ namespace cam
     {
         //initiate the commands handlers
         m_supportedCommands[GET_MAPPING] = handleNotImplementedCmd;
-        m_supportedCommands[SET_MAPPING] = handleNotImplementedCmd;
+        m_supportedCommands[CREATE_MAPPING] = handleNotImplementedCmd;
     }
 
     /* Commands implementation section*/
@@ -73,7 +75,7 @@ namespace cam
         {
             m_activeMapping = std::make_shared<CredentialAssetMappingStorage>(g_storageMapping);
             
-            log_debug("Wallet found in %s",g_storageDatabasePath.c_str());
+            log_debug("Wallet found in %s", g_storageMapping.c_str());
 
             ZstrGuard endpoint(zmsg_popstr(message));
             ZstrGuard name(zmsg_popstr (message));
@@ -108,7 +110,7 @@ namespace cam
             //ignore none "REQUEST" message
             if (subject != "REQUEST")
             {
-                log_warning ("Received mailbox message with subject '%s' from '%s', ignoring", subject.c_str(),sender.c_str());
+                log_warning ("Received mailbox message with subject '%s' from '%s', ignoring", subject.c_str(), sender.c_str());
                 return true;
             }
             
