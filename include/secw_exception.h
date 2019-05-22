@@ -106,10 +106,27 @@ namespace secw
 // Type of document is unknown
     class SecwUnknownDocumentTypeException : public SecwException
     {
+    private:
+        std::string m_documentType;
+
+        void fillSerializationInfo(cxxtools::SerializationInfo& si) const override
+        {
+            si.addMember("documentType") <<= m_documentType;
+        }
+
     public:
-        explicit SecwUnknownDocumentTypeException(const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::UNKNOWN_DOCUMENT_TYPE)
+        explicit SecwUnknownDocumentTypeException(const std::string & documentType) :
+            SecwException("Unknown document type '" +documentType+"'", ErrorCode::UNKNOWN_DOCUMENT_TYPE),
+            m_documentType(documentType)
         {}
+
+        SecwUnknownDocumentTypeException(const cxxtools::SerializationInfo &extraData, const std::string & whatArg) :
+            SecwException(whatArg, ErrorCode::UNKNOWN_DOCUMENT_TYPE)
+        {
+            extraData.getMember("documentType") >>= m_documentType;
+        }
+
+        inline std::string getDocumentType() const { return m_documentType; }
     };
 
 // Portfolio is unknown
@@ -141,10 +158,27 @@ namespace secw
 // Invalid format of document
     class SecwInvalidDocumentFormatException : public SecwException
     {
+    private:
+        std::string m_documentField;
+
+        void fillSerializationInfo(cxxtools::SerializationInfo& si) const override
+        {
+            si.addMember("documentField") <<= m_documentField;
+        }
+
     public:
-        explicit SecwInvalidDocumentFormatException(const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::INVALID_DOCUMENT_FORMAT)
+        explicit SecwInvalidDocumentFormatException(const std::string & documentField) :
+            SecwException("Error in field '"+documentField+"'", ErrorCode::INVALID_DOCUMENT_FORMAT),
+            m_documentField(documentField)
         {}
+
+        SecwInvalidDocumentFormatException(const cxxtools::SerializationInfo &extraData, const std::string & whatArg) :
+            SecwException(whatArg, ErrorCode::INVALID_DOCUMENT_FORMAT)
+        {
+            extraData.getMember("documentField") >>= m_documentField;
+        }
+
+        inline std::string getDocumentField() const { return m_documentField; }
     };
 
 // Impossible to load the portfolio
@@ -168,10 +202,26 @@ namespace secw
 // document do not exist
     class SecwDocumentDoNotExistException : public SecwException
     {
+    private:
+        Id m_documentId;
+
+        void fillSerializationInfo(cxxtools::SerializationInfo &si) const override
+        {
+            si.addMember("documentId") <<= m_documentId;
+        }
     public:
-        explicit SecwDocumentDoNotExistException(const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::DOCUMENT_DO_NOT_EXIST)
+        explicit SecwDocumentDoNotExistException(const Id & documentId) :
+            SecwException("Document '"+documentId+"'does not exist", ErrorCode::DOCUMENT_DO_NOT_EXIST),
+            m_documentId(documentId)
         {}
+
+        SecwDocumentDoNotExistException(const cxxtools::SerializationInfo &extraData, const std::string & whatArg) :
+            SecwException(whatArg, ErrorCode::DOCUMENT_DO_NOT_EXIST)
+        {
+            extraData.getMember("documentId") >>= m_documentId;
+        }
+
+        inline Id getDocumentId() const { return m_documentId; }
     };
     
 // Illegal action by the client
@@ -186,10 +236,26 @@ namespace secw
 // Usage ID is unknown
     class SecwUnknownUsageIDException : public SecwException
     {
+    private:
+        UsageId m_usageId;
+
+        void fillSerializationInfo(cxxtools::SerializationInfo &si) const override
+        {
+            si.addMember("usageId") <<= m_usageId;
+        }
     public:
-        explicit SecwUnknownUsageIDException(const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::UNKNOWN_USAGE_ID)
+        explicit SecwUnknownUsageIDException(const UsageId & usageId) :
+            SecwException("Unknown usage ID '"+usageId+"'", ErrorCode::UNKNOWN_USAGE_ID),
+            m_usageId(usageId)
         {}
+
+        SecwUnknownUsageIDException(const cxxtools::SerializationInfo &extraData, const std::string & whatArg) :
+            SecwException(whatArg, ErrorCode::UNKNOWN_USAGE_ID)
+        {
+            extraData.getMember("usageId") >>= m_usageId;
+        }
+
+        inline UsageId getUsageId() const { return m_usageId; }
     };
 
 } // namepsace secw

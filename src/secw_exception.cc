@@ -67,14 +67,14 @@ namespace secw
             case UNSUPPORTED_COMMAND:           throw SecwUnsupportedCommandException(whatArg);
             case PROTOCOL_ERROR:                throw SecwProtocolErrorException(whatArg);
             case BAD_COMMAND_ARGUMENT:          throw SecwBadCommandArgumentException(whatArg);
-            case UNKNOWN_DOCUMENT_TYPE:         throw SecwUnknownDocumentTypeException(whatArg);
+            case UNKNOWN_DOCUMENT_TYPE:         throw SecwUnknownDocumentTypeException(extraData, whatArg);
             case UNKNOWN_PORTFOLIO:             throw SecwUnknownPortfolioException(extraData, whatArg);
-            case INVALID_DOCUMENT_FORMAT:       throw SecwInvalidDocumentFormatException(whatArg);
+            case INVALID_DOCUMENT_FORMAT:       throw SecwInvalidDocumentFormatException(extraData, whatArg);
             case IMPOSSIBLE_TO_LOAD_PORTFOLIO:  throw SecwImpossibleToLoadPortfolioException(whatArg);
             case UNKNOWN_TAG:                   throw SecwUnknownTagException(whatArg);
-            case DOCUMENT_DO_NOT_EXIST:         throw SecwDocumentDoNotExistException(whatArg);
+            case DOCUMENT_DO_NOT_EXIST:         throw SecwDocumentDoNotExistException(extraData, whatArg);
             case ILLEGAL_ACCESS:                throw SecwIllegalAccess(whatArg);
-            case UNKNOWN_USAGE_ID:              throw SecwUnknownUsageIDException(whatArg);
+            case UNKNOWN_USAGE_ID:              throw SecwUnknownUsageIDException(extraData, whatArg);
             default: throw SecwException(whatArg);
         }
     }

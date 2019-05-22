@@ -70,7 +70,7 @@ namespace secw
         }
         catch(const std::exception& e)
         {
-            throw SecwInvalidDocumentFormatException(e.what());
+            throw SecwInvalidDocumentFormatException(DOC_SNMPV1_COMMUNITY_NAME);
         }
     }
 
@@ -92,7 +92,7 @@ namespace secw
 
     void Snmpv1::validate() const
     {
-        if(m_communityName.empty()) throw SecwInvalidDocumentFormatException("Community name is empty");
+        if(m_communityName.empty()) throw SecwInvalidDocumentFormatException(DOC_SNMPV1_COMMUNITY_NAME);
     }
 
 } // namespace secw

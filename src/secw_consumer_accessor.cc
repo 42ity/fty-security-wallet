@@ -201,7 +201,7 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test()
     {
       consumerAccessor.getDocumentWithPrivateData(portfolioName, "XXXXX-XXXXXXXXX");
 
-      throw std::runtime_error("Document is return");
+      throw std::runtime_error("Document is returned");
     }
     catch(const SecwUnknownPortfolioException & e)
     {

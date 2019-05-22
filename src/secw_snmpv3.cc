@@ -75,17 +75,23 @@ namespace secw
 
     void Snmpv3::validate() const
     {
-        if(!m_containPrivateData) throw SecwInvalidDocumentFormatException("Private part is missing");
-        if(m_securityName.empty()) throw SecwInvalidDocumentFormatException("Security name is empty");
+        //at least one password is missing here
+        if(!m_containPrivateData)
+        {
+            if(m_authPassword.empty()) throw SecwInvalidDocumentFormatException(DOC_SNMPV3_AUTH_PASSWORD);
+            if(m_privPassword.empty()) throw SecwInvalidDocumentFormatException(DOC_SNMPV3_PRIV_PASSWORD);
+        }
+
+        if(m_securityName.empty()) throw SecwInvalidDocumentFormatException(DOC_SNMPV3_SECURITY_NAME);
 
         if(m_securityLevel == Snmpv3SecurityLevel::AUTH_PRIV)
         {
-            if(m_authPassword.empty()) throw SecwInvalidDocumentFormatException("Auth password is empty");
-            if(m_privPassword.empty()) throw SecwInvalidDocumentFormatException("Priv password is empty");
+            if(m_authPassword.empty()) throw SecwInvalidDocumentFormatException(DOC_SNMPV3_AUTH_PASSWORD);
+            if(m_privPassword.empty()) throw SecwInvalidDocumentFormatException(DOC_SNMPV3_PRIV_PASSWORD);
         }
         else if(m_securityLevel == Snmpv3SecurityLevel::AUTH_NO_PRIV)
         {
-            if(m_authPassword.empty()) throw SecwInvalidDocumentFormatException("Auth password is empty");
+            if(m_authPassword.empty()) throw SecwInvalidDocumentFormatException(DOC_SNMPV3_AUTH_PASSWORD);
         }
     }
 
@@ -120,7 +126,15 @@ namespace secw
             {
                 *authPassword >>= m_authPassword;
             }
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwInvalidDocumentFormatException(DOC_SNMPV3_AUTH_PASSWORD);
+        }
 
+
+        try
+        {
             const cxxtools::SerializationInfo * authPriv = si.findMember(DOC_SNMPV3_PRIV_PASSWORD);
             if(authPriv != nullptr)
             {
@@ -129,7 +143,7 @@ namespace secw
         }
         catch(const std::exception& e)
         {
-            throw SecwInvalidDocumentFormatException(e.what());
+            throw SecwInvalidDocumentFormatException(DOC_SNMPV3_PRIV_PASSWORD);
         }
     }
 
@@ -137,34 +151,47 @@ namespace secw
     {
         try
         {
-            {
-                uint8_t tmp = MAX_SECURITY_LEVEL;
-                si.getMember(DOC_SNMPV3_SECURITY_LEVEL) >>= tmp;
-                if(tmp >= MAX_SECURITY_LEVEL) throw SecwInvalidDocumentFormatException("Security level invalid value)");
-                m_securityLevel = static_cast<Snmpv3SecurityLevel>(tmp);
-            }
-
-            {
-                si.getMember(DOC_SNMPV3_SECURITY_NAME) >>= m_securityName;
-            }
-
-            {
-                uint8_t tmp = MAX_AUTH_PROTOCOL;
-                si.getMember(DOC_SNMPV3_AUTH_PROTOCOL) >>= tmp;
-                if(tmp >= MAX_AUTH_PROTOCOL) throw SecwInvalidDocumentFormatException("Auth protocol invalid value");
-                m_authProtocol = static_cast<Snmpv3AuthProtocol>(tmp);
-            }
-
-            {
-                uint8_t tmp = MAX_PRIV_PROTOCOL;
-                si.getMember(DOC_SNMPV3_PRIV_PROTOCOL) >>= tmp;
-                if(tmp >= MAX_PRIV_PROTOCOL) throw SecwInvalidDocumentFormatException("Priv Protocol invalid value");
-                m_privProtocol = static_cast<Snmpv3PrivProtocol>(tmp);
-            }
+            uint8_t tmp = MAX_SECURITY_LEVEL;
+            si.getMember(DOC_SNMPV3_SECURITY_LEVEL) >>= tmp;
+            if(tmp >= MAX_SECURITY_LEVEL) throw SecwInvalidDocumentFormatException(DOC_SNMPV3_SECURITY_LEVEL);
+            m_securityLevel = static_cast<Snmpv3SecurityLevel>(tmp);
         }
         catch(const std::exception& e)
         {
-            throw SecwInvalidDocumentFormatException(e.what());
+            throw SecwInvalidDocumentFormatException(DOC_SNMPV3_SECURITY_LEVEL);
+        }
+
+        try
+        {
+            si.getMember(DOC_SNMPV3_SECURITY_NAME) >>= m_securityName;
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwInvalidDocumentFormatException(DOC_SNMPV3_SECURITY_NAME);
+        }
+
+        try
+        {
+            uint8_t tmp = MAX_AUTH_PROTOCOL;
+            si.getMember(DOC_SNMPV3_AUTH_PROTOCOL) >>= tmp;
+            if(tmp >= MAX_AUTH_PROTOCOL) throw SecwInvalidDocumentFormatException(DOC_SNMPV3_AUTH_PROTOCOL);
+            m_authProtocol = static_cast<Snmpv3AuthProtocol>(tmp);
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwInvalidDocumentFormatException(DOC_SNMPV3_AUTH_PROTOCOL);
+        }
+
+        try
+        {
+            uint8_t tmp = MAX_PRIV_PROTOCOL;
+            si.getMember(DOC_SNMPV3_PRIV_PROTOCOL) >>= tmp;
+            if(tmp >= MAX_PRIV_PROTOCOL) throw SecwInvalidDocumentFormatException(DOC_SNMPV3_PRIV_PROTOCOL);
+            m_privProtocol = static_cast<Snmpv3PrivProtocol>(tmp);
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwInvalidDocumentFormatException(DOC_SNMPV3_PRIV_PROTOCOL);
         }
     }
 

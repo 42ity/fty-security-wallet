@@ -168,7 +168,6 @@ namespace secw
                 return portfolio;
             }
         }
-       
         throw SecwUnknownPortfolioException(name);
     }
     

@@ -54,9 +54,9 @@ namespace secw
 
     void UserAndPassword::validate() const
     {
-        if(!m_containPrivateData) throw SecwInvalidDocumentFormatException("Private part is missing");
-        if(m_username.empty()) throw SecwInvalidDocumentFormatException("Username is empty");
-        if(m_password.empty()) throw SecwInvalidDocumentFormatException("Password is empty");
+        if(!m_containPrivateData) throw SecwInvalidDocumentFormatException(DOC_USER_AND_PASSWORD_PASSWORD);
+        if(m_username.empty()) throw SecwInvalidDocumentFormatException(DOC_USER_AND_PASSWORD_USERNAME);
+        if(m_password.empty()) throw SecwInvalidDocumentFormatException(DOC_USER_AND_PASSWORD_PASSWORD);
     }
 
 //Private
@@ -85,7 +85,7 @@ namespace secw
         }
         catch(const std::exception& e)
         {
-            throw SecwInvalidDocumentFormatException(e.what());
+            throw SecwInvalidDocumentFormatException(DOC_USER_AND_PASSWORD_PASSWORD);
         }
     }
 
@@ -97,7 +97,7 @@ namespace secw
         }
         catch(const std::exception& e)
         {
-            throw SecwInvalidDocumentFormatException(e.what());
+            throw SecwInvalidDocumentFormatException(DOC_USER_AND_PASSWORD_USERNAME);
         }
     }
 
