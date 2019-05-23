@@ -73,8 +73,8 @@ namespace cam
     std::string toString() const;
 
     // Attributs 
-    UsageId m_usageId;
     AssetId m_assetId;
+    UsageId m_usageId;
     CredentialId m_credentialId;
     CredentialStatus m_credentialStatus;
     MapExtendedInfo m_extendedInfo;
