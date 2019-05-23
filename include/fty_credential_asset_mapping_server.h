@@ -60,7 +60,12 @@ namespace cam
         static std::shared_ptr<CredentialAssetMappingStorage> m_activeMapping;
         
         //Handler for all supported commands
-        static std::string handleNotImplementedCmd(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleGetMapping(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleCreateMapping(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleRemoveMapping(const Sender & sender, const std::vector<std::string> & params);
+        /*static std::string handleGetMapping(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleGetMapping(const Sender & sender, const std::vector<std::string> & params);*/
+
         
         //Helpers
         static zmsg_t *generateErrorMsg(const std::string & correlationId, const std::string & errPayload);
@@ -69,6 +74,7 @@ namespace cam
         //Command list
         static constexpr const char* GET_MAPPING = "GET_MAPPING";
         static constexpr const char* CREATE_MAPPING = "CREATE_MAPPING";
+        static constexpr const char* REMOVE_MAPPING = "REMOVE_MAPPING";
 
     };
     

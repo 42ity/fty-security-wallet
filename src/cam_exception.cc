@@ -60,9 +60,9 @@ namespace cam
         {
             case UNSUPPORTED_COMMAND:           throw CamUnsupportedCommandException(whatArg);
             case PROTOCOL_ERROR:                throw CamProtocolErrorException(whatArg);
-            case BAD_COMMAND_ARGUMENT:          throw CamBadCommandArgumentException(whatArg);
-            case MAPPING_DO_NOT_EXIST:          throw CamMappingDoNotExistException(whatArg);
-            case MAPPING_ALREADY_EXIST:         throw CamMappingAlreadyExistException(whatArg);
+            case BAD_COMMAND_ARGUMENT:          throw CamBadCommandArgumentException(extraData, whatArg);
+            case MAPPING_DO_NOT_EXIST:          throw CamMappingDoNotExistException(extraData, whatArg);
+            case MAPPING_ALREADY_EXIST:         throw CamMappingAlreadyExistException(extraData, whatArg);
             case MAPPING_INVALID:               throw CamMappingInvalidException(whatArg);
             default: throw CamException(whatArg);
         }
@@ -71,6 +71,11 @@ namespace cam
     CamException::CamException(const std::string & whatArg, ErrorCode code) :
         m_code(code),
         m_whatArg(whatArg)
+    {}
+
+    CamException::CamException(ErrorCode code) :
+        m_code(code),
+        m_whatArg("Unknown error")
     {}
     
     const char* CamException::what() const noexcept

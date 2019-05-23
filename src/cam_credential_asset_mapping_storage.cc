@@ -82,13 +82,7 @@ namespace cam
             {
                 log_info(" No mapping %s. Creating default mapping...", m_pathDatabase.c_str());
             }
-
-            /*CredentialAssetMapping mapping;
-            mapping.m_usageId = "test-usage";
-            mapping.m_assetId = "asset-1";
-            mapping.m_credentialId = "cred-1";
-
-            setMapping(mapping);*/
+            
         }
         catch(const std::exception& e)
         {
@@ -142,7 +136,7 @@ namespace cam
         }
         catch(const std::exception& e)
         {
-            throw CamMappingDoNotExistException("Error: "+std::string(e.what()));
+            throw CamMappingDoNotExistException(assetId,usageId);
         }
     }
 
@@ -165,7 +159,7 @@ namespace cam
 
         if(deleted == 0)
         {
-            throw CamMappingDoNotExistException(hash);
+            throw CamMappingDoNotExistException(assetId, usageId);
         }
 
     }

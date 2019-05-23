@@ -128,7 +128,7 @@ namespace secw
             m_portfolioName(portfolioName)
         {}
 
-        SecwUnknownPortfolioException(cxxtools::SerializationInfo& extraData, const std::string & whatArg) :
+        SecwUnknownPortfolioException(const cxxtools::SerializationInfo& extraData, const std::string & whatArg) :
             SecwException(whatArg, ErrorCode::UNKNOWN_PORTFOLIO)
         {
             extraData.getMember("portfolioName") >>= m_portfolioName;

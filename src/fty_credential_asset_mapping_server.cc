@@ -39,17 +39,41 @@ namespace cam
         : mlm::MlmAgent(pipe)
     {
         //initiate the commands handlers
-        m_supportedCommands[GET_MAPPING] = handleNotImplementedCmd;
-        m_supportedCommands[CREATE_MAPPING] = handleNotImplementedCmd;
+        m_supportedCommands[GET_MAPPING] = handleGetMapping;
+        m_supportedCommands[CREATE_MAPPING] = handleCreateMapping;
+        m_supportedCommands[REMOVE_MAPPING] = handleRemoveMapping;
     }
 
-    /* Commands implementation section*/
-    //TODO remove
-    std::string CredentialAssetMappingServer::handleNotImplementedCmd(const Sender & /*sender*/, const std::vector<std::string> & /*params*/)
+    std::string CredentialAssetMappingServer::handleGetMapping(const Sender & /*sender*/, const std::vector<std::string> & /*params*/)
     {
         /*
-        * No parameters for this command.
+        * Parameters for this command:
         * 
+        * 0. asset id
+        * 1. usage id
+        */
+        
+        throw CamException("Command is not implemented yet!!");
+    }
+
+    std::string CredentialAssetMappingServer::handleCreateMapping(const Sender & /*sender*/, const std::vector<std::string> & /*params*/)
+    {
+        /*
+        * Parameters for this command:
+        * 
+        * 0. CredentialMapping object in json
+        */
+
+        throw CamException("Command is not implemented yet!!");
+    }
+
+    std::string CredentialAssetMappingServer::handleRemoveMapping(const Sender & /*sender*/, const std::vector<std::string> & /*params*/)
+    {
+        /*
+        * Parameters for this command:
+        * 
+        * 0. asset id
+        * 1. usage id
         */
         
         throw CamException("Command is not implemented yet!!");

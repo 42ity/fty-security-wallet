@@ -105,20 +105,50 @@ int main (int argc, char *argv [])
     zstr_sendx (secw_server, "STORAGE_CONFIGURATION_PATH", storage_access_path.get(), NULL);
     zstr_sendx (secw_server, "STORAGE_DATABASE_PATH", storage_database_path.get(), NULL);
     zstr_sendx (secw_server, "CONNECT", endpoint.get(), secw_actor_name.get(), NULL);
+
+    //start broker agent
+    zactor_t *cam_server = zactor_new (fty_credential_asset_mapping_server, (void *)endpoint);
+    //set configuration parameters
+    zstr_sendx (cam_server, "STORAGE_MAPPING_PATH", mapping_actor_name.get(), NULL);
+    zstr_sendx (cam_server, "CONNECT",  endpoint.get(), mapping_actor_name.get(), NULL);
     
-    while (true) {
-        char *str = zstr_recv (secw_server);
-        if (str) {
-            puts (str);
-            zstr_free (&str);
+    bool secwRun = true;
+    bool camRun= true;
+    
+    while (secwRun || camRun)
+    {
+        if(secwRun)
+        {
+            char *str = zstr_recv (secw_server);
+            if (str)
+            {
+                puts (str);
+                zstr_free (&str);
+            }
+            else
+            {
+                log_info ("Secw Interrupted ...");
+                zactor_destroy(&secw_server);
+                secwRun = false;
+            }
         }
-        else {
-            log_info ("Interrupted ...");
-            break;
+
+        if(camRun)
+        {
+            char *camStr = zstr_recv (cam_server);
+            if (camStr)
+            {
+                puts (camStr);
+                zstr_free (&camStr);
+            }
+            else
+            {
+                log_info ("Cam Interrupted ...");
+                zactor_destroy(&cam_server);
+                camRun = false;
+            }
         }
     }
-
-    zactor_destroy(&secw_server);
 
     return 0;
 

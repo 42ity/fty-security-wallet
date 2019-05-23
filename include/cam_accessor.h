@@ -49,24 +49,19 @@ namespace cam
     
     ~Accessor();
 
-    /*CredentialId getCredentialId(const AssetId & assetId, const UsageId & usageId) const;
-    CredentialId getCredentialId(const AssetId & assetId, const UsageId & usageId) const;
-    CredentialStatus getCredentialStatus(const AssetId & assetId, const UsageId & usageId) const;
-    MapExtendedInfo getExtendedInfo(const AssetId & assetId, const UsageId & usageId) const;*/
-
     void createMapping( const AssetId & assetId, const UsageId & usageId,
-                        const CredentialId & credentialId, CredentialStatus status = UNKNOWN,
+                        const CredentialId & credentialId, CredentialStatus status = CredentialStatus::UNKNOWN,
                         const MapExtendedInfo & extendedInfo = {});
 
     const CredentialAssetMapping getMapping(const AssetId & assetId, const UsageId & usageId) const;
+
+    void removeMapping(const AssetId & assetId, const UsageId & usageId);
 
     /*bool isMappingExisting(const AssetId & assetId, const UsageId & usageId) const;
     
     void updateCredentialId(const AssetId & assetId, const UsageId & usageId, const CredentialId & credentialId);
     void updateCredentialStatus(const AssetId & assetId, const UsageId & usageId, CredentialStatus status);
-    void updateExtendedInfo(const AssetId & assetId, const UsageId & usageId, const MapExtendedInfo & extendedInfo);
-
-    void removeMapping(const AssetId & assetId, const UsageId & usageId);*/
+    void updateExtendedInfo(const AssetId & assetId, const UsageId & usageId, const MapExtendedInfo & extendedInfo);*/
   
   private:
     ClientId m_clientId;
