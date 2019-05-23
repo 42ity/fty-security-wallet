@@ -27,6 +27,8 @@
 #include <cxxtools/jsonserializer.h>
 #include <cxxtools/jsondeserializer.h>
 
+#include "cam_helpers.h"
+
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -82,7 +84,7 @@ namespace cam
             {
                 log_info(" No mapping %s. Creating default mapping...", m_pathDatabase.c_str());
             }
-            
+
         }
         catch(const std::exception& e)
         {

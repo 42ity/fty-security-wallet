@@ -24,6 +24,7 @@
 #include "cam_credential_asset_mapping.h"
 #include "cam_credential_asset_mapping_storage.h"
 #include "cam_exception.h"
+#include "cam_helpers.h"
 
 #include "fty_security_wallet.h"
 
@@ -44,7 +45,7 @@ namespace cam
         m_supportedCommands[REMOVE_MAPPING] = handleRemoveMapping;
     }
 
-    std::string CredentialAssetMappingServer::handleGetMapping(const Sender & /*sender*/, const std::vector<std::string> & /*params*/)
+    std::string CredentialAssetMappingServer::handleGetMapping(const Sender & /*sender*/, const std::vector<std::string> & params)
     {
         /*
         * Parameters for this command:
@@ -52,22 +53,56 @@ namespace cam
         * 0. asset id
         * 1. usage id
         */
+
+        if(params.size() < 2)
+        {
+            throw CamBadCommandArgumentException("", "Command need at least 2 arguments");
+        }
+
+        const AssetId & assetId = params.at(0);
+        const UsageId & usageId = params.at(1);
+
+        const CredentialAssetMapping & mapping = m_activeMapping->getMapping(assetId, usageId);
+
+        cxxtools::SerializationInfo si;
+    
+        mapping.fillSerializationInfo(si);
         
-        throw CamException("Command is not implemented yet!!");
+        return serialize(si);
     }
 
-    std::string CredentialAssetMappingServer::handleCreateMapping(const Sender & /*sender*/, const std::vector<std::string> & /*params*/)
+    std::string CredentialAssetMappingServer::handleCreateMapping(const Sender & /*sender*/, const std::vector<std::string> & params)
     {
         /*
         * Parameters for this command:
         * 
         * 0. CredentialMapping object in json
         */
+        
+        if(params.size() < 1)
+        {
+            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+        }
+        
+        const cxxtools::SerializationInfo si = deserialize(params.at(0));
 
-        throw CamException("Command is not implemented yet!!");
+        CredentialAssetMapping mapping;
+        
+        mapping.fromSerializationInfo(si);
+        
+        if(m_activeMapping->isMappingExisting(mapping.m_assetId, mapping.m_usageId))
+        {
+            throw CamMappingAlreadyExistException(mapping.m_assetId, mapping.m_usageId);
+        }
+        
+        m_activeMapping->setMapping(mapping);
+        
+        m_activeMapping->save();
+        
+        return "";
     }
 
-    std::string CredentialAssetMappingServer::handleRemoveMapping(const Sender & /*sender*/, const std::vector<std::string> & /*params*/)
+    std::string CredentialAssetMappingServer::handleRemoveMapping(const Sender & /*sender*/, const std::vector<std::string> & params)
     {
         /*
         * Parameters for this command:
@@ -75,8 +110,20 @@ namespace cam
         * 0. asset id
         * 1. usage id
         */
+
+        if(params.size() < 2)
+        {
+            throw CamBadCommandArgumentException("", "Command need at least 2 arguments");
+        }
+
+        const AssetId & assetId = params.at(0);
+        const UsageId & usageId = params.at(1);
+
+        m_activeMapping->removeMapping(assetId, usageId);
         
-        throw CamException("Command is not implemented yet!!");
+        m_activeMapping->save();
+        
+        return "";
     }
 
     /*
@@ -342,7 +389,7 @@ fty_credential_asset_mapping_server_test (bool verbose)
     
     zactor_t *server = zactor_new (fty_credential_asset_mapping_server, (void *)endpoint);
     //set configuration parameters
-    zstr_sendx (server, "STORAGE_MAPPING_PATH", SELFTEST_DIR_RO"/mapping.json", NULL);
+    zstr_sendx (server, "STORAGE_MAPPING_PATH", SELFTEST_DIR_RW"/mapping.json", NULL);
     zstr_sendx (server, "CONNECT", endpoint, MAPPING_AGENT, NULL);
 
     mlm_client_t *client = mlm_client_new();

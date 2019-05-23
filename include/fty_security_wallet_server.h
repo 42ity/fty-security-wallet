@@ -70,8 +70,6 @@ namespace secw
         static std::string handleCreate(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleDelete(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleUpdate(const Sender & sender, const std::vector<std::string> & params);
-
-        static std::string handleNotImplementedCmd(const Sender & sender, const std::vector<std::string> & params);
         
         //Helpers
         static zmsg_t *generateErrorMsg(const std::string & correlationId, const std::string & errPayload);

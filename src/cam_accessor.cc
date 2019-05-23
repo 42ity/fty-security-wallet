@@ -206,9 +206,9 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
           throw std::runtime_error("Wrong usage id. Received '"+mapping.m_usageId+"' expected '"+usageId+"'");
         }
 
-        if(mapping.m_credentialId != "mapping-1")
+        if(mapping.m_credentialId != "cred-1")
         {
-          throw std::runtime_error("Wrong credential id. Received '"+mapping.m_credentialId+"' expected 'mapping-1'");
+          throw std::runtime_error("Wrong credential id. Received '"+mapping.m_credentialId+"' expected 'cred-1'");
         }
 
         if(mapping.m_credentialStatus != CredentialStatus::UNKNOWN)
