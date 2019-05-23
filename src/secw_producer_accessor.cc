@@ -625,7 +625,8 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
       producerAccessor.deleteDocument("default", id);
 
       //check that the document is removed
-      if(producerAccessor.getListDocumentsWithoutPrivateData("default", {id}).size() != 0)
+      std::vector<Id> ids = {id};
+      if(producerAccessor.getListDocumentsWithoutPrivateData("default",ids).size() != 0)
       {
         throw std::runtime_error("Document is not removed");
       }
@@ -820,7 +821,8 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
       producerAccessor.deleteDocument("default", id);
 
       //check that the document is removed
-      if(producerAccessor.getListDocumentsWithoutPrivateData("default", {id}).size() != 0)
+      std::vector<Id> ids = {id};
+      if(producerAccessor.getListDocumentsWithoutPrivateData("default", ids).size() != 0)
       {
         throw std::runtime_error("Document is not removed");
       }
@@ -1015,7 +1017,8 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
       producerAccessor.deleteDocument("default", id);
 
       //check that the document is removed
-      if(producerAccessor.getListDocumentsWithoutPrivateData("default", {id}).size() != 0)
+      std::vector<Id> ids = {id};
+      if(producerAccessor.getListDocumentsWithoutPrivateData("default", ids).size() != 0)
       {
         throw std::runtime_error("Document is not removed");
       }

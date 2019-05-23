@@ -42,6 +42,7 @@ namespace secw
         UNKNOWN_TAG,
         DOCUMENT_DO_NOT_EXIST,
         ILLEGAL_ACCESS,
+        UNKNOWN_USAGE_ID,
     };
 
     class SecwException : public std::exception
@@ -179,6 +180,15 @@ namespace secw
     public:
         explicit SecwIllegalAccess(const std::string & whatArg) :
             SecwException(whatArg, ErrorCode::ILLEGAL_ACCESS)
+        {}
+    };
+
+// Usage ID is unknown
+    class SecwUnknownUsageIDException : public SecwException
+    {
+    public:
+        explicit SecwUnknownUsageIDException(const std::string & whatArg) :
+            SecwException(whatArg, ErrorCode::UNKNOWN_USAGE_ID)
         {}
     };
 
