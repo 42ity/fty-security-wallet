@@ -60,11 +60,13 @@ namespace cam
         static std::shared_ptr<CredentialAssetMappingStorage> m_activeMapping;
         
         //Handler for all supported commands
-        static std::string handleGetMapping(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleCreateMapping(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleGetMapping(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleUpdateCredentialMapping(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleUpdateStatusMapping(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleUpdateInfoMapping(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleRemoveMapping(const Sender & sender, const std::vector<std::string> & params);
-        /*static std::string handleGetMapping(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleGetMapping(const Sender & sender, const std::vector<std::string> & params);*/
+
 
         
         //Helpers
@@ -72,8 +74,11 @@ namespace cam
     
     public:
         //Command list
-        static constexpr const char* GET_MAPPING = "GET_MAPPING";
         static constexpr const char* CREATE_MAPPING = "CREATE_MAPPING";
+        static constexpr const char* GET_MAPPING = "GET_MAPPING";
+        static constexpr const char* UPDATE_CREDENTIAL_MAPPING = "UPDATE_CREDENTIAL_MAPPING";
+        static constexpr const char* UPDATE_STATUS_MAPPING = "UPDATE_STATUS_MAPPING";
+        static constexpr const char* UPDATE_INFO_MAPPING = "UPDATE_INFO_MAPPING";
         static constexpr const char* REMOVE_MAPPING = "REMOVE_MAPPING";
 
     };

@@ -85,13 +85,49 @@ namespace cam
     sendCommand(CredentialAssetMappingServer::REMOVE_MAPPING, {assetId, usageId} );
   }
 
-  /*bool isMappingExisting(const AssetId & assetId, const UsageId & usageId) const;
+  /*bool isMappingExisting(const AssetId & assetId, const UsageId & usageId) const;*/
   
-  void updateCredentialId(const AssetId & assetId, const UsageId & usageId, const CredentialId & credentialId);
-  void updateCredentialStatus(const AssetId & assetId, const UsageId & usageId, CredentialStatus status);
-  void updateExtendedInfo(const AssetId & assetId, const UsageId & usageId, const MapExtendedInfo & extendedInfo);
+  void Accessor::updateCredentialId(const AssetId & assetId, const UsageId & usageId, const CredentialId & credentialId)
+  {
+    CredentialAssetMapping mapping;
+    mapping.m_assetId = assetId;
+    mapping.m_usageId = usageId;
+    mapping.m_credentialId = credentialId;
 
-  void removeMapping(const AssetId & assetId, const UsageId & usageId);*/
+    cxxtools::SerializationInfo si;
+
+    si <<= mapping;
+
+    sendCommand(CredentialAssetMappingServer::UPDATE_CREDENTIAL_MAPPING, {serialize(si)} );
+  }
+
+  void Accessor::updateCredentialStatus(const AssetId & assetId, const UsageId & usageId, CredentialStatus status)
+  {
+    CredentialAssetMapping mapping;
+    mapping.m_assetId = assetId;
+    mapping.m_usageId = usageId;
+    mapping.m_credentialStatus = status;
+
+    cxxtools::SerializationInfo si;
+
+    si <<= mapping;
+
+    sendCommand(CredentialAssetMappingServer::UPDATE_STATUS_MAPPING, {serialize(si)} );
+  }
+
+  void Accessor::updateExtendedInfo(const AssetId & assetId, const UsageId & usageId, const MapExtendedInfo & extendedInfo)
+  {
+    CredentialAssetMapping mapping;
+    mapping.m_assetId = assetId;
+    mapping.m_usageId = usageId;
+    mapping.m_extendedInfo = extendedInfo;
+
+    cxxtools::SerializationInfo si;
+
+    si <<= mapping;
+
+    sendCommand(CredentialAssetMappingServer::UPDATE_INFO_MAPPING, {serialize(si)} );
+  }
 
   std::vector<std::string> Accessor::sendCommand(const std::string & command, const std::vector<std::string> & frames) const
   {
@@ -297,6 +333,9 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       {
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
         accessor.createMapping(assetId, usageId, credId, status, extendedInfo );
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
       }
       catch(const std::exception& e)
       {
@@ -338,7 +377,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
           throw std::runtime_error("Wrong credential status");
         }
 
-        if((mapping.m_extendedInfo.size() != 1 ) || (mapping.m_extendedInfo.at(key) != data))
+        if((mapping.m_extendedInfo.size() != extendedInfo.size() ) || (mapping.m_extendedInfo.at(key) != data))
         {
           throw std::runtime_error("Wrong extended info");
         }
@@ -500,6 +539,307 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
     }
 
   } // 3.X
+
+  //test 4.X -> need 2.X success
+  {
+    AssetId assetId("asset-4");
+    UsageId usageId("test-usage-4");
+    CredentialId credId("Test-mapping-update");
+    CredentialStatus status(CredentialStatus::VALID);
+    
+    std::string key("key");
+    std::string data("data");
+    MapExtendedInfo extendedInfo;
+    extendedInfo[key] = data;
+
+    //test 4.1 => test create
+    testNumber = "4.1";
+    testName = "createMapping for the next test";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        accessor.createMapping(assetId, usageId, credId, status, extendedInfo );
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+    //test 4.2 => test update mapping
+    testNumber = "4.2";
+    testName = "updateCredentialId";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+
+        credId = "new_cred";
+        accessor.updateCredentialId(assetId, usageId, credId);
+        
+        const CredentialAssetMapping mapping = accessor.getMapping(assetId, usageId);
+
+        if(mapping.m_assetId != assetId)
+        {
+          throw std::runtime_error("Wrong asset id. Received '"+mapping.m_assetId+"' expected '"+assetId+"'");
+        }
+
+        if(mapping.m_usageId != usageId)
+        {
+          throw std::runtime_error("Wrong usage id. Received '"+mapping.m_usageId+"' expected '"+usageId+"'");
+        }
+
+        if(mapping.m_credentialId != credId)
+        {
+          throw std::runtime_error("Wrong credential id. Received '"+mapping.m_credentialId+"' expected '"+credId+"'");
+        }
+
+        if(mapping.m_credentialStatus != CredentialStatus::UNKNOWN)
+        {
+          throw std::runtime_error("Wrong credential status");
+        }
+
+        if((mapping.m_extendedInfo.size() != extendedInfo.size() ) || (mapping.m_extendedInfo.at(key) != data))
+        {
+          throw std::runtime_error("Wrong extended info");
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+    //test 4.3 => test exception CamMappingDoNotExistException
+    testNumber = "4.3";
+    testName = "updateCredentialId => CamMappingDoNotExistException";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        accessor.updateCredentialId("XXXXXX", "XXXXXX", credId);
+        
+        throw std::runtime_error("Mapping is updated");
+      }
+      catch(const CamMappingDoNotExistException &)
+      {
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+    //test 4.4 => test update mapping
+    testNumber = "4.4";
+    testName = "updateCredentialStatus";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+
+        status = CredentialStatus::ERROR;
+
+        accessor.updateCredentialStatus(assetId, usageId, status);
+        
+        const CredentialAssetMapping mapping = accessor.getMapping(assetId, usageId);
+
+        if(mapping.m_assetId != assetId)
+        {
+          throw std::runtime_error("Wrong asset id. Received '"+mapping.m_assetId+"' expected '"+assetId+"'");
+        }
+
+        if(mapping.m_usageId != usageId)
+        {
+          throw std::runtime_error("Wrong usage id. Received '"+mapping.m_usageId+"' expected '"+usageId+"'");
+        }
+
+        if(mapping.m_credentialId != credId)
+        {
+          throw std::runtime_error("Wrong credential id. Received '"+mapping.m_credentialId+"' expected '"+credId+"'");
+        }
+
+        if(mapping.m_credentialStatus != status)
+        {
+          throw std::runtime_error("Wrong credential status");
+        }
+
+        if((mapping.m_extendedInfo.size() != extendedInfo.size() ) || (mapping.m_extendedInfo.at(key) != data))
+        {
+          throw std::runtime_error("Wrong extended info");
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+    //test 4.5 => test exception CamMappingDoNotExistException
+    testNumber = "4.5";
+    testName = "updateCredentialStatus => CamMappingDoNotExistException";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        accessor.updateCredentialStatus("XXXXXX", "XXXXXX", status);
+        
+        throw std::runtime_error("Mapping is updated");
+      }
+      catch(const CamMappingDoNotExistException &)
+      {
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+    //test 4.6 => test update mapping
+    testNumber = "4.6";
+    testName = "updateExtendedInfo";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+
+        data = "45";
+        std::string extraKey("update-key");
+        std::string extraData("update-data");
+
+        extendedInfo[key] = data;
+        extendedInfo[extraKey] = extraData;
+
+        accessor.updateExtendedInfo(assetId, usageId, extendedInfo);
+        
+        const CredentialAssetMapping mapping = accessor.getMapping(assetId, usageId);
+
+        if(mapping.m_assetId != assetId)
+        {
+          throw std::runtime_error("Wrong asset id. Received '"+mapping.m_assetId+"' expected '"+assetId+"'");
+        }
+
+        if(mapping.m_usageId != usageId)
+        {
+          throw std::runtime_error("Wrong usage id. Received '"+mapping.m_usageId+"' expected '"+usageId+"'");
+        }
+
+        if(mapping.m_credentialId != credId)
+        {
+          throw std::runtime_error("Wrong credential id. Received '"+mapping.m_credentialId+"' expected '"+credId+"'");
+        }
+
+        if(mapping.m_credentialStatus != status)
+        {
+          throw std::runtime_error("Wrong credential status");
+        }
+
+        if((mapping.m_extendedInfo.size() != extendedInfo.size() ) || (mapping.m_extendedInfo.at(key) != data) || mapping.m_extendedInfo.at(extraKey) != extraData)
+        {
+          throw std::runtime_error("Wrong extended info");
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+    //test 4.7 => test exception CamMappingDoNotExistException
+    testNumber = "4.7";
+    testName = "updateExtendedInfo => CamMappingDoNotExistException";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        accessor.updateExtendedInfo("XXXXXX", "XXXXXX", extendedInfo);
+        
+        throw std::runtime_error("Mapping is updated");
+      }
+      catch(const CamMappingDoNotExistException &)
+      {
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+    //test 4.8 => test remove
+    testNumber = "4.8";
+    testName = "removeMapping => end of tests 4";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+
+        accessor.removeMapping(assetId, usageId);
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+  } // 4.X
 
   return testsResults;
   

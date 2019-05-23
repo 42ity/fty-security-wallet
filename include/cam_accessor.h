@@ -57,11 +57,11 @@ namespace cam
 
     void removeMapping(const AssetId & assetId, const UsageId & usageId);
 
-    /*bool isMappingExisting(const AssetId & assetId, const UsageId & usageId) const;
+    /*bool isMappingExisting(const AssetId & assetId, const UsageId & usageId) const;*/
     
     void updateCredentialId(const AssetId & assetId, const UsageId & usageId, const CredentialId & credentialId);
     void updateCredentialStatus(const AssetId & assetId, const UsageId & usageId, CredentialStatus status);
-    void updateExtendedInfo(const AssetId & assetId, const UsageId & usageId, const MapExtendedInfo & extendedInfo);*/
+    void updateExtendedInfo(const AssetId & assetId, const UsageId & usageId, const MapExtendedInfo & extendedInfo);
   
   private:
     ClientId m_clientId;

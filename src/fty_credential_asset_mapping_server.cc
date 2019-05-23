@@ -40,10 +40,19 @@ namespace cam
         : mlm::MlmAgent(pipe)
     {
         //initiate the commands handlers
-        m_supportedCommands[GET_MAPPING] = handleGetMapping;
         m_supportedCommands[CREATE_MAPPING] = handleCreateMapping;
+
+        m_supportedCommands[GET_MAPPING] = handleGetMapping;
+
+        m_supportedCommands[UPDATE_CREDENTIAL_MAPPING] = handleUpdateCredentialMapping;
+        m_supportedCommands[UPDATE_STATUS_MAPPING] = handleUpdateStatusMapping;
+        m_supportedCommands[UPDATE_INFO_MAPPING] = handleUpdateInfoMapping;
+
         m_supportedCommands[REMOVE_MAPPING] = handleRemoveMapping;
     }
+
+    /* Commands implementation section*/
+    //TODO remove: throw CamException("Command is not implemented yet!!");
 
     std::string CredentialAssetMappingServer::handleGetMapping(const Sender & /*sender*/, const std::vector<std::string> & params)
     {
@@ -120,6 +129,100 @@ namespace cam
         const UsageId & usageId = params.at(1);
 
         m_activeMapping->removeMapping(assetId, usageId);
+        
+        m_activeMapping->save();
+        
+        return "";
+    }
+
+    std::string CredentialAssetMappingServer::handleUpdateCredentialMapping(const Sender & /*sender*/, const std::vector<std::string> & params)
+    {
+        /*
+        * Parameters for this command:
+        * 
+        * 0. CredentialMapping object in json
+        */
+
+        if(params.size() < 1)
+        {
+            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+        }
+
+        const cxxtools::SerializationInfo si = deserialize(params.at(0));
+
+        CredentialAssetMapping receivedMapping;
+        
+        receivedMapping.fromSerializationInfo(si);
+
+        CredentialAssetMapping existingMapping = m_activeMapping->getMapping(receivedMapping.m_assetId, receivedMapping.m_usageId);
+
+        //update the mapping
+        existingMapping.m_credentialId = receivedMapping.m_credentialId;
+        existingMapping.m_credentialStatus = CredentialStatus::UNKNOWN;
+
+        m_activeMapping->setMapping(existingMapping);
+        
+        m_activeMapping->save();
+        
+        return "";
+    }
+
+    std::string CredentialAssetMappingServer::handleUpdateStatusMapping(const Sender & /*sender*/, const std::vector<std::string> & params)
+    {
+        /*
+        * Parameters for this command:
+        * 
+        * 0. CredentialMapping object in json
+        */
+
+        if(params.size() < 1)
+        {
+            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+        }
+
+        const cxxtools::SerializationInfo si = deserialize(params.at(0));
+
+        CredentialAssetMapping receivedMapping;
+        
+        receivedMapping.fromSerializationInfo(si);
+
+        CredentialAssetMapping existingMapping = m_activeMapping->getMapping(receivedMapping.m_assetId, receivedMapping.m_usageId);
+
+        //update the mapping
+        existingMapping.m_credentialStatus = receivedMapping.m_credentialStatus;
+
+        m_activeMapping->setMapping(existingMapping);
+        
+        m_activeMapping->save();
+        
+        return "";
+    }
+
+    std::string CredentialAssetMappingServer::handleUpdateInfoMapping(const Sender & /*sender*/, const std::vector<std::string> & params)
+    {
+        /*
+        * Parameters for this command:
+        * 
+        * 0. CredentialMapping object in json
+        */
+
+        if(params.size() < 1)
+        {
+            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+        }
+
+        const cxxtools::SerializationInfo si = deserialize(params.at(0));
+
+        CredentialAssetMapping receivedMapping;
+        
+        receivedMapping.fromSerializationInfo(si);
+
+        CredentialAssetMapping existingMapping = m_activeMapping->getMapping(receivedMapping.m_assetId, receivedMapping.m_usageId);
+
+        //update the mapping
+        existingMapping.m_extendedInfo = receivedMapping.m_extendedInfo;
+
+        m_activeMapping->setMapping(existingMapping);
         
         m_activeMapping->save();
         
