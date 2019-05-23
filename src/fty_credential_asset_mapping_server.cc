@@ -101,7 +101,7 @@ namespace cam
         
         if(m_activeMapping->isMappingExisting(mapping.m_assetId, mapping.m_usageId))
         {
-            throw CamMappingAlreadyExistException(mapping.m_assetId, mapping.m_usageId);
+            throw CamMappingAlreadyExistsException(mapping.m_assetId, mapping.m_usageId);
         }
         
         m_activeMapping->setMapping(mapping);

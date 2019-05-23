@@ -37,8 +37,8 @@ namespace cam
         UNSUPPORTED_COMMAND,
         PROTOCOL_ERROR,
         BAD_COMMAND_ARGUMENT,
-        MAPPING_DO_NOT_EXIST,
-        MAPPING_ALREADY_EXIST,
+        MAPPING_DOES_NOT_EXIST,
+        MAPPING_ALREADY_EXISTS,
         MAPPING_INVALID,
     };
 
@@ -141,7 +141,7 @@ namespace cam
     };
     
 // Mapping do not exist
-    class CamMappingDoNotExistException : public CamException
+    class CamMappingDoesNotExistException : public CamException
     {
     private:
         std::string m_asset, m_usage;
@@ -152,16 +152,16 @@ namespace cam
             si.addMember("usage") <<= m_usage;
         }
     public:
-        explicit CamMappingDoNotExistException(const std::string & asset, const std::string & usage) :
-            CamException(ErrorCode::MAPPING_DO_NOT_EXIST),
+        explicit CamMappingDoesNotExistException(const std::string & asset, const std::string & usage) :
+            CamException(ErrorCode::MAPPING_DOES_NOT_EXIST),
             m_asset(asset),
             m_usage(usage)
         {
             m_whatArg = "Mapping for asset '"+m_asset+"' and usage '" + m_usage + "' do not exist";
         }
 
-        explicit CamMappingDoNotExistException(const cxxtools::SerializationInfo& extraData, const std::string & whatArg) :
-            CamException(whatArg, ErrorCode::MAPPING_DO_NOT_EXIST)
+        explicit CamMappingDoesNotExistException(const cxxtools::SerializationInfo& extraData, const std::string & whatArg) :
+            CamException(whatArg, ErrorCode::MAPPING_DOES_NOT_EXIST)
         {
             extraData.getMember("asset") >>= m_asset;
             extraData.getMember("usage") >>= m_usage;
@@ -172,7 +172,7 @@ namespace cam
     };
 
 // Mapping already exist
-    class CamMappingAlreadyExistException : public CamException
+    class CamMappingAlreadyExistsException : public CamException
     {
     private:
         std::string m_asset, m_usage;
@@ -184,16 +184,16 @@ namespace cam
         }
         
     public:
-        explicit CamMappingAlreadyExistException(const std::string & asset, const std::string & usage) :
-            CamException(ErrorCode::MAPPING_ALREADY_EXIST),
+        explicit CamMappingAlreadyExistsException(const std::string & asset, const std::string & usage) :
+            CamException(ErrorCode::MAPPING_ALREADY_EXISTS),
             m_asset(asset),
             m_usage(usage)
         {
              m_whatArg = "Mapping for asset '"+m_asset+"' and usage '" + m_usage + "' already exist";
         }
 
-        explicit CamMappingAlreadyExistException(const cxxtools::SerializationInfo& extraData, const std::string & whatArg) :
-            CamException(whatArg, ErrorCode::MAPPING_ALREADY_EXIST)
+        explicit CamMappingAlreadyExistsException(const cxxtools::SerializationInfo& extraData, const std::string & whatArg) :
+            CamException(whatArg, ErrorCode::MAPPING_ALREADY_EXISTS)
         {
             extraData.getMember("asset") >>= m_asset;
             extraData.getMember("usage") >>= m_usage;

@@ -269,9 +269,9 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       }
     }
 
-    //test 1.2 => test exception CamMappingDoNotExistException
+    //test 1.2 => test exception CamMappingDoesNotExistException
     testNumber = "1.2";
-    testName = "getMapping => CamMappingDoNotExistException";
+    testName = "getMapping => CamMappingDoesNotExistException";
     printf("\n-----------------------------------------------------------------------\n");
     {
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
@@ -285,7 +285,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
         const CredentialAssetMapping mapping = accessor.getMapping(assetId, usageId);
         throw std::runtime_error("Mapping is returned");
       }
-      catch(const CamMappingDoNotExistException & e)
+      catch(const CamMappingDoesNotExistException & e)
       {
         if( (e.getAssetId() == assetId) && ( e.getUsageId() == usageId) )
         {
@@ -394,9 +394,9 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       }
     }
 
-    //test 2.3 => test exception CamMappingAlreadyExistException
+    //test 2.3 => test exception CamMappingAlreadyExistsException
     testNumber = "2.3";
-    testName = "createMapping => CamMappingAlreadyExistException";
+    testName = "createMapping => CamMappingAlreadyExistsException";
     printf("\n-----------------------------------------------------------------------\n");
     {
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
@@ -408,7 +408,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
 
         throw std::runtime_error("Mapping is created");
       }
-      catch(const CamMappingAlreadyExistException & e)
+      catch(const CamMappingAlreadyExistsException & e)
       {
         if( (e.getAssetId() == assetId) && ( e.getUsageId() == usageId) )
         {
@@ -464,9 +464,9 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       }
     }
 
-    //test 3.2 => test exception CamMappingDoNotExistException
+    //test 3.2 => test exception CamMappingDoesNotExistException
     testNumber = "3.2";
-    testName = "getMapping => CamMappingDoNotExistException";
+    testName = "getMapping => CamMappingDoesNotExistException";
     printf("\n-----------------------------------------------------------------------\n");
     {
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
@@ -477,7 +477,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
 
         throw std::runtime_error("Mapping is returned");
       }
-      catch(const CamMappingDoNotExistException & e)
+      catch(const CamMappingDoesNotExistException & e)
       {
         if( (e.getAssetId() == assetId) && ( e.getUsageId() == usageId) )
         {
@@ -501,9 +501,9 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       }
     }
 
-    //test 3.3 => test exception CamMappingDoNotExistException
+    //test 3.3 => test exception CamMappingDoesNotExistException
     testNumber = "3.3";
-    testName = "removeMapping => CamMappingDoNotExistException";
+    testName = "removeMapping => CamMappingDoesNotExistException";
     printf("\n-----------------------------------------------------------------------\n");
     {
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
@@ -514,7 +514,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
         
         throw std::runtime_error("Mapping is removed");
       }
-      catch(const CamMappingDoNotExistException & e)
+      catch(const CamMappingDoesNotExistException & e)
       {
         if( (e.getAssetId() == assetId) && ( e.getUsageId() == usageId) )
         {
@@ -626,9 +626,9 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       }
     }
 
-    //test 4.3 => test exception CamMappingDoNotExistException
+    //test 4.3 => test exception CamMappingDoesNotExistException
     testNumber = "4.3";
-    testName = "updateCredentialId => CamMappingDoNotExistException";
+    testName = "updateCredentialId => CamMappingDoesNotExistException";
     printf("\n-----------------------------------------------------------------------\n");
     {
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
@@ -639,7 +639,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
         
         throw std::runtime_error("Mapping is updated");
       }
-      catch(const CamMappingDoNotExistException &)
+      catch(const CamMappingDoesNotExistException &)
       {
         printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
         testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -705,9 +705,9 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       }
     }
 
-    //test 4.5 => test exception CamMappingDoNotExistException
+    //test 4.5 => test exception CamMappingDoesNotExistException
     testNumber = "4.5";
-    testName = "updateCredentialStatus => CamMappingDoNotExistException";
+    testName = "updateCredentialStatus => CamMappingDoesNotExistException";
     printf("\n-----------------------------------------------------------------------\n");
     {
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
@@ -718,7 +718,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
         
         throw std::runtime_error("Mapping is updated");
       }
-      catch(const CamMappingDoNotExistException &)
+      catch(const CamMappingDoesNotExistException &)
       {
         printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
         testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -789,9 +789,9 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       }
     }
 
-    //test 4.7 => test exception CamMappingDoNotExistException
+    //test 4.7 => test exception CamMappingDoesNotExistException
     testNumber = "4.7";
-    testName = "updateExtendedInfo => CamMappingDoNotExistException";
+    testName = "updateExtendedInfo => CamMappingDoesNotExistException";
     printf("\n-----------------------------------------------------------------------\n");
     {
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
@@ -802,7 +802,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
         
         throw std::runtime_error("Mapping is updated");
       }
-      catch(const CamMappingDoNotExistException &)
+      catch(const CamMappingDoesNotExistException &)
       {
         printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
         testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);

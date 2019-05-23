@@ -138,7 +138,7 @@ namespace cam
         }
         catch(const std::exception& e)
         {
-            throw CamMappingDoNotExistException(assetId,usageId);
+            throw CamMappingDoesNotExistException(assetId,usageId);
         }
     }
 
@@ -161,7 +161,7 @@ namespace cam
 
         if(deleted == 0)
         {
-            throw CamMappingDoNotExistException(assetId, usageId);
+            throw CamMappingDoesNotExistException(assetId, usageId);
         }
 
     }

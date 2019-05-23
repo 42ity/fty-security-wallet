@@ -61,8 +61,8 @@ namespace cam
             case UNSUPPORTED_COMMAND:           throw CamUnsupportedCommandException(whatArg);
             case PROTOCOL_ERROR:                throw CamProtocolErrorException(whatArg);
             case BAD_COMMAND_ARGUMENT:          throw CamBadCommandArgumentException(extraData, whatArg);
-            case MAPPING_DO_NOT_EXIST:          throw CamMappingDoNotExistException(extraData, whatArg);
-            case MAPPING_ALREADY_EXIST:         throw CamMappingAlreadyExistException(extraData, whatArg);
+            case MAPPING_DOES_NOT_EXIST:          throw CamMappingDoesNotExistException(extraData, whatArg);
+            case MAPPING_ALREADY_EXISTS:         throw CamMappingAlreadyExistsException(extraData, whatArg);
             case MAPPING_INVALID:               throw CamMappingInvalidException(whatArg);
             default: throw CamException(whatArg);
         }
