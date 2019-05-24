@@ -8,6 +8,10 @@ include_HEADERS = \
 
 if ENABLE_DRAFTS
 include_HEADERS += \
+    cam_credential_asset_mapping.h \
+    cam_accessor.h \
+    cam_exception.h \
+    fty_credential_asset_mapping_server.h \
     secw_document.h \
     secw_exception.h \
     secw_producer_accessor.h \

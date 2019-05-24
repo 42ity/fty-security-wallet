@@ -1,0 +1,19 @@
+{
+	"version": 1,
+	"mappings": [
+			{
+					"cam_usage": "test-usage",
+					"cam_asset": "asset-1",
+					"cam_credential": "cred-1",
+					"cam_status": 0,
+					"cam_extended_info": [
+						{
+							"first": "port",
+							"second": "80"
+						}
+
+					]
+			}
+	]
+}
+

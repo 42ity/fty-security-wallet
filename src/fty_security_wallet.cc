@@ -62,10 +62,13 @@ int main (int argc, char *argv [])
     }
 
     // Parse config file
-    ZstrGuard actor_name(strdup(SECURITY_WALLET_AGENT));
+    ZstrGuard secw_actor_name(strdup(SECURITY_WALLET_AGENT));
     ZstrGuard endpoint( strdup(DEFAULT_ENDPOINT));
     ZstrGuard storage_database_path( strdup(DEFAULT_STORAGE_DATABASE_PATH));
     ZstrGuard storage_access_path( strdup(DEFAULT_STORAGE_CONFIGURATION_PATH));
+
+    ZstrGuard mapping_actor_name(strdup(MAPPING_AGENT));
+    ZstrGuard storage_mapping_path( strdup(DEFAULT_STORAGE_MAPPING_PATH));
 
     //char *log_config = NULL;
     if(config_file) {
@@ -76,13 +79,16 @@ int main (int argc, char *argv [])
             exit (EXIT_FAILURE);
         }
         // VERBOSE
-        if (streq (zconfig_get (config, "server/verbose", "false"), "true")) {
+        if (streq (zconfig_get (config, "secw_server/verbose", "false"), "true")) {
             verbose = true;
         }
-        endpoint = strdup (zconfig_get (config, "malamute/endpoint", DEFAULT_ENDPOINT));
-        actor_name = strdup (zconfig_get (config, "malamute/address", SECURITY_WALLET_AGENT));
-        storage_database_path = strdup (zconfig_get (config, "storage/database", DEFAULT_STORAGE_DATABASE_PATH));
-        storage_access_path = strdup (zconfig_get (config, "storage/configuration", DEFAULT_STORAGE_CONFIGURATION_PATH));
+        endpoint = strdup (zconfig_get (config, "secw-malamute/endpoint", DEFAULT_ENDPOINT));
+        secw_actor_name = strdup (zconfig_get (config, "secw-malamute/address", SECURITY_WALLET_AGENT));
+        storage_database_path = strdup (zconfig_get (config, "secw-storage/database", DEFAULT_STORAGE_DATABASE_PATH));
+        storage_access_path = strdup (zconfig_get (config, "secw-storage/configuration", DEFAULT_STORAGE_CONFIGURATION_PATH));
+
+        mapping_actor_name = strdup (zconfig_get (config, "mapping-malamute/address", MAPPING_AGENT));
+        storage_mapping_path = strdup (zconfig_get (config, "mapping-storage/database", MAPPING_AGENT));
     }
 
     if (verbose)
@@ -94,25 +100,55 @@ int main (int argc, char *argv [])
     log_info(SECURITY_WALLET_AGENT " starting");
 
     //start broker agent
-    zactor_t *server = zactor_new (fty_security_wallet_server, (void *)endpoint);
+    zactor_t *secw_server = zactor_new (fty_security_wallet_server, (void *)endpoint);
     //set configuration parameters
-    zstr_sendx (server, "STORAGE_CONFIGURATION_PATH", storage_access_path.get(), NULL);
-    zstr_sendx (server, "STORAGE_DATABASE_PATH", storage_database_path.get(), NULL);
-    zstr_sendx (server, "CONNECT", endpoint.get(), actor_name.get(), NULL);
+    zstr_sendx (secw_server, "STORAGE_CONFIGURATION_PATH", storage_access_path.get(), NULL);
+    zstr_sendx (secw_server, "STORAGE_DATABASE_PATH", storage_database_path.get(), NULL);
+    zstr_sendx (secw_server, "CONNECT", endpoint.get(), secw_actor_name.get(), NULL);
+
+    //start broker agent
+    zactor_t *cam_server = zactor_new (fty_credential_asset_mapping_server, (void *)endpoint);
+    //set configuration parameters
+    zstr_sendx (cam_server, "STORAGE_MAPPING_PATH", mapping_actor_name.get(), NULL);
+    zstr_sendx (cam_server, "CONNECT",  endpoint.get(), mapping_actor_name.get(), NULL);
     
-    while (true) {
-        char *str = zstr_recv (server);
-        if (str) {
-            puts (str);
-            zstr_free (&str);
+    bool secwRun = true;
+    bool camRun= true;
+    
+    while (secwRun || camRun)
+    {
+        if(secwRun)
+        {
+            char *str = zstr_recv (secw_server);
+            if (str)
+            {
+                puts (str);
+                zstr_free (&str);
+            }
+            else
+            {
+                log_info ("Secw Interrupted ...");
+                zactor_destroy(&secw_server);
+                secwRun = false;
+            }
         }
-        else {
-            log_info ("Interrupted ...");
-            break;
+
+        if(camRun)
+        {
+            char *camStr = zstr_recv (cam_server);
+            if (camStr)
+            {
+                puts (camStr);
+                zstr_free (&camStr);
+            }
+            else
+            {
+                log_info ("Cam Interrupted ...");
+                zactor_destroy(&cam_server);
+                camRun = false;
+            }
         }
     }
-
-    zactor_destroy(&server);
 
     return 0;
 

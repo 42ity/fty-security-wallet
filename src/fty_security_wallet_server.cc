@@ -60,16 +60,7 @@ SecurityWalletServer::SecurityWalletServer(zsock_t *pipe)
 }
 
 /* Commands implementation section*/
-//TODO remove
-std::string SecurityWalletServer::handleNotImplementedCmd(const Sender & /*sender*/, const std::vector<std::string> & /*params*/)
-{
-    /*
-     * No parameters for this command.
-     * 
-     */
-    
-    throw SecwException("Command is not implemented yet!!");
-}
+//TODO remove: throw SecwException("Command is not implemented yet!!");
 
 std::string SecurityWalletServer::handleGetListPortfolio(const Sender & /*sender*/, const std::vector<std::string> & /*params*/)
 {
@@ -789,7 +780,7 @@ fty_security_wallet_server_test (bool verbose)
     
     zactor_t *server = zactor_new (fty_security_wallet_server, (void *)endpoint);
     //set configuration parameters
-    zstr_sendx (server, "STORAGE_CONFIGURATION_PATH", SELFTEST_DIR_RO"/configuration.json", NULL);
+    zstr_sendx (server, "STORAGE_CONFIGURATION_PATH", SELFTEST_DIR_RW"/configuration.json", NULL);
     zstr_sendx (server, "STORAGE_DATABASE_PATH", SELFTEST_DIR_RW"/data.json", NULL);
     zstr_sendx (server, "CONNECT", endpoint, SECURITY_WALLET_AGENT, NULL);
 

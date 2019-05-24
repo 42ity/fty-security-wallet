@@ -11,6 +11,14 @@
 *.xml7
 
 # Ignore the source doc texts generated from program sources
+cam_credential_asset_mapping.txt
+cam_credential_asset_mapping.doc
+cam_accessor.txt
+cam_accessor.doc
+cam_exception.txt
+cam_exception.doc
+fty_credential_asset_mapping_server.txt
+fty_credential_asset_mapping_server.doc
 secw_document.txt
 secw_document.doc
 secw_exception.txt

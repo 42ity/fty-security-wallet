@@ -1,5 +1,5 @@
 /*  =========================================================================
-    secw_exception - secw exception
+    cam_exception - Credential asset mapping exceptions
 
     Copyright (C) 2019 Eaton
 
@@ -19,26 +19,19 @@
     =========================================================================
 */
 
-/*
-@header
-    secw_exception - secw exception
-@discuss
-@end
-*/
-
-#include "fty_security_wallet_classes.h"
-
 #include <sstream>
 #include <cxxtools/jsondeserializer.h>
 #include <cxxtools/jsonserializer.h>
 
-namespace secw
+#include "cam_exception.h"
+
+namespace cam
 {
 /*-----------------------------------------------------------------------------*/
 /*   Exception                                                                 */
 /*-----------------------------------------------------------------------------*/
 //Public
-    void SecwException::throwSecwException(const std::string & data)
+    void CamException::throwCamException(const std::string & data)
     {
         //get the serializationInfo
         std::stringstream input;
@@ -61,35 +54,36 @@ namespace secw
         }
         catch(...)
         {}
-              
+        
+
         switch(errorCode)
         {
-            case UNSUPPORTED_COMMAND:           throw SecwUnsupportedCommandException(whatArg);
-            case PROTOCOL_ERROR:                throw SecwProtocolErrorException(whatArg);
-            case BAD_COMMAND_ARGUMENT:          throw SecwBadCommandArgumentException(whatArg);
-            case UNKNOWN_DOCUMENT_TYPE:         throw SecwUnknownDocumentTypeException(whatArg);
-            case UNKNOWN_PORTFOLIO:             throw SecwUnknownPortfolioException(extraData, whatArg);
-            case INVALID_DOCUMENT_FORMAT:       throw SecwInvalidDocumentFormatException(whatArg);
-            case IMPOSSIBLE_TO_LOAD_PORTFOLIO:  throw SecwImpossibleToLoadPortfolioException(whatArg);
-            case UNKNOWN_TAG:                   throw SecwUnknownTagException(whatArg);
-            case DOCUMENT_DO_NOT_EXIST:         throw SecwDocumentDoNotExistException(whatArg);
-            case ILLEGAL_ACCESS:                throw SecwIllegalAccess(whatArg);
-            case UNKNOWN_USAGE_ID:              throw SecwUnknownUsageIDException(whatArg);
-            default: throw SecwException(whatArg);
+            case UNSUPPORTED_COMMAND:           throw CamUnsupportedCommandException(whatArg);
+            case PROTOCOL_ERROR:                throw CamProtocolErrorException(whatArg);
+            case BAD_COMMAND_ARGUMENT:          throw CamBadCommandArgumentException(extraData, whatArg);
+            case MAPPING_DOES_NOT_EXIST:          throw CamMappingDoesNotExistException(extraData, whatArg);
+            case MAPPING_ALREADY_EXISTS:         throw CamMappingAlreadyExistsException(extraData, whatArg);
+            case MAPPING_INVALID:               throw CamMappingInvalidException(whatArg);
+            default: throw CamException(whatArg);
         }
     }
 
-    SecwException::SecwException(const std::string & whatArg, ErrorCode code) :
+    CamException::CamException(const std::string & whatArg, ErrorCode code) :
         m_code(code),
         m_whatArg(whatArg)
     {}
+
+    CamException::CamException(ErrorCode code) :
+        m_code(code),
+        m_whatArg("Unknown error")
+    {}
     
-    const char* SecwException::what() const noexcept
+    const char* CamException::what() const noexcept
     {
         return m_whatArg.c_str();
     }
 
-    std::string SecwException::toJson() const
+    std::string CamException::toJson() const
     {
         std::stringstream output;
         cxxtools::JsonSerializer serializer(output);
@@ -102,7 +96,7 @@ namespace secw
         return output.str();
     }
 
-    void operator<<= (cxxtools::SerializationInfo& si, const SecwException & exception)
+    void operator<<= (cxxtools::SerializationInfo& si, const CamException & exception)
     {
         si.addMember("errorCode") <<= exception.m_code;
         si.addMember("whatArg") <<= exception.m_whatArg;
@@ -110,10 +104,8 @@ namespace secw
     }
 
 //Protected 
-    void SecwException::fillSerializationInfo(cxxtools::SerializationInfo& /*si*/) const
+    void CamException::fillSerializationInfo(cxxtools::SerializationInfo& /*si*/) const
     {}
 
-
-
-} // namespace secw
+} // namespace cam
 

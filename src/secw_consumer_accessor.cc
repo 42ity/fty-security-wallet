@@ -193,17 +193,30 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #1.2 SecwUnknownPortfolioException\n");
+    std::string portfolioName("XXXXX");
+
     ConsumerAccessor consumerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    
     try
     {
-      consumerAccessor.getDocumentWithPrivateData("XXXXX", "XXXXX-XXXXXXXXX");
+      consumerAccessor.getDocumentWithPrivateData(portfolioName, "XXXXX-XXXXXXXXX");
 
       throw std::runtime_error("Document is return");
     }
-    catch(const SecwUnknownPortfolioException &)
+    catch(const SecwUnknownPortfolioException & e)
     {
-      printf(" *<=  Test #1.2 > OK\n");
-      testsResults.emplace_back (" Test #1.2 SecwUnknownPortfolioException",true);
+      if(e.getPortfolioName() == portfolioName )
+      {
+        printf(" *<=  Test #1.2 > OK\n");
+        testsResults.emplace_back (" Test #1.2 SecwUnknownPortfolioException",true);
+      }
+      else
+      {
+        printf(" *<=  Test #1.2 > Failed\n");
+        printf("Error: missmatch of portfolio name %s, %s\n\n",e.getPortfolioName().c_str(),portfolioName.c_str());
+        testsResults.emplace_back (" Test #1.2 SecwUnknownPortfolioException",false);
+      }
+      
     }
     catch(const std::exception& e)
     {
