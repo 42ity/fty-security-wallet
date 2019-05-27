@@ -148,12 +148,28 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
             //We don't read the id because will portfolio insertion process is gonna do it
             //We don't read the type because it is define by the object type
             si.getMember(DOC_NAME_ENTRY) >>= m_name;
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwInvalidDocumentFormatException(DOC_NAME_ENTRY);
+        }
+
+        try
+        {
             si.getMember(DOC_TAGS_ENTRY) >>= m_tags;
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwInvalidDocumentFormatException(DOC_TAGS_ENTRY);
+        }
+
+        try
+        {
             si.getMember(DOC_USAGES_ENTRY) >>= m_usages;
         }
         catch(const std::exception& e)
         {
-            throw SecwInvalidDocumentFormatException(e.what());
+            throw SecwInvalidDocumentFormatException(DOC_USAGES_ENTRY);
         }
     }
 
@@ -187,12 +203,12 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
             {
                if(doc->getType() != type)
                {
-                   throw SecwInvalidDocumentFormatException("The override cannot happened due to mismatch of type");
+                   throw SecwInvalidDocumentFormatException(DOC_TYPE_ENTRY);
                }
                
                if(doc->getId() != id)
                {
-                   throw SecwInvalidDocumentFormatException("The override cannot happened due to mismatch of id");
+                   throw SecwInvalidDocumentFormatException(DOC_ID_ENTRY);
                }
             }
             else
@@ -231,7 +247,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
         }
         catch(const std::exception& e)
         {
-            throw SecwInvalidDocumentFormatException(e.what());
+            throw SecwException(e.what());
         }
 
     }

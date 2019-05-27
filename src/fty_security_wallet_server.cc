@@ -260,7 +260,7 @@ std::string SecurityWalletServer::handleGetListDocumentsWithoutSecret(const Send
 
     auto usageIDs = m_activeWallet->getConfiguration().getAllUsageId();
     if (!usage.empty() && usageIDs.find(usage) == usageIDs.end()) {
-        throw SecwUnknownUsageIDException("Unknown usage ID");
+        throw SecwUnknownUsageIDException(usage);
     }
 
     if(!usage.empty())

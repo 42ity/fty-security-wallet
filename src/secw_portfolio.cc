@@ -70,7 +70,7 @@ namespace secw
         //Check if document exist
         if(m_documents.count(doc->getId()) < 1)
         {
-            throw SecwDocumentDoNotExistException("Document with id "+ doc->getId() +" do not exist");
+            throw SecwDocumentDoNotExistException(doc->getId());
         }
         
          m_documents[doc->getId()] = doc->clone();
@@ -81,7 +81,7 @@ namespace secw
     {
         if(m_documents.count(id) < 1)
         {
-            throw SecwDocumentDoNotExistException("Document with id "+ id +" do not exist");
+            throw SecwDocumentDoNotExistException(id);
         }
             
         return m_documents.at(id)->clone();
