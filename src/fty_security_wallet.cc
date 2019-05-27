@@ -114,7 +114,7 @@ int main (int argc, char *argv [])
     
     while (true)
     {
-       char *str = zstr_recv (secw_server);
+        char *str = zstr_recv (secw_server);
         if (str)
         {
             puts (str);
@@ -142,7 +142,7 @@ int main (int argc, char *argv [])
 
     log_info ("Secw Interrupted ...");
     zactor_destroy(&secw_server);
-    
+
     log_info ("Cam Interrupted ...");
     zactor_destroy(&cam_server);
 
