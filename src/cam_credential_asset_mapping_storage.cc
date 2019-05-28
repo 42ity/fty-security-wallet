@@ -39,6 +39,7 @@ namespace cam
     m_pathDatabase(databasePath)
     {
         //Load database
+        log_info(" Loading mapping from %s ...", m_pathDatabase.c_str());
         try
         {
             struct stat buffer;   

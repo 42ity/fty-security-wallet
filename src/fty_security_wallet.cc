@@ -91,6 +91,10 @@ int main (int argc, char *argv [])
         storage_mapping_path = strdup (zconfig_get (config, "mapping-storage/database", MAPPING_AGENT));
     }
 
+    log_debug (SECURITY_WALLET_AGENT ": storage_access_path '%s'", storage_access_path.get());
+    log_debug (SECURITY_WALLET_AGENT ": storage_database_path '%s'", storage_database_path.get());
+    log_debug (SECURITY_WALLET_AGENT ": storage_mapping_path '%s'.", storage_mapping_path.get());
+
     if (verbose)
     {
         ftylog_setVeboseMode(ftylog_getInstance());
@@ -109,7 +113,7 @@ int main (int argc, char *argv [])
     //start broker agent
     zactor_t *cam_server = zactor_new (fty_credential_asset_mapping_server, (void *)endpoint);
     //set configuration parameters
-    zstr_sendx (cam_server, "STORAGE_MAPPING_PATH", mapping_actor_name.get(), NULL);
+    zstr_sendx (cam_server, "STORAGE_MAPPING_PATH", storage_mapping_path.get(), NULL);
     zstr_sendx (cam_server, "CONNECT",  endpoint.get(), mapping_actor_name.get(), NULL);
     
     bool secwRun = true;
@@ -127,28 +131,29 @@ int main (int argc, char *argv [])
             }
             else
             {
-                log_info ("Secw Interrupted ...");
-                zactor_destroy(&secw_server);
-                secwRun = false;
+                secwRun = camRun = false;
             }
         }
 
         if(camRun)
         {
-            char *camStr = zstr_recv (cam_server);
-            if (camStr)
+            char *str = zstr_recv (cam_server);
+            if (str)
             {
-                puts (camStr);
-                zstr_free (&camStr);
+                puts (str);
+                zstr_free (&str);
             }
             else
             {
-                log_info ("Cam Interrupted ...");
-                zactor_destroy(&cam_server);
-                camRun = false;
+                secwRun = camRun = false;
             }
         }
     }
+
+    log_info ("Secw Interrupted ...");
+    zactor_destroy(&secw_server);
+    log_info ("Cam Interrupted ...");
+    zactor_destroy(&cam_server);
 
     return 0;
 
