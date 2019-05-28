@@ -57,11 +57,21 @@ namespace cam
 
     void removeMapping(const AssetId & assetId, const UsageId & usageId);
 
-    /*bool isMappingExisting(const AssetId & assetId, const UsageId & usageId) const;*/
-    
     void updateCredentialId(const AssetId & assetId, const UsageId & usageId, const CredentialId & credentialId);
     void updateCredentialStatus(const AssetId & assetId, const UsageId & usageId, CredentialStatus status);
     void updateExtendedInfo(const AssetId & assetId, const UsageId & usageId, const MapExtendedInfo & extendedInfo);
+
+    bool isMappingExisting(const AssetId & assetId, const UsageId & usageId) const;
+
+    /*const std::vector<CredentialAssetMapping> getCredentialMappingsForUsage( const CredentialId & credentialId,
+                                                                        const UsageId & usageId) const;*/
+
+    const std::vector<CredentialAssetMapping> getCredentialMappings(const CredentialId & credentialId) const;
+
+    const std::vector<CredentialAssetMapping> getAssetMappings(const AssetId & assetId) const;
+
+    uint32_t countCredentialMappingsForCredential(const CredentialId & credentialId) const;
+
   
   private:
     ClientId m_clientId;
