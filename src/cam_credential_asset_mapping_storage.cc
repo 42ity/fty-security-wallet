@@ -107,6 +107,8 @@ namespace cam
 
     void CredentialAssetMappingStorage::save() const
     {
+        log_debug("Update mapping database");
+        
         //create the file content
         cxxtools::SerializationInfo rootSi;
 
@@ -127,6 +129,8 @@ namespace cam
         cxxtools::JsonSerializer serializer(output);
         serializer.beautify(true);
         serializer.serialize(rootSi);
+
+        output.close();
     }
     
     const CredentialAssetMapping & CredentialAssetMappingStorage::getMapping(const AssetId & assetId, const UsageId & usageId) const

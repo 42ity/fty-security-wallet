@@ -116,42 +116,37 @@ int main (int argc, char *argv [])
     zstr_sendx (cam_server, "STORAGE_MAPPING_PATH", storage_mapping_path.get(), NULL);
     zstr_sendx (cam_server, "CONNECT",  endpoint.get(), mapping_actor_name.get(), NULL);
     
-    bool secwRun = true;
-    bool camRun= true;
-    
-    while (secwRun || camRun)
+    while (true)
     {
-        if(secwRun)
+        char *str = zstr_recv (secw_server);
+        if (str)
         {
-            char *str = zstr_recv (secw_server);
-            if (str)
-            {
-                puts (str);
-                zstr_free (&str);
-            }
-            else
-            {
-                secwRun = camRun = false;
-            }
+            puts (str);
+            zstr_free (&str);
+        }
+        else
+        {
+            //stop everything
+            break;
         }
 
-        if(camRun)
+        char *camStr = zstr_recv (cam_server);
+        if (camStr)
         {
-            char *str = zstr_recv (cam_server);
-            if (str)
-            {
-                puts (str);
-                zstr_free (&str);
-            }
-            else
-            {
-                secwRun = camRun = false;
-            }
+            puts (camStr);
+            zstr_free (&camStr);
         }
+        else
+        {
+            //stop everything
+            break;
+        }
+
     }
 
     log_info ("Secw Interrupted ...");
     zactor_destroy(&secw_server);
+
     log_info ("Cam Interrupted ...");
     zactor_destroy(&cam_server);
 
