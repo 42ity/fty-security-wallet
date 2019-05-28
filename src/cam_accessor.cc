@@ -129,6 +129,67 @@ namespace cam
     sendCommand(CredentialAssetMappingServer::UPDATE_INFO_MAPPING, {serialize(si)} );
   }
 
+  bool Accessor::isMappingExisting(const AssetId & assetId, const UsageId & usageId) const
+  {
+    bool exist = true;
+
+    try
+    {
+      getMapping(assetId, usageId);
+    }
+    catch(const CamMappingDoesNotExistException &)
+    {
+      exist = false;
+    }
+
+    return exist;
+  }
+
+  const std::vector<CredentialAssetMapping> Accessor::getAssetMappings(const AssetId & assetId) const
+  {
+    std::vector<CredentialAssetMapping> mappings;
+
+    std::vector<std::string> payload;
+
+    payload = sendCommand(CredentialAssetMappingServer::GET_ASSET_MAPPINGS, {assetId} );
+
+    cxxtools::SerializationInfo si = deserialize(payload.at(0));
+
+    si >>= mappings;
+
+    return mappings;
+  }
+
+  const std::vector<CredentialAssetMapping> Accessor::getCredentialMappings(const CredentialId & credentialId) const
+  {
+    std::vector<CredentialAssetMapping> mappings;
+
+    std::vector<std::string> payload;
+
+    payload = sendCommand(CredentialAssetMappingServer::GET_CRED_MAPPINGS, {credentialId} );
+
+    cxxtools::SerializationInfo si = deserialize(payload.at(0));
+
+    si >>= mappings;
+
+    return mappings;
+  }
+
+  uint32_t Accessor::countCredentialMappingsForCredential(const CredentialId & credentialId) const
+  {
+    uint32_t counter = 0;
+
+    std::vector<std::string> payload;
+
+    payload = sendCommand(CredentialAssetMappingServer::COUNT_CRED_MAPPINGS, {credentialId} );
+
+    cxxtools::SerializationInfo si = deserialize(payload.at(0));
+
+    si >>= counter;
+
+    return counter;
+  }
+
   std::vector<std::string> Accessor::sendCommand(const std::string & command, const std::vector<std::string> & frames) const
   {
     //Prepare the request:
@@ -840,6 +901,269 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
     }
 
   } // 4.X
+
+  //test 5.X
+  {
+    //test 5.1
+    testNumber = "5.1";
+    testName = "isMappingExisting => true";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        
+        AssetId assetId("asset-1");
+        UsageId usageId("test-usage");
+
+        if(! accessor.isMappingExisting(assetId,usageId))
+        {
+          throw std::runtime_error("Mapping does not exist");
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+    //test 5.2
+    testNumber = "5.2";
+    testName = "isMappingExisting => false";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+
+        AssetId assetId("asset-XXXXX");
+        UsageId usageId("usage-XXXXX");
+
+        if(accessor.isMappingExisting(assetId,usageId))
+        {
+          throw std::runtime_error("Mapping exists");
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+  } // 5.X
+
+
+  //test 6.X
+  {
+    //test 6.1
+    testNumber = "6.1";
+    testName = "getAssetMappings => 3 mappings";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        
+        AssetId assetId("assetA");
+
+        const std::vector<CredentialAssetMapping> mappings = accessor.getAssetMappings(assetId);
+
+        if(mappings.size() != 3)
+        {
+          throw std::runtime_error("Expected 3 mappings received "+std::to_string(mappings.size()));
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+    //test 6.2
+    testNumber = "6.2";
+    testName = "getAssetMappings => 0 mapping";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        
+        AssetId assetId("XXXXXX");
+
+        const std::vector<CredentialAssetMapping> mappings = accessor.getAssetMappings(assetId);
+
+        if(mappings.size() != 0)
+        {
+          throw std::runtime_error("Expected 0 mapping received "+std::to_string(mappings.size()));
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+  } // 6.X
+
+  //test 7.X
+  {
+    //test 7.1
+    testNumber = "7.1";
+    testName = "getAssetMappings => 3 mappings";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        
+        CredentialId credId("credC");
+
+        const std::vector<CredentialAssetMapping> mappings = accessor.getCredentialMappings(credId);
+
+        if(mappings.size() != 3)
+        {
+          throw std::runtime_error("Expected 3 mappings received "+std::to_string(mappings.size()));
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+    //test 7.2
+    testNumber = "7.2";
+    testName = "getCredentialMappings => 0 mapping";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        
+        CredentialId credId("XXXXXX");
+
+        const std::vector<CredentialAssetMapping> mappings = accessor.getCredentialMappings(credId);
+
+        if(mappings.size() != 0)
+        {
+          throw std::runtime_error("Expected 0 mapping received "+std::to_string(mappings.size()));
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+  } // 7.X
+
+  //test 8.X
+  {
+    //test 8.1
+    testNumber = "8.1";
+    testName = "countCredentialMappingsForCredential => 3 mappings";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        
+        CredentialId credId("credC");
+
+        uint32_t counter = accessor.countCredentialMappingsForCredential(credId);
+
+        if(counter != 3)
+        {
+          throw std::runtime_error("Expected 3 mappings received "+std::to_string(counter));
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+    //test 8.2
+    testNumber = "8.2";
+    testName = "countCredentialMappingsForCredential => 0 mapping";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        
+        CredentialId credId("XXXXXX");
+
+        uint32_t counter = accessor.countCredentialMappingsForCredential(credId);
+
+        if(counter != 0)
+        {
+          throw std::runtime_error("Expected 0 mapping received "+std::to_string(counter));
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+  } // 8.X
+  
 
   return testsResults;
   

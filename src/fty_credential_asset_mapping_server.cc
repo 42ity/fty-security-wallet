@@ -49,6 +49,11 @@ namespace cam
         m_supportedCommands[UPDATE_INFO_MAPPING] = handleUpdateInfoMapping;
 
         m_supportedCommands[REMOVE_MAPPING] = handleRemoveMapping;
+
+        m_supportedCommands[GET_ASSET_MAPPINGS] = handleGetAssetMappings;
+        m_supportedCommands[GET_CRED_MAPPINGS] = handleGetCredentialMappings;
+
+        m_supportedCommands[COUNT_CRED_MAPPINGS] = handleCountCredentialMappingsForCredential;
     }
 
     /* Commands implementation section*/
@@ -227,6 +232,78 @@ namespace cam
         m_activeMapping->save();
         
         return "";
+    }
+
+    std::string CredentialAssetMappingServer::handleGetAssetMappings(const Sender & /*sender*/, const std::vector<std::string> & params)
+    {
+        /*
+        * Parameters for this command:
+        * 
+        * 0. asset id
+        */
+
+        if(params.size() < 1)
+        {
+            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+        }
+
+        const AssetId & assetId = params.at(0);
+
+        std::vector<CredentialAssetMapping> mappings = m_activeMapping->getAssetMappings(assetId);
+        
+        cxxtools::SerializationInfo si;
+
+        si <<= mappings;
+
+        return serialize(si);
+    }
+
+    std::string CredentialAssetMappingServer::handleGetCredentialMappings(const Sender & /*sender*/, const std::vector<std::string> & params)
+    {
+        /*
+        * Parameters for this command:
+        * 
+        * 0. credential id
+        */
+
+        if(params.size() < 1)
+        {
+            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+        }
+
+        const CredentialId & credentialId = params.at(0);
+
+        std::vector<CredentialAssetMapping> mappings = m_activeMapping->getCredentialMappings(credentialId);
+        
+        cxxtools::SerializationInfo si;
+
+        si <<= mappings;
+
+        return serialize(si);
+    }
+
+    std::string CredentialAssetMappingServer::handleCountCredentialMappingsForCredential(const Sender & /*sender*/, const std::vector<std::string> & params)
+    {
+        /*
+        * Parameters for this command:
+        * 
+        * 0. credential id
+        */
+
+        if(params.size() < 1)
+        {
+            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+        }
+
+        const CredentialId & credentialId = params.at(0);
+
+        std::vector<CredentialAssetMapping> mappings = m_activeMapping->getCredentialMappings(credentialId);
+        
+        cxxtools::SerializationInfo si;
+
+        si <<= static_cast<uint32_t>(mappings.size());
+
+        return serialize(si);
     }
 
     /*

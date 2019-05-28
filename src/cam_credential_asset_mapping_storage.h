@@ -51,7 +51,7 @@ namespace cam
     std::vector<CredentialAssetMapping> getAssetMappings(const AssetId & assetId) const;
 
     static constexpr const uint8_t MAPPING_VERSION = 1;
-
+    
   private:
     std::string m_pathDatabase;
     std::map<Hash, CredentialAssetMapping> m_mappings;

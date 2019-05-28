@@ -13,6 +13,54 @@
 						}
 
 					]
+			},
+			{
+				"cam_usage": "usageA",
+				"cam_asset": "assetA",
+				"cam_credential": "credA",
+				"cam_status": 0,
+				"cam_extended_info": [
+				]
+			},
+			{
+				"cam_usage": "usageA",
+				"cam_asset": "assetB",
+				"cam_credential": "credB",
+				"cam_status": 0,
+				"cam_extended_info": [
+				]
+			},
+			{
+				"cam_usage": "usageB",
+				"cam_asset": "assetA",
+				"cam_credential": "credB",
+				"cam_status": 0,
+				"cam_extended_info": [
+				]
+			},
+			{
+				"cam_usage": "usageC",
+				"cam_asset": "assetA",
+				"cam_credential": "credC",
+				"cam_status": 0,
+				"cam_extended_info": [
+				]
+			},
+			{
+				"cam_usage": "usageD",
+				"cam_asset": "assetB",
+				"cam_credential": "credC",
+				"cam_status": 0,
+				"cam_extended_info": [
+				]
+			},
+			{
+				"cam_usage": "usageD",
+				"cam_asset": "assetC",
+				"cam_credential": "credC",
+				"cam_status": 0,
+				"cam_extended_info": [
+				]
 			}
 	]
 }

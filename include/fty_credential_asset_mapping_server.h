@@ -66,6 +66,9 @@ namespace cam
         static std::string handleUpdateStatusMapping(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleUpdateInfoMapping(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleRemoveMapping(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleGetAssetMappings(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleGetCredentialMappings(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleCountCredentialMappingsForCredential(const Sender & sender, const std::vector<std::string> & params);
 
 
         
@@ -80,6 +83,11 @@ namespace cam
         static constexpr const char* UPDATE_STATUS_MAPPING = "UPDATE_STATUS_MAPPING";
         static constexpr const char* UPDATE_INFO_MAPPING = "UPDATE_INFO_MAPPING";
         static constexpr const char* REMOVE_MAPPING = "REMOVE_MAPPING";
+
+        static constexpr const char* GET_ASSET_MAPPINGS = "GET_ASSET_MAPPINGS";
+        static constexpr const char* GET_CRED_MAPPINGS = "GET_CRED_MAPPINGS";
+
+        static constexpr const char* COUNT_CRED_MAPPINGS = "COUNT_CRED_MAPPINGS";
 
     };
     
