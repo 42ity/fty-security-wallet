@@ -192,6 +192,11 @@ namespace cam
 
   std::vector<std::string> Accessor::sendCommand(const std::string & command, const std::vector<std::string> & frames) const
   {
+    if(!m_client)
+    {
+      throw CamMalamuteClientIsNullException();
+    }
+
     //Prepare the request:
     zmsg_t *request = zmsg_new();
     ZuuidGuard  zuuid(zuuid_new ());
@@ -206,8 +211,20 @@ namespace cam
       zmsg_addstr (request, frame.c_str());
     }
 
+    if(zsys_interrupted)
+    {
+      zmsg_destroy(&request);
+      throw CamMalamuteInterruptedException();
+    }
+
     //send the message
     mlm_client_sendto (m_client, MAPPING_AGENT, "REQUEST", NULL, m_timeout, &request);
+
+    if(zsys_interrupted)
+    {
+      zmsg_destroy(&request);
+      throw CamMalamuteInterruptedException();
+    }
 
     //Get the reply
     ZmsgGuard recv(mlm_client_recv (m_client));
