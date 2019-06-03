@@ -40,6 +40,8 @@ namespace cam
         MAPPING_DOES_NOT_EXIST,
         MAPPING_ALREADY_EXISTS,
         MAPPING_INVALID,
+        MLM_CLIENT_IS_NULL,
+        MLM_INTERRUPTED
     };
 
     class CamException : public std::exception
@@ -73,6 +75,7 @@ namespace cam
     };
 
     void operator<<= (cxxtools::SerializationInfo& si, const CamException & exception);
+
 
 // Command is not supported
     class CamUnsupportedCommandException : public CamException
@@ -209,6 +212,24 @@ namespace cam
     public:
         explicit CamMappingInvalidException(const std::string & whatArg) :
             CamException(whatArg, ErrorCode::MAPPING_INVALID)
+        {}
+    };
+
+// Malamute client is null
+    class CamMalamuteClientIsNullException : public CamException
+    {
+    public:
+        explicit CamMalamuteClientIsNullException() :
+            CamException("Malamute client is null", ErrorCode::MLM_CLIENT_IS_NULL)
+        {}
+    };
+
+// Malamute Interrupted
+    class CamMalamuteInterruptedException : public CamException
+    {
+    public:
+        explicit CamMalamuteInterruptedException() :
+            CamException("Malamute interrupted", ErrorCode::MLM_INTERRUPTED)
         {}
     };
 

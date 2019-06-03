@@ -91,6 +91,10 @@ int main (int argc, char *argv [])
         storage_mapping_path = strdup (zconfig_get (config, "mapping-storage/database", MAPPING_AGENT));
     }
 
+    log_debug (SECURITY_WALLET_AGENT ": storage_access_path '%s'", storage_access_path.get());
+    log_debug (SECURITY_WALLET_AGENT ": storage_database_path '%s'", storage_database_path.get());
+    log_debug (SECURITY_WALLET_AGENT ": storage_mapping_path '%s'.", storage_mapping_path.get());
+
     if (verbose)
     {
         ftylog_setVeboseMode(ftylog_getInstance());
