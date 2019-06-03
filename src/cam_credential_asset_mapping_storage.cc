@@ -187,7 +187,7 @@ namespace cam
         return isMappingExisting;
     }
 
-    std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getCredentialMappingsForUsage( const CredentialId & credentialId,
+    std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getCredentialMappingsForService( const CredentialId & credentialId,
                                                                         const ServiceId & serviceId) const
     {
         std::vector<CredentialAssetMapping> list;

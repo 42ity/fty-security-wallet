@@ -64,7 +64,7 @@ namespace cam
 
     bool isMappingExisting(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const;
 
-    /*const std::vector<CredentialAssetMapping> getCredentialMappingsForUsage( const CredentialId & credentialId,
+    /*const std::vector<CredentialAssetMapping> getCredentialMappingsForService( const CredentialId & credentialId,
                                                                         const ServiceId & serviceId) const;*/
 
     const std::vector<CredentialAssetMapping> getCredentialMappings(const CredentialId & credentialId) const;

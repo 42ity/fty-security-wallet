@@ -46,7 +46,7 @@ namespace cam
     std::vector<CredentialAssetMapping> getMappings(const AssetId & assetId, const ServiceId & serviceId) const;
     std::vector<CredentialAssetMapping> getAllMappings() const;
 
-    std::vector<CredentialAssetMapping> getCredentialMappingsForUsage( const CredentialId & credentialId,
+    std::vector<CredentialAssetMapping> getCredentialMappingsForService( const CredentialId & credentialId,
                                                                         const ServiceId & serviceId) const;
 
     std::vector<CredentialAssetMapping> getCredentialMappings(const CredentialId & credentialId) const;
