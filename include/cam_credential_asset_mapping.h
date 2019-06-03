@@ -38,10 +38,12 @@ namespace cam
 
   using CredentialId = std::string;
   using AssetId = std::string;
-  using UsageId = std::string;
+  using ServiceId = std::string;
+  using Protocol = std::string;
+  using Port = std::string;
   using MapExtendedInfo = std::map<std::string, std::string>;
 
-  enum CredentialStatus : uint8_t
+  enum Status : uint8_t
   {
     UNKNOWN = 0,
     VALID,
@@ -53,8 +55,10 @@ namespace cam
    * Some key definition for serialization
    * 
    */
-  static constexpr const char* USAGE_ID_ENTRY = "cam_usage";
+  static constexpr const char* SERVICE_ID_ENTRY = "cam_service";
   static constexpr const char* ASSET_ID_ENTRY = "cam_asset";
+  static constexpr const char* PROTOCOL_ENTRY = "cam_protocol";
+  static constexpr const char* PORT_ENTRY = "cam_port";
   static constexpr const char* CREDENTIAL_ID_ENTRY = "cam_credential";
   static constexpr const char* CREDENTIAL_STATUS_ENTRY = "cam_status";
   static constexpr const char* EXTENDED_INFO_ENTRY = "cam_extended_info";
@@ -74,9 +78,11 @@ namespace cam
 
     // Attributs 
     AssetId m_assetId;
-    UsageId m_usageId;
+    ServiceId m_serviceId;
+    Protocol m_protocol;
+    Port m_port;
     CredentialId m_credentialId;
-    CredentialStatus m_credentialStatus;
+    Status m_status;
     MapExtendedInfo m_extendedInfo;
 
   };

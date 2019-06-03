@@ -144,63 +144,71 @@ namespace cam
     class CamMappingDoesNotExistException : public CamException
     {
     private:
-        std::string m_asset, m_usage;
+        std::string m_asset, m_service, m_protocol;
 
         void fillSerializationInfo(cxxtools::SerializationInfo& si) const override
         {
             si.addMember("asset") <<= m_asset;
-            si.addMember("usage") <<= m_usage;
+            si.addMember("service") <<= m_service;
+            si.addMember("protocol") <<= m_protocol;
         }
     public:
-        explicit CamMappingDoesNotExistException(const std::string & asset, const std::string & usage) :
+        explicit CamMappingDoesNotExistException(const std::string & asset, const std::string & service, const std::string & protocol) :
             CamException(ErrorCode::MAPPING_DOES_NOT_EXIST),
             m_asset(asset),
-            m_usage(usage)
+            m_service(service),
+            m_protocol(protocol)
         {
-            m_whatArg = "Mapping for asset '"+m_asset+"' and usage '" + m_usage + "' do not exist";
+            m_whatArg = "Mapping for asset '"+m_asset+"', service '" + m_service + "' and protocol '" +m_protocol+"' do not exist";
         }
 
         explicit CamMappingDoesNotExistException(const cxxtools::SerializationInfo& extraData, const std::string & whatArg) :
             CamException(whatArg, ErrorCode::MAPPING_DOES_NOT_EXIST)
         {
             extraData.getMember("asset") >>= m_asset;
-            extraData.getMember("usage") >>= m_usage;
+            extraData.getMember("service") >>= m_service;
+            extraData.getMember("protocol") >>= m_protocol;
         }
 
         inline std::string getAssetId() const { return m_asset; }
-        inline std::string getUsageId() const { return m_usage; }
+        inline std::string getServiceId() const { return m_service; }
+        inline std::string getProtocol() const { return m_protocol; }
     };
 
 // Mapping already exist
     class CamMappingAlreadyExistsException : public CamException
     {
     private:
-        std::string m_asset, m_usage;
+        std::string m_asset, m_service, m_protocol;
 
         void fillSerializationInfo(cxxtools::SerializationInfo& si) const override
         {
             si.addMember("asset") <<= m_asset;
-            si.addMember("usage") <<= m_usage;
+            si.addMember("service") <<= m_service;
+            si.addMember("protocol") <<= m_protocol;
         }
         
     public:
-        explicit CamMappingAlreadyExistsException(const std::string & asset, const std::string & usage) :
+        explicit CamMappingAlreadyExistsException(const std::string & asset, const std::string & service, const std::string & protocol) :
             CamException(ErrorCode::MAPPING_ALREADY_EXISTS),
             m_asset(asset),
-            m_usage(usage)
+            m_service(service),
+            m_protocol(protocol)
         {
-             m_whatArg = "Mapping for asset '"+m_asset+"' and usage '" + m_usage + "' already exist";
+             m_whatArg = "Mapping for asset '"+m_asset+"', service '" + m_service + "' and protocol '" +m_protocol+"' already exist";
         }
 
         explicit CamMappingAlreadyExistsException(const cxxtools::SerializationInfo& extraData, const std::string & whatArg) :
             CamException(whatArg, ErrorCode::MAPPING_ALREADY_EXISTS)
         {
             extraData.getMember("asset") >>= m_asset;
-            extraData.getMember("usage") >>= m_usage;
+            extraData.getMember("service") >>= m_service;
+            extraData.getMember("protocol") >>= m_protocol;
         }
         
         inline std::string getAssetId() const { return m_asset; }
-        inline std::string getUsageId() const { return m_usage; }
+        inline std::string getServiceId() const { return m_service; }
+        inline std::string getProtocol() const { return m_protocol; }
     };
 
 // Mapping invalid

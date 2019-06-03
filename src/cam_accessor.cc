@@ -46,16 +46,18 @@ namespace cam
     mlm_client_destroy(&m_client);
   }
 
-  void Accessor::createMapping( const AssetId & assetId, const UsageId & usageId,
-                      const CredentialId & credentialId, CredentialStatus status,
+  void Accessor::createMapping( const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol,
+                      const Port & port, const CredentialId & credentialId, Status status,
                       const MapExtendedInfo & extendedInfo)
   {
     CredentialAssetMapping mapping;
 
     mapping.m_assetId = assetId;
-    mapping.m_usageId = usageId;
+    mapping.m_serviceId = serviceId;
+    mapping.m_protocol = protocol;
+    mapping.m_port = port;
     mapping.m_credentialId = credentialId;
-    mapping.m_credentialStatus = status;
+    mapping.m_status = status;
     mapping.m_extendedInfo = extendedInfo;
 
     cxxtools::SerializationInfo si;
@@ -65,13 +67,13 @@ namespace cam
     sendCommand(CredentialAssetMappingServer::CREATE_MAPPING, {serialize(si)} );
   }
 
-  const CredentialAssetMapping Accessor::getMapping(const AssetId & assetId, const UsageId & usageId) const
+  const CredentialAssetMapping Accessor::getMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const
   {
     CredentialAssetMapping mapping;
 
     std::vector<std::string> payload;
 
-    payload = sendCommand(CredentialAssetMappingServer::GET_MAPPING, {assetId, usageId} );
+    payload = sendCommand(CredentialAssetMappingServer::GET_MAPPING, {assetId, serviceId, protocol} );
 
     cxxtools::SerializationInfo si = deserialize(payload.at(0));
 
@@ -80,18 +82,19 @@ namespace cam
     return mapping;
   }
 
-  void Accessor::removeMapping(const AssetId & assetId, const UsageId & usageId)
+  void Accessor::removeMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol)
   {
-    sendCommand(CredentialAssetMappingServer::REMOVE_MAPPING, {assetId, usageId} );
+    sendCommand(CredentialAssetMappingServer::REMOVE_MAPPING, {assetId, serviceId, protocol} );
   }
 
-  /*bool isMappingExisting(const AssetId & assetId, const UsageId & usageId) const;*/
+  /*bool isMappingExisting(const AssetId & assetId, const ServiceId & serviceId) const;*/
   
-  void Accessor::updateCredentialId(const AssetId & assetId, const UsageId & usageId, const CredentialId & credentialId)
+  void Accessor::updateCredentialId(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol, const CredentialId & credentialId)
   {
     CredentialAssetMapping mapping;
     mapping.m_assetId = assetId;
-    mapping.m_usageId = usageId;
+    mapping.m_serviceId = serviceId;
+    mapping.m_protocol = protocol;
     mapping.m_credentialId = credentialId;
 
     cxxtools::SerializationInfo si;
@@ -101,12 +104,28 @@ namespace cam
     sendCommand(CredentialAssetMappingServer::UPDATE_CREDENTIAL_MAPPING, {serialize(si)} );
   }
 
-  void Accessor::updateCredentialStatus(const AssetId & assetId, const UsageId & usageId, CredentialStatus status)
+  void Accessor::updatePort(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol, const Port & port)
   {
     CredentialAssetMapping mapping;
     mapping.m_assetId = assetId;
-    mapping.m_usageId = usageId;
-    mapping.m_credentialStatus = status;
+    mapping.m_serviceId = serviceId;
+    mapping.m_protocol = protocol;
+    mapping.m_port = port;
+
+    cxxtools::SerializationInfo si;
+
+    si <<= mapping;
+
+    sendCommand(CredentialAssetMappingServer::UPDATE_PORT_MAPPING, {serialize(si)} );
+  }
+
+  void Accessor::updateStatus(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol, Status status)
+  {
+    CredentialAssetMapping mapping;
+    mapping.m_assetId = assetId;
+    mapping.m_serviceId = serviceId;
+    mapping.m_protocol = protocol;
+    mapping.m_status = status;
 
     cxxtools::SerializationInfo si;
 
@@ -115,11 +134,12 @@ namespace cam
     sendCommand(CredentialAssetMappingServer::UPDATE_STATUS_MAPPING, {serialize(si)} );
   }
 
-  void Accessor::updateExtendedInfo(const AssetId & assetId, const UsageId & usageId, const MapExtendedInfo & extendedInfo)
+  void Accessor::updateExtendedInfo(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol, const MapExtendedInfo & extendedInfo)
   {
     CredentialAssetMapping mapping;
     mapping.m_assetId = assetId;
-    mapping.m_usageId = usageId;
+    mapping.m_serviceId = serviceId;
+    mapping.m_protocol = protocol;
     mapping.m_extendedInfo = extendedInfo;
 
     cxxtools::SerializationInfo si;
@@ -129,13 +149,13 @@ namespace cam
     sendCommand(CredentialAssetMappingServer::UPDATE_INFO_MAPPING, {serialize(si)} );
   }
 
-  bool Accessor::isMappingExisting(const AssetId & assetId, const UsageId & usageId) const
+  bool Accessor::isMappingExisting(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const
   {
     bool exist = true;
 
     try
     {
-      getMapping(assetId, usageId);
+      getMapping(assetId, serviceId, protocol);
     }
     catch(const CamMappingDoesNotExistException &)
     {
@@ -152,6 +172,36 @@ namespace cam
     std::vector<std::string> payload;
 
     payload = sendCommand(CredentialAssetMappingServer::GET_ASSET_MAPPINGS, {assetId} );
+
+    cxxtools::SerializationInfo si = deserialize(payload.at(0));
+
+    si >>= mappings;
+
+    return mappings;
+  }
+
+  const std::vector<CredentialAssetMapping> Accessor::getMappings(const AssetId & assetId, const ServiceId & serviceId) const
+  {
+    std::vector<CredentialAssetMapping> mappings;
+
+    std::vector<std::string> payload;
+
+    payload = sendCommand(CredentialAssetMappingServer::GET_MAPPINGS, {assetId, serviceId} );
+
+    cxxtools::SerializationInfo si = deserialize(payload.at(0));
+
+    si >>= mappings;
+
+    return mappings;
+  }
+
+  const std::vector<CredentialAssetMapping> Accessor::getAllMappings() const
+  {
+    std::vector<CredentialAssetMapping> mappings;
+
+    std::vector<std::string> payload;
+
+    payload = sendCommand(CredentialAssetMappingServer::GET_ALL_MAPPINGS, {} );
 
     cxxtools::SerializationInfo si = deserialize(payload.at(0));
 
@@ -289,18 +339,29 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
         
         AssetId assetId("asset-1");
-        UsageId usageId("test-usage");
+        ServiceId serviceId("test-usage");
+        Protocol protocol("http");
 
-        const CredentialAssetMapping mapping = accessor.getMapping(assetId, usageId);
+        const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
 
         if(mapping.m_assetId != assetId)
         {
           throw std::runtime_error("Wrong asset id. Received '"+mapping.m_assetId+"' expected '"+assetId+"'");
         }
 
-        if(mapping.m_usageId != usageId)
+        if(mapping.m_serviceId != serviceId)
         {
-          throw std::runtime_error("Wrong usage id. Received '"+mapping.m_usageId+"' expected '"+usageId+"'");
+          throw std::runtime_error("Wrong usage id. Received '"+mapping.m_serviceId+"' expected '"+serviceId+"'");
+        }
+
+        if(mapping.m_protocol != protocol)
+        {
+          throw std::runtime_error("Wrong protocol. Received '"+mapping.m_protocol+"' expected '"+protocol+"'");
+        }
+
+        if(mapping.m_port != "80")
+        {
+          throw std::runtime_error("Wrong port. Received '"+mapping.m_port+"' expected '80'");
         }
 
         if(mapping.m_credentialId != "cred-1")
@@ -308,7 +369,8 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
           throw std::runtime_error("Wrong credential id. Received '"+mapping.m_credentialId+"' expected 'cred-1'");
         }
 
-        if(mapping.m_credentialStatus != CredentialStatus::UNKNOWN)
+
+        if(mapping.m_status != Status::UNKNOWN)
         {
           throw std::runtime_error("Wrong credential status");
         }
@@ -338,17 +400,18 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       
       AssetId assetId("asset-XXXXX");
-      UsageId usageId("usage-XXXXX");
+      ServiceId serviceId("usage-XXXXX");
+      Protocol protocol("protocol-XXXXX");
 
       try
       {
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
-        const CredentialAssetMapping mapping = accessor.getMapping(assetId, usageId);
+        const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
         throw std::runtime_error("Mapping is returned");
       }
       catch(const CamMappingDoesNotExistException & e)
       {
-        if( (e.getAssetId() == assetId) && ( e.getUsageId() == usageId) )
+        if( (e.getAssetId() == assetId) && ( e.getServiceId() == serviceId) && (e.getProtocol() == protocol) )
         {
           printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
           testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -356,8 +419,8 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
         else
         {
           printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
-          printf("Error in excpetion format: AssetId expect '%s' received '%s', UsageId excpected '%s' received '%s' \n",
-            assetId.c_str(), e.getAssetId().c_str(), usageId.c_str(), e.getUsageId().c_str());
+          printf("Error in excpetion format: AssetId expect '%s' received '%s', ServiceId excpected '%s' received '%s', Protocol excpected '%s' received '%s' \n",
+            assetId.c_str(), e.getAssetId().c_str(), serviceId.c_str(), e.getServiceId().c_str(), protocol.c_str(), e.getProtocol().c_str());
 
           testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
         }
@@ -375,9 +438,11 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
   //test 2.X
   {
     AssetId assetId("asset-2");
-    UsageId usageId("test-usage-2");
+    ServiceId serviceId("test-usage-2");
+    Protocol protocol("test-proto");
+    Port port("80");
     CredentialId credId("Test-mapping");
-    CredentialStatus status(CredentialStatus::VALID);
+    Status status(Status::VALID);
     
     std::string key("key");
     std::string data("data");
@@ -393,7 +458,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       try
       {
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
-        accessor.createMapping(assetId, usageId, credId, status, extendedInfo );
+        accessor.createMapping(assetId, serviceId, protocol, port, credId, status, extendedInfo );
 
         printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
         testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -416,16 +481,16 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       {
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
         
-        const CredentialAssetMapping mapping = accessor.getMapping(assetId, usageId);
+        const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
 
         if(mapping.m_assetId != assetId)
         {
           throw std::runtime_error("Wrong asset id. Received '"+mapping.m_assetId+"' expected '"+assetId+"'");
         }
 
-        if(mapping.m_usageId != usageId)
+        if(mapping.m_serviceId != serviceId)
         {
-          throw std::runtime_error("Wrong usage id. Received '"+mapping.m_usageId+"' expected '"+usageId+"'");
+          throw std::runtime_error("Wrong usage id. Received '"+mapping.m_serviceId+"' expected '"+serviceId+"'");
         }
 
         if(mapping.m_credentialId != credId)
@@ -433,9 +498,19 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
           throw std::runtime_error("Wrong credential id. Received '"+mapping.m_credentialId+"' expected '"+credId+"'");
         }
 
-        if(mapping.m_credentialStatus != status)
+        if(mapping.m_status != status)
         {
           throw std::runtime_error("Wrong credential status");
+        }
+
+        if(mapping.m_protocol != protocol)
+        {
+          throw std::runtime_error("Wrong protocol. Received '"+mapping.m_protocol+"' expected '"+protocol+"'");
+        }
+
+        if(mapping.m_port != "80")
+        {
+          throw std::runtime_error("Wrong port. Received '"+mapping.m_port+"' expected '80'");
         }
 
         if((mapping.m_extendedInfo.size() != extendedInfo.size() ) || (mapping.m_extendedInfo.at(key) != data))
@@ -465,13 +540,13 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       try
       {
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
-        accessor.createMapping(assetId, usageId, credId, status, extendedInfo );
+        accessor.createMapping(assetId, serviceId, protocol, port, credId, status, extendedInfo );
 
         throw std::runtime_error("Mapping is created");
       }
       catch(const CamMappingAlreadyExistsException & e)
       {
-        if( (e.getAssetId() == assetId) && ( e.getUsageId() == usageId) )
+        if( (e.getAssetId() == assetId) && ( e.getServiceId() == serviceId) && (e.getProtocol() == protocol))
         {
           printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
           testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -479,8 +554,8 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
         else
         {
           printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
-          printf("Error in excpetion format: AssetId expect '%s' received '%s', UsageId excpected '%s' received '%s' \n",
-            assetId.c_str(), e.getAssetId().c_str(), usageId.c_str(), e.getUsageId().c_str());
+          printf("Error in excpetion format: AssetId expect '%s' received '%s', ServiceId excpected '%s' received '%s' \n",
+            assetId.c_str(), e.getAssetId().c_str(), serviceId.c_str(), e.getServiceId().c_str());
 
           testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
         }
@@ -499,7 +574,8 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
   {
 
     AssetId assetId("asset-2");
-    UsageId usageId("test-usage-2");
+    ServiceId serviceId("test-usage-2");
+    Protocol protocol("test-proto");
 
     //test 3.1 => test remove
     testNumber = "3.1";
@@ -511,7 +587,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       {
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
 
-        accessor.removeMapping(assetId, usageId);
+        accessor.removeMapping(assetId, serviceId, protocol);
 
         printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
         testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -534,13 +610,13 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       try
       {
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
-        const CredentialAssetMapping mapping = accessor.getMapping(assetId, usageId);
+        const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
 
         throw std::runtime_error("Mapping is returned");
       }
       catch(const CamMappingDoesNotExistException & e)
       {
-        if( (e.getAssetId() == assetId) && ( e.getUsageId() == usageId) )
+        if( (e.getAssetId() == assetId) && ( e.getServiceId() == serviceId) )
         {
           printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
           testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -548,8 +624,8 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
         else
         {
           printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
-          printf("Error in excpetion format: AssetId expect '%s' received '%s', UsageId excpected '%s' received '%s' \n",
-            assetId.c_str(), e.getAssetId().c_str(), usageId.c_str(), e.getUsageId().c_str());
+          printf("Error in excpetion format: AssetId expect '%s' received '%s', ServiceId excpected '%s' received '%s' \n",
+            assetId.c_str(), e.getAssetId().c_str(), serviceId.c_str(), e.getServiceId().c_str());
 
           testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
         }
@@ -571,13 +647,13 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       try
       {
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
-        accessor.removeMapping(assetId, usageId);
+        accessor.removeMapping(assetId, serviceId, protocol);
         
         throw std::runtime_error("Mapping is removed");
       }
       catch(const CamMappingDoesNotExistException & e)
       {
-        if( (e.getAssetId() == assetId) && ( e.getUsageId() == usageId) )
+        if( (e.getAssetId() == assetId) && ( e.getServiceId() == serviceId) )
         {
           printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
           testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -585,8 +661,8 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
         else
         {
           printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
-          printf("Error in excpetion format: AssetId expect '%s' received '%s', UsageId excpected '%s' received '%s' \n",
-            assetId.c_str(), e.getAssetId().c_str(), usageId.c_str(), e.getUsageId().c_str());
+          printf("Error in excpetion format: AssetId expect '%s' received '%s', ServiceId excpected '%s' received '%s' \n",
+            assetId.c_str(), e.getAssetId().c_str(), serviceId.c_str(), e.getServiceId().c_str());
 
           testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
         }
@@ -604,9 +680,11 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
   //test 4.X -> need 2.X success
   {
     AssetId assetId("asset-4");
-    UsageId usageId("test-usage-4");
+    ServiceId serviceId("test-usage-4");
+    Protocol protocol("http");
+    Port port("80");
     CredentialId credId("Test-mapping-update");
-    CredentialStatus status(CredentialStatus::VALID);
+    Status status(Status::VALID);
     
     std::string key("key");
     std::string data("data");
@@ -622,7 +700,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       try
       {
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
-        accessor.createMapping(assetId, usageId, credId, status, extendedInfo );
+        accessor.createMapping(assetId, serviceId, protocol, port, credId, status, extendedInfo );
 
         printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
         testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -646,18 +724,18 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
 
         credId = "new_cred";
-        accessor.updateCredentialId(assetId, usageId, credId);
+        accessor.updateCredentialId(assetId, serviceId, protocol, credId);
         
-        const CredentialAssetMapping mapping = accessor.getMapping(assetId, usageId);
+        const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
 
         if(mapping.m_assetId != assetId)
         {
           throw std::runtime_error("Wrong asset id. Received '"+mapping.m_assetId+"' expected '"+assetId+"'");
         }
 
-        if(mapping.m_usageId != usageId)
+        if(mapping.m_serviceId != serviceId)
         {
-          throw std::runtime_error("Wrong usage id. Received '"+mapping.m_usageId+"' expected '"+usageId+"'");
+          throw std::runtime_error("Wrong usage id. Received '"+mapping.m_serviceId+"' expected '"+serviceId+"'");
         }
 
         if(mapping.m_credentialId != credId)
@@ -665,7 +743,17 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
           throw std::runtime_error("Wrong credential id. Received '"+mapping.m_credentialId+"' expected '"+credId+"'");
         }
 
-        if(mapping.m_credentialStatus != CredentialStatus::UNKNOWN)
+        if(mapping.m_protocol != protocol)
+        {
+          throw std::runtime_error("Wrong protocol. Received '"+mapping.m_protocol+"' expected '"+protocol+"'");
+        }
+
+        if(mapping.m_port != port)
+        {
+          throw std::runtime_error("Wrong port. Received '"+mapping.m_port+"' expected '"+port+"'");
+        }
+
+        if(mapping.m_status != Status::UNKNOWN)
         {
           throw std::runtime_error("Wrong credential status");
         }
@@ -696,7 +784,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       try
       {
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
-        accessor.updateCredentialId("XXXXXX", "XXXXXX", credId);
+        accessor.updateCredentialId("XXXXXX", "XXXXXX", "XXXXX", credId);
         
         throw std::runtime_error("Mapping is updated");
       }
@@ -715,7 +803,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
 
     //test 4.4 => test update mapping
     testNumber = "4.4";
-    testName = "updateCredentialStatus";
+    testName = "updateStatus";
     printf("\n-----------------------------------------------------------------------\n");
     {
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
@@ -723,20 +811,30 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       {
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
 
-        status = CredentialStatus::ERROR;
+        status = Status::ERROR;
 
-        accessor.updateCredentialStatus(assetId, usageId, status);
+        accessor.updateStatus(assetId, serviceId, protocol, status);
         
-        const CredentialAssetMapping mapping = accessor.getMapping(assetId, usageId);
+        const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
 
         if(mapping.m_assetId != assetId)
         {
           throw std::runtime_error("Wrong asset id. Received '"+mapping.m_assetId+"' expected '"+assetId+"'");
         }
 
-        if(mapping.m_usageId != usageId)
+        if(mapping.m_serviceId != serviceId)
         {
-          throw std::runtime_error("Wrong usage id. Received '"+mapping.m_usageId+"' expected '"+usageId+"'");
+          throw std::runtime_error("Wrong usage id. Received '"+mapping.m_serviceId+"' expected '"+serviceId+"'");
+        }
+
+        if(mapping.m_protocol != protocol)
+        {
+          throw std::runtime_error("Wrong protocol. Received '"+mapping.m_protocol+"' expected '"+protocol+"'");
+        }
+
+        if(mapping.m_port != port)
+        {
+          throw std::runtime_error("Wrong port. Received '"+mapping.m_port+"' expected '"+port+"'");
         }
 
         if(mapping.m_credentialId != credId)
@@ -744,7 +842,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
           throw std::runtime_error("Wrong credential id. Received '"+mapping.m_credentialId+"' expected '"+credId+"'");
         }
 
-        if(mapping.m_credentialStatus != status)
+        if(mapping.m_status != status)
         {
           throw std::runtime_error("Wrong credential status");
         }
@@ -768,14 +866,14 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
 
     //test 4.5 => test exception CamMappingDoesNotExistException
     testNumber = "4.5";
-    testName = "updateCredentialStatus => CamMappingDoesNotExistException";
+    testName = "updateStatus => CamMappingDoesNotExistException";
     printf("\n-----------------------------------------------------------------------\n");
     {
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
-        accessor.updateCredentialStatus("XXXXXX", "XXXXXX", status);
+        accessor.updateStatus("XXXXXX", "XXXXXX", "XXXX", status);
         
         throw std::runtime_error("Mapping is updated");
       }
@@ -809,18 +907,28 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
         extendedInfo[key] = data;
         extendedInfo[extraKey] = extraData;
 
-        accessor.updateExtendedInfo(assetId, usageId, extendedInfo);
+        accessor.updateExtendedInfo(assetId, serviceId, protocol, extendedInfo);
         
-        const CredentialAssetMapping mapping = accessor.getMapping(assetId, usageId);
+        const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
 
         if(mapping.m_assetId != assetId)
         {
           throw std::runtime_error("Wrong asset id. Received '"+mapping.m_assetId+"' expected '"+assetId+"'");
         }
 
-        if(mapping.m_usageId != usageId)
+        if(mapping.m_serviceId != serviceId)
         {
-          throw std::runtime_error("Wrong usage id. Received '"+mapping.m_usageId+"' expected '"+usageId+"'");
+          throw std::runtime_error("Wrong usage id. Received '"+mapping.m_serviceId+"' expected '"+serviceId+"'");
+        }
+
+        if(mapping.m_protocol != protocol)
+        {
+          throw std::runtime_error("Wrong protocol. Received '"+mapping.m_protocol+"' expected '"+protocol+"'");
+        }
+
+        if(mapping.m_port != port)
+        {
+          throw std::runtime_error("Wrong port. Received '"+mapping.m_port+"' expected '"+port+"'");
         }
 
         if(mapping.m_credentialId != credId)
@@ -828,7 +936,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
           throw std::runtime_error("Wrong credential id. Received '"+mapping.m_credentialId+"' expected '"+credId+"'");
         }
 
-        if(mapping.m_credentialStatus != status)
+        if(mapping.m_status != status)
         {
           throw std::runtime_error("Wrong credential status");
         }
@@ -859,7 +967,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       try
       {
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
-        accessor.updateExtendedInfo("XXXXXX", "XXXXXX", extendedInfo);
+        accessor.updateExtendedInfo("XXXXXX", "XXXXXX", "XXXXXX", extendedInfo);
         
         throw std::runtime_error("Mapping is updated");
       }
@@ -876,8 +984,97 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       }
     }
 
-    //test 4.8 => test remove
+    //test 4.8 => test update mapping
     testNumber = "4.8";
+    testName = "updatePort";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+
+        port = "443";
+
+        accessor.updatePort(assetId, serviceId, protocol, port);
+        
+        const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
+
+        if(mapping.m_assetId != assetId)
+        {
+          throw std::runtime_error("Wrong asset id. Received '"+mapping.m_assetId+"' expected '"+assetId+"'");
+        }
+
+        if(mapping.m_serviceId != serviceId)
+        {
+          throw std::runtime_error("Wrong usage id. Received '"+mapping.m_serviceId+"' expected '"+serviceId+"'");
+        }
+
+        if(mapping.m_protocol != protocol)
+        {
+          throw std::runtime_error("Wrong protocol. Received '"+mapping.m_protocol+"' expected '"+protocol+"'");
+        }
+
+        if(mapping.m_port != port)
+        {
+          throw std::runtime_error("Wrong port. Received '"+mapping.m_port+"' expected '"+port+"'");
+        }
+
+        if(mapping.m_credentialId != credId)
+        {
+          throw std::runtime_error("Wrong credential id. Received '"+mapping.m_credentialId+"' expected '"+credId+"'");
+        }
+
+        if(mapping.m_status != Status::UNKNOWN)
+        {
+          throw std::runtime_error("Wrong credential status");
+        }
+
+        if((mapping.m_extendedInfo.size() != extendedInfo.size() ) || (mapping.m_extendedInfo.at(key) != data))
+        {
+          throw std::runtime_error("Wrong extended info");
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+    //test 4.9 => test exception CamMappingDoesNotExistException
+    testNumber = "4.9";
+    testName = "updatePort => CamMappingDoesNotExistException";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        accessor.updatePort("XXXXXX", "XXXXXX", "XXXX", port);
+        
+        throw std::runtime_error("Mapping is updated");
+      }
+      catch(const CamMappingDoesNotExistException &)
+      {
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+    //test 4.10 => test remove
+    testNumber = "4.10";
     testName = "removeMapping => end of tests 4";
     printf("\n-----------------------------------------------------------------------\n");
     {
@@ -886,7 +1083,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       {
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
 
-        accessor.removeMapping(assetId, usageId);
+        accessor.removeMapping(assetId, serviceId, protocol);
 
         printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
         testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -915,9 +1112,10 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
         
         AssetId assetId("asset-1");
-        UsageId usageId("test-usage");
+        ServiceId serviceId("test-usage");
+        Protocol protocol("http");
 
-        if(! accessor.isMappingExisting(assetId,usageId))
+        if(! accessor.isMappingExisting(assetId,serviceId, protocol))
         {
           throw std::runtime_error("Mapping does not exist");
         }
@@ -945,9 +1143,11 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
         Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
 
         AssetId assetId("asset-XXXXX");
-        UsageId usageId("usage-XXXXX");
+        ServiceId serviceId("usage-XXXXX");
+        Protocol protocol("protocol-XXXXXX");
 
-        if(accessor.isMappingExisting(assetId,usageId))
+
+        if(accessor.isMappingExisting(assetId,serviceId, protocol))
         {
           throw std::runtime_error("Mapping exists");
         }
