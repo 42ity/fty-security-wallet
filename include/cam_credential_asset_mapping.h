@@ -89,6 +89,7 @@ namespace cam
 
   void operator<<= (cxxtools::SerializationInfo& si, const CredentialAssetMapping & mapping);
   void operator>>= (const cxxtools::SerializationInfo& si, CredentialAssetMapping & mapping);
+  void operator>>= (const std::string& str, CredentialAssetMapping & mapping);
 
   //add a stream operator to display the CredentialAssetMapping in debug for example
   std::ostream& operator<< (std::ostream& os, const CredentialAssetMapping & mapping);

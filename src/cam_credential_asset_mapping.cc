@@ -94,6 +94,25 @@ namespace cam
     return returnData;
   }
 
+  void operator>>= (const std::string& str, CredentialAssetMapping & mapping)
+  {
+      cxxtools::SerializationInfo si;
+      
+      try
+      {
+          std::stringstream input;
+          input << str;
+          cxxtools::JsonDeserializer deserializer(input);
+          deserializer.deserialize(si);
+      }
+      catch(const std::exception& e)
+      {
+          throw CamProtocolErrorException("Error in json: "+std::string(e.what()));
+      }
+
+      mapping.fromSerializationInfo(si);
+  }
+
   void operator<<= (cxxtools::SerializationInfo& si, const CredentialAssetMapping & mapping)
   {
     mapping.fillSerializationInfo(si);
