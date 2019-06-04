@@ -249,12 +249,19 @@ namespace cam
   std::vector<std::string> Accessor::sendCommand(const std::string & command, const std::vector<std::string> & frames) const
   {
     mlm_client_t * client = mlm_client_new();
-    mlm_client_connect(client, m_endPoint.c_str(), m_timeout, m_clientId.c_str());
 
-    if(!client)
+    if(client != NULL)
     {
       mlm_client_destroy(&client);
       throw CamMalamuteClientIsNullException();
+    }
+    
+    int rc = mlm_client_connect (client, m_endPoint.c_str(), m_timeout, m_clientId.c_str());
+    
+    if (rc != 0)
+    {
+      mlm_client_destroy(&client);
+      throw CamMalamuteConnectionFailedException();
     }
 
     //Prepare the request:
