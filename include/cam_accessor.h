@@ -53,6 +53,9 @@ namespace cam
                         const Port & port, const CredentialId & credentialId, Status status = Status::UNKNOWN,
                         const MapExtendedInfo & extendedInfo = {});
 
+    void createMapping( const CredentialAssetMapping & mapping);
+    void updateMapping( const CredentialAssetMapping & mapping);
+
     const CredentialAssetMapping getMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const;
 
     void removeMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol);
@@ -81,7 +84,7 @@ namespace cam
   private:
     ClientId m_clientId;
     uint32_t m_timeout;
-    mutable mlm_client_t * m_client;
+    std::string m_endPoint;
 
     std::vector<std::string> sendCommand(const std::string & command, const std::vector<std::string> & frames) const;
   };

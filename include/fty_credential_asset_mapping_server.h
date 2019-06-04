@@ -62,6 +62,7 @@ namespace cam
         //Handler for all supported commands
         static std::string handleCreateMapping(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleGetMapping(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleUpdateMapping(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleUpdatePortMapping(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleUpdateCredentialMapping(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleUpdateStatusMapping(const Sender & sender, const std::vector<std::string> & params);
@@ -82,6 +83,8 @@ namespace cam
         //Command list
         static constexpr const char* CREATE_MAPPING = "CREATE_MAPPING";
         static constexpr const char* GET_MAPPING = "GET_MAPPING";
+
+        static constexpr const char* UPDATE_MAPPING = "UPDATE_MAPPING";
         static constexpr const char* UPDATE_PORT_MAPPING = "UPDATE_PORT_MAPPING";
         static constexpr const char* UPDATE_CREDENTIAL_MAPPING = "UPDATE_CREDENTIAL_MAPPING";
         static constexpr const char* UPDATE_STATUS_MAPPING = "UPDATE_STATUS_MAPPING";
