@@ -133,9 +133,9 @@ namespace cam
         output.close();
     }
     
-    const CredentialAssetMapping & CredentialAssetMappingStorage::getMapping(const AssetId & assetId, const UsageId & usageId) const
+    const CredentialAssetMapping & CredentialAssetMappingStorage::getMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const
     {
-        Hash hash = computeHash(assetId, usageId);
+        Hash hash = computeHash(assetId, serviceId, protocol);
 
         try
         {
@@ -143,37 +143,37 @@ namespace cam
         }
         catch(const std::exception& e)
         {
-            throw CamMappingDoesNotExistException(assetId,usageId);
+            throw CamMappingDoesNotExistException(assetId,serviceId, protocol);
         }
     }
 
     void CredentialAssetMappingStorage::setMapping(const CredentialAssetMapping & mapping)
     {
-        if( mapping.m_assetId.empty() || mapping.m_usageId.empty() || mapping.m_credentialId.empty() )
+        if( mapping.m_assetId.empty() || mapping.m_serviceId.empty() || mapping.m_protocol.empty() )
         {
             throw CamException("Bad format");
         }
 
-        Hash hash = computeHash(mapping.m_assetId, mapping.m_usageId);
+        Hash hash = computeHash(mapping.m_assetId, mapping.m_serviceId, mapping.m_protocol);
         m_mappings[hash] = mapping;
     }
 
-    void CredentialAssetMappingStorage::removeMapping(const AssetId & assetId, const UsageId & usageId)
+    void CredentialAssetMappingStorage::removeMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol)
     {
-        Hash hash = computeHash(assetId, usageId);
+        Hash hash = computeHash(assetId, serviceId, protocol);
 
         size_t deleted = m_mappings.erase(hash);
 
         if(deleted == 0)
         {
-            throw CamMappingDoesNotExistException(assetId, usageId);
+            throw CamMappingDoesNotExistException(assetId, serviceId, protocol);
         }
 
     }
 
-    bool CredentialAssetMappingStorage::isMappingExisting(const AssetId & assetId, const UsageId & usageId) const
+    bool CredentialAssetMappingStorage::isMappingExisting(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const
     {
-        Hash hash = computeHash(assetId, usageId);
+        Hash hash = computeHash(assetId, serviceId, protocol);
         
         bool isMappingExisting = true;
         try
@@ -188,14 +188,14 @@ namespace cam
         return isMappingExisting;
     }
 
-    std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getCredentialMappingsForUsage( const CredentialId & credentialId,
-                                                                        const UsageId & usageId) const
+    std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getCredentialMappingsForService( const CredentialId & credentialId,
+                                                                        const ServiceId & serviceId) const
     {
         std::vector<CredentialAssetMapping> list;
 
         for( const auto item : m_mappings)
         {
-            if( (item.second.m_usageId == usageId) && (item.second.m_credentialId == credentialId) )
+            if( (item.second.m_serviceId == serviceId) && (item.second.m_credentialId == credentialId) )
             {
                 list.push_back(item.second);
             }
@@ -219,6 +219,33 @@ namespace cam
         return list;  
     }
 
+    std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getMappings(const AssetId & assetId, const ServiceId & serviceId) const
+    {
+        std::vector<CredentialAssetMapping> list;
+
+        for( const auto item : m_mappings)
+        {
+            if( (item.second.m_assetId == assetId) && (item.second.m_serviceId == serviceId) )
+            {
+                list.push_back(item.second);
+            }
+        }
+
+        return list;  
+    }
+
+    std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getAllMappings() const
+    {
+        std::vector<CredentialAssetMapping> list;
+
+        for( const auto item : m_mappings)
+        {
+            list.push_back(item.second);
+        }
+
+        return list;  
+    }
+
     std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getAssetMappings(const AssetId & assetId) const
     {
         std::vector<CredentialAssetMapping> list;
@@ -234,9 +261,9 @@ namespace cam
         return  list; 
     }
 
-    Hash CredentialAssetMappingStorage::computeHash(const AssetId & assetId, const UsageId & usageId)
+    Hash CredentialAssetMappingStorage::computeHash(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol)
     {
-        return "A:"+assetId+"|U:"+usageId;
+        return "A"+assetId+"|S"+serviceId+"|P:"+protocol;
     }
 
 } // namepsace cam 

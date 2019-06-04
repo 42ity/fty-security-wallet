@@ -62,11 +62,14 @@ namespace cam
         //Handler for all supported commands
         static std::string handleCreateMapping(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleGetMapping(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleUpdatePortMapping(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleUpdateCredentialMapping(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleUpdateStatusMapping(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleUpdateInfoMapping(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleRemoveMapping(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleGetAssetMappings(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleGetMappings(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleGetAllMappings(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleGetCredentialMappings(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleCountCredentialMappingsForCredential(const Sender & sender, const std::vector<std::string> & params);
 
@@ -79,6 +82,7 @@ namespace cam
         //Command list
         static constexpr const char* CREATE_MAPPING = "CREATE_MAPPING";
         static constexpr const char* GET_MAPPING = "GET_MAPPING";
+        static constexpr const char* UPDATE_PORT_MAPPING = "UPDATE_PORT_MAPPING";
         static constexpr const char* UPDATE_CREDENTIAL_MAPPING = "UPDATE_CREDENTIAL_MAPPING";
         static constexpr const char* UPDATE_STATUS_MAPPING = "UPDATE_STATUS_MAPPING";
         static constexpr const char* UPDATE_INFO_MAPPING = "UPDATE_INFO_MAPPING";
@@ -86,6 +90,8 @@ namespace cam
 
         static constexpr const char* GET_ASSET_MAPPINGS = "GET_ASSET_MAPPINGS";
         static constexpr const char* GET_CRED_MAPPINGS = "GET_CRED_MAPPINGS";
+        static constexpr const char* GET_MAPPINGS = "GET_MAPPINGS";
+        static constexpr const char* GET_ALL_MAPPINGS = "GET_ALL_MAPPINGS";
 
         static constexpr const char* COUNT_CRED_MAPPINGS = "COUNT_CRED_MAPPINGS";
 

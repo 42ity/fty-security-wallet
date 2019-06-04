@@ -30,18 +30,22 @@ namespace cam
 {
   CredentialAssetMapping::CredentialAssetMapping():
   m_assetId(),
-  m_usageId(),
+  m_serviceId(),
+  m_protocol(),
+  m_port(),
   m_credentialId(),
-  m_credentialStatus(CredentialStatus::UNKNOWN),
+  m_status(Status::UNKNOWN),
   m_extendedInfo()
   {}
 
   void CredentialAssetMapping::fillSerializationInfo(cxxtools::SerializationInfo& si) const
   {
-    si.addMember(USAGE_ID_ENTRY) <<= m_usageId;
+    si.addMember(SERVICE_ID_ENTRY) <<= m_serviceId;
     si.addMember(ASSET_ID_ENTRY) <<= m_assetId;
+    si.addMember(PROTOCOL_ENTRY) <<= m_protocol;
+    si.addMember(PORT_ENTRY) <<= m_port;
     si.addMember(CREDENTIAL_ID_ENTRY) <<= m_credentialId;
-    si.addMember(CREDENTIAL_STATUS_ENTRY) <<= m_credentialStatus;
+    si.addMember(CREDENTIAL_STATUS_ENTRY) <<= m_status;
     si.addMember(EXTENDED_INFO_ENTRY) <<= m_extendedInfo;
   }
 
@@ -49,13 +53,15 @@ namespace cam
   {
     //try
     {
-      si.getMember(USAGE_ID_ENTRY) >>= m_usageId;
+      si.getMember(SERVICE_ID_ENTRY) >>= m_serviceId;
       si.getMember(ASSET_ID_ENTRY) >>= m_assetId;
+      si.getMember(PROTOCOL_ENTRY) >>= m_protocol;
+      si.getMember(PORT_ENTRY) >>= m_port;
       si.getMember(CREDENTIAL_ID_ENTRY) >>= m_credentialId;
       
       uint8_t status = 0;
       si.getMember(CREDENTIAL_STATUS_ENTRY) >>= status;
-      m_credentialStatus = static_cast<CredentialStatus>(status);
+      m_status = static_cast<Status>(status);
       
       si.getMember(EXTENDED_INFO_ENTRY) >>= m_extendedInfo;
     }

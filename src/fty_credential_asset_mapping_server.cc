@@ -44,6 +44,7 @@ namespace cam
 
         m_supportedCommands[GET_MAPPING] = handleGetMapping;
 
+        m_supportedCommands[UPDATE_PORT_MAPPING] = handleUpdatePortMapping;
         m_supportedCommands[UPDATE_CREDENTIAL_MAPPING] = handleUpdateCredentialMapping;
         m_supportedCommands[UPDATE_STATUS_MAPPING] = handleUpdateStatusMapping;
         m_supportedCommands[UPDATE_INFO_MAPPING] = handleUpdateInfoMapping;
@@ -52,6 +53,8 @@ namespace cam
 
         m_supportedCommands[GET_ASSET_MAPPINGS] = handleGetAssetMappings;
         m_supportedCommands[GET_CRED_MAPPINGS] = handleGetCredentialMappings;
+        m_supportedCommands[GET_MAPPINGS] = handleGetMappings;
+        m_supportedCommands[GET_ALL_MAPPINGS] = handleGetAllMappings;
 
         m_supportedCommands[COUNT_CRED_MAPPINGS] = handleCountCredentialMappingsForCredential;
     }
@@ -66,6 +69,7 @@ namespace cam
         * 
         * 0. asset id
         * 1. usage id
+        * 2. protocol
         */
 
         if(params.size() < 2)
@@ -74,9 +78,10 @@ namespace cam
         }
 
         const AssetId & assetId = params.at(0);
-        const UsageId & usageId = params.at(1);
+        const ServiceId & serviceId = params.at(1);
+        const Protocol & protocol = params.at(2);
 
-        const CredentialAssetMapping & mapping = m_activeMapping->getMapping(assetId, usageId);
+        const CredentialAssetMapping & mapping = m_activeMapping->getMapping(assetId, serviceId, protocol);
 
         cxxtools::SerializationInfo si;
     
@@ -104,9 +109,9 @@ namespace cam
         
         mapping.fromSerializationInfo(si);
         
-        if(m_activeMapping->isMappingExisting(mapping.m_assetId, mapping.m_usageId))
+        if(m_activeMapping->isMappingExisting(mapping.m_assetId, mapping.m_serviceId, mapping.m_protocol))
         {
-            throw CamMappingAlreadyExistsException(mapping.m_assetId, mapping.m_usageId);
+            throw CamMappingAlreadyExistsException(mapping.m_assetId, mapping.m_serviceId, mapping.m_protocol);
         }
         
         m_activeMapping->setMapping(mapping);
@@ -123,6 +128,7 @@ namespace cam
         * 
         * 0. asset id
         * 1. usage id
+        * 2. protocol
         */
 
         if(params.size() < 2)
@@ -131,9 +137,42 @@ namespace cam
         }
 
         const AssetId & assetId = params.at(0);
-        const UsageId & usageId = params.at(1);
+        const ServiceId & serviceId = params.at(1);
+        const Protocol & protocol = params.at(2);
 
-        m_activeMapping->removeMapping(assetId, usageId);
+        m_activeMapping->removeMapping(assetId, serviceId, protocol);
+        
+        m_activeMapping->save();
+        
+        return "";
+    }
+
+    std::string CredentialAssetMappingServer::handleUpdatePortMapping(const Sender & /*sender*/, const std::vector<std::string> & params)
+    {
+        /*
+        * Parameters for this command:
+        * 
+        * 0. CredentialMapping object in json
+        */
+
+        if(params.size() < 1)
+        {
+            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+        }
+
+        const cxxtools::SerializationInfo si = deserialize(params.at(0));
+
+        CredentialAssetMapping receivedMapping;
+        
+        receivedMapping.fromSerializationInfo(si);
+
+        CredentialAssetMapping existingMapping = m_activeMapping->getMapping(receivedMapping.m_assetId, receivedMapping.m_serviceId, receivedMapping.m_protocol);
+
+        //update the mapping
+        existingMapping.m_port = receivedMapping.m_port;
+        existingMapping.m_status = Status::UNKNOWN;
+
+        m_activeMapping->setMapping(existingMapping);
         
         m_activeMapping->save();
         
@@ -159,11 +198,11 @@ namespace cam
         
         receivedMapping.fromSerializationInfo(si);
 
-        CredentialAssetMapping existingMapping = m_activeMapping->getMapping(receivedMapping.m_assetId, receivedMapping.m_usageId);
+        CredentialAssetMapping existingMapping = m_activeMapping->getMapping(receivedMapping.m_assetId, receivedMapping.m_serviceId, receivedMapping.m_protocol);
 
         //update the mapping
         existingMapping.m_credentialId = receivedMapping.m_credentialId;
-        existingMapping.m_credentialStatus = CredentialStatus::UNKNOWN;
+        existingMapping.m_status = Status::UNKNOWN;
 
         m_activeMapping->setMapping(existingMapping);
         
@@ -191,10 +230,10 @@ namespace cam
         
         receivedMapping.fromSerializationInfo(si);
 
-        CredentialAssetMapping existingMapping = m_activeMapping->getMapping(receivedMapping.m_assetId, receivedMapping.m_usageId);
+        CredentialAssetMapping existingMapping = m_activeMapping->getMapping(receivedMapping.m_assetId, receivedMapping.m_serviceId, receivedMapping.m_protocol);
 
         //update the mapping
-        existingMapping.m_credentialStatus = receivedMapping.m_credentialStatus;
+        existingMapping.m_status = receivedMapping.m_status;
 
         m_activeMapping->setMapping(existingMapping);
         
@@ -222,7 +261,7 @@ namespace cam
         
         receivedMapping.fromSerializationInfo(si);
 
-        CredentialAssetMapping existingMapping = m_activeMapping->getMapping(receivedMapping.m_assetId, receivedMapping.m_usageId);
+        CredentialAssetMapping existingMapping = m_activeMapping->getMapping(receivedMapping.m_assetId, receivedMapping.m_serviceId, receivedMapping.m_protocol);
 
         //update the mapping
         existingMapping.m_extendedInfo = receivedMapping.m_extendedInfo;
@@ -257,6 +296,49 @@ namespace cam
 
         return serialize(si);
     }
+
+    std::string CredentialAssetMappingServer::handleGetMappings(const Sender & /*sender*/, const std::vector<std::string> & params)
+    {
+        /*
+        * Parameters for this command:
+        * 
+        * 0. asset id
+        * 1. service id
+        */
+
+        if(params.size() < 2)
+        {
+            throw CamBadCommandArgumentException("", "Command need at least 2 arguments");
+        }
+
+        const AssetId & assetId = params.at(0);
+        const ServiceId & serviceId = params.at(1);
+
+        std::vector<CredentialAssetMapping> mappings = m_activeMapping->getMappings(assetId, serviceId);
+        
+        cxxtools::SerializationInfo si;
+
+        si <<= mappings;
+
+        return serialize(si);
+    }
+
+    std::string CredentialAssetMappingServer::handleGetAllMappings(const Sender & /*sender*/, const std::vector<std::string> & /*params*/)
+    {
+        /*
+        * Parameters for this command:
+        */
+
+        std::vector<CredentialAssetMapping> mappings = m_activeMapping->getAllMappings();
+        
+        cxxtools::SerializationInfo si;
+
+        si <<= mappings;
+
+        return serialize(si);
+    }
+
+
 
     std::string CredentialAssetMappingServer::handleGetCredentialMappings(const Sender & /*sender*/, const std::vector<std::string> & params)
     {

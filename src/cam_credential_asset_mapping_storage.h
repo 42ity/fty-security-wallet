@@ -36,15 +36,18 @@ namespace cam
     explicit CredentialAssetMappingStorage(const std::string & databasePath);
     void save() const;
     
-    const CredentialAssetMapping & getMapping(const AssetId & assetId, const UsageId & usageId) const;
+    const CredentialAssetMapping & getMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const;
     void setMapping(const CredentialAssetMapping & mapping);
 
-    void removeMapping(const AssetId & assetId, const UsageId & usageId);
+    void removeMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol);
 
-    bool isMappingExisting(const AssetId & assetId, const UsageId & usageId) const;
+    bool isMappingExisting(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const;
+    
+    std::vector<CredentialAssetMapping> getMappings(const AssetId & assetId, const ServiceId & serviceId) const;
+    std::vector<CredentialAssetMapping> getAllMappings() const;
 
-    std::vector<CredentialAssetMapping> getCredentialMappingsForUsage( const CredentialId & credentialId,
-                                                                        const UsageId & usageId) const;
+    std::vector<CredentialAssetMapping> getCredentialMappingsForService( const CredentialId & credentialId,
+                                                                        const ServiceId & serviceId) const;
 
     std::vector<CredentialAssetMapping> getCredentialMappings(const CredentialId & credentialId) const;
 
@@ -56,7 +59,7 @@ namespace cam
     std::string m_pathDatabase;
     std::map<Hash, CredentialAssetMapping> m_mappings;
 
-    static Hash computeHash(const AssetId & assetId, const UsageId & usageId);
+    static Hash computeHash(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol);
   };
 
 } // namepsace cam 

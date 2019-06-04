@@ -49,26 +49,31 @@ namespace cam
     
     ~Accessor();
 
-    void createMapping( const AssetId & assetId, const UsageId & usageId,
-                        const CredentialId & credentialId, CredentialStatus status = CredentialStatus::UNKNOWN,
+    void createMapping( const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol,
+                        const Port & port, const CredentialId & credentialId, Status status = Status::UNKNOWN,
                         const MapExtendedInfo & extendedInfo = {});
 
-    const CredentialAssetMapping getMapping(const AssetId & assetId, const UsageId & usageId) const;
+    const CredentialAssetMapping getMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const;
 
-    void removeMapping(const AssetId & assetId, const UsageId & usageId);
+    void removeMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol);
 
-    void updateCredentialId(const AssetId & assetId, const UsageId & usageId, const CredentialId & credentialId);
-    void updateCredentialStatus(const AssetId & assetId, const UsageId & usageId, CredentialStatus status);
-    void updateExtendedInfo(const AssetId & assetId, const UsageId & usageId, const MapExtendedInfo & extendedInfo);
+    void updateCredentialId(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol, const CredentialId & credentialId);
+    void updatePort(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol, const Port & port);
+    void updateStatus(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol, Status status);
+    void updateExtendedInfo(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol, const MapExtendedInfo & extendedInfo);
 
-    bool isMappingExisting(const AssetId & assetId, const UsageId & usageId) const;
+    bool isMappingExisting(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const;
 
-    /*const std::vector<CredentialAssetMapping> getCredentialMappingsForUsage( const CredentialId & credentialId,
-                                                                        const UsageId & usageId) const;*/
+    /*const std::vector<CredentialAssetMapping> getCredentialMappingsForService( const CredentialId & credentialId,
+                                                                        const ServiceId & serviceId) const;*/
 
     const std::vector<CredentialAssetMapping> getCredentialMappings(const CredentialId & credentialId) const;
 
     const std::vector<CredentialAssetMapping> getAssetMappings(const AssetId & assetId) const;
+
+    const std::vector<CredentialAssetMapping> getMappings(const AssetId & assetId, const ServiceId & serviceId) const;
+
+    const std::vector<CredentialAssetMapping> getAllMappings() const;
 
     uint32_t countCredentialMappingsForCredential(const CredentialId & credentialId) const;
 
