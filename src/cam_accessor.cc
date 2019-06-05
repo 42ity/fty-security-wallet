@@ -250,7 +250,7 @@ namespace cam
   {
     mlm_client_t * client = mlm_client_new();
 
-    if(client != NULL)
+    if(client == NULL)
     {
       mlm_client_destroy(&client);
       throw CamMalamuteClientIsNullException();

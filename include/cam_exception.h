@@ -41,7 +41,8 @@ namespace cam
         MAPPING_ALREADY_EXISTS,
         MAPPING_INVALID,
         MLM_CLIENT_IS_NULL,
-        MLM_INTERRUPTED
+        MLM_INTERRUPTED,
+        MLM_FAILED
     };
 
     class CamException : public std::exception
@@ -238,6 +239,15 @@ namespace cam
     public:
         explicit CamMalamuteInterruptedException() :
             CamException("Malamute interrupted", ErrorCode::MLM_INTERRUPTED)
+        {}
+    };
+// Malamute Connection Failed Exception
+
+    class CamMalamuteConnectionFailedException : public CamException
+    {
+    public:
+        explicit CamMalamuteConnectionFailedException() :
+            CamException("Malamute Connection Failed", ErrorCode::MLM_FAILED)
         {}
     };
 
