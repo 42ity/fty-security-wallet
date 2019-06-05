@@ -48,6 +48,7 @@ namespace cam
         m_supportedCommands[UPDATE_CREDENTIAL_MAPPING] = handleUpdateCredentialMapping;
         m_supportedCommands[UPDATE_STATUS_MAPPING] = handleUpdateStatusMapping;
         m_supportedCommands[UPDATE_INFO_MAPPING] = handleUpdateInfoMapping;
+        m_supportedCommands[UPDATE_MAPPING] = handleUpdateMapping;
 
         m_supportedCommands[REMOVE_MAPPING] = handleRemoveMapping;
 
@@ -141,6 +142,37 @@ namespace cam
         const Protocol & protocol = params.at(2);
 
         m_activeMapping->removeMapping(assetId, serviceId, protocol);
+        
+        m_activeMapping->save();
+        
+        return "";
+    }
+
+    std::string CredentialAssetMappingServer::handleUpdateMapping(const Sender & /*sender*/, const std::vector<std::string> & params)
+    {
+        /*
+        * Parameters for this command:
+        * 
+        * 0. CredentialMapping object in json
+        */
+        
+        if(params.size() < 1)
+        {
+            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+        }
+        
+        const cxxtools::SerializationInfo si = deserialize(params.at(0));
+
+        CredentialAssetMapping mapping;
+        
+        mapping.fromSerializationInfo(si);
+        
+        if(! m_activeMapping->isMappingExisting(mapping.m_assetId, mapping.m_serviceId, mapping.m_protocol))
+        {
+            throw CamMappingDoesNotExistException(mapping.m_assetId, mapping.m_serviceId, mapping.m_protocol);
+        }
+        
+        m_activeMapping->setMapping(mapping);
         
         m_activeMapping->save();
         

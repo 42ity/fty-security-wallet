@@ -36,15 +36,11 @@ namespace cam
                   const std::string & endPoint):
     m_clientId(clientId),
     m_timeout(timeout),
-    m_client(mlm_client_new())
-  {
-    mlm_client_connect(m_client, endPoint.c_str(), m_timeout, m_clientId.c_str());
-  }
+    m_endPoint(endPoint)
+  {}
 
   Accessor::~Accessor()
-  {
-    mlm_client_destroy(&m_client);
-  }
+  {}
 
   void Accessor::createMapping( const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol,
                       const Port & port, const CredentialId & credentialId, Status status,
@@ -60,11 +56,21 @@ namespace cam
     mapping.m_status = status;
     mapping.m_extendedInfo = extendedInfo;
 
+    createMapping(mapping);
+  }
+
+  void Accessor::createMapping( const CredentialAssetMapping & mapping)
+  {
     cxxtools::SerializationInfo si;
-
     si <<= mapping;
-
     sendCommand(CredentialAssetMappingServer::CREATE_MAPPING, {serialize(si)} );
+  }
+
+  void Accessor::updateMapping( const CredentialAssetMapping & mapping)
+  {
+    cxxtools::SerializationInfo si;
+    si <<= mapping;
+    sendCommand(CredentialAssetMappingServer::UPDATE_MAPPING, {serialize(si)} );
   }
 
   const CredentialAssetMapping Accessor::getMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const
@@ -242,9 +248,20 @@ namespace cam
 
   std::vector<std::string> Accessor::sendCommand(const std::string & command, const std::vector<std::string> & frames) const
   {
-    if(!m_client)
+    mlm_client_t * client = mlm_client_new();
+
+    if(client == NULL)
     {
+      mlm_client_destroy(&client);
       throw CamMalamuteClientIsNullException();
+    }
+    
+    int rc = mlm_client_connect (client, m_endPoint.c_str(), m_timeout, m_clientId.c_str());
+    
+    if (rc != 0)
+    {
+      mlm_client_destroy(&client);
+      throw CamMalamuteConnectionFailedException();
     }
 
     //Prepare the request:
@@ -264,20 +281,23 @@ namespace cam
     if(zsys_interrupted)
     {
       zmsg_destroy(&request);
+      mlm_client_destroy(&client);
       throw CamMalamuteInterruptedException();
     }
 
     //send the message
-    mlm_client_sendto (m_client, MAPPING_AGENT, "REQUEST", NULL, m_timeout, &request);
+    mlm_client_sendto (client, MAPPING_AGENT, "REQUEST", NULL, m_timeout, &request);
 
     if(zsys_interrupted)
     {
       zmsg_destroy(&request);
+      mlm_client_destroy(&client);
       throw CamMalamuteInterruptedException();
     }
 
     //Get the reply
-    ZmsgGuard recv(mlm_client_recv (m_client));
+    ZmsgGuard recv(mlm_client_recv (client));
+    mlm_client_destroy(&client);
 
     //Get number of frame all the frame
     size_t numberOfFrame = zmsg_size(recv);
@@ -309,11 +329,11 @@ namespace cam
       //It's an error and we will throw directly the exceptions
       if(receivedFrames.size() == 2)
       {
-          CamException::throwCamException(receivedFrames.at(1));
+        CamException::throwCamException(receivedFrames.at(1));
       }
       else
       {
-          throw CamProtocolErrorException("Missing data for error");
+        throw CamProtocolErrorException("Missing data for error");
       }
 
     }
