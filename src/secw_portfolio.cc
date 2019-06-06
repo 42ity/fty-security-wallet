@@ -44,6 +44,15 @@ namespace secw
         //make a copy using factory
         DocumentPtr copyDoc = doc->clone();
 
+        //lazy check to ensure that the name do not exist => name unique by portfolio
+        for( const auto & item : m_documents)
+        {
+            if(item.second->getName() == doc->getName())
+            {
+                throw SecwNameAlreadyExistsException(doc->getName());
+            }
+        }
+
         //create an id
         Id id;
         do
@@ -67,13 +76,24 @@ namespace secw
     
     void Portfolio::update(const DocumentPtr & doc)
     {
+        Id id = doc->getId();
+
         //Check if document exist
-        if(m_documents.count(doc->getId()) < 1)
+        if(m_documents.count(id) < 1)
         {
-            throw SecwDocumentDoNotExistException(doc->getId());
+            throw SecwDocumentDoNotExistException(id);
         }
-        
-         m_documents[doc->getId()] = doc->clone();
+
+        //lazy check to ensure that the name do not exist => name unique by portfolio
+        for( const auto & item : m_documents)
+        {
+            if( (item.first != id) && (item.second->getName() == doc->getName()))
+            {
+                throw SecwNameAlreadyExistsException(doc->getName());
+            }
+        }
+
+        m_documents[id] = doc->clone();
     }
     
     
