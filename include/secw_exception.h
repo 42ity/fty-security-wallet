@@ -43,6 +43,7 @@ namespace secw
         DOCUMENT_DO_NOT_EXIST,
         ILLEGAL_ACCESS,
         UNKNOWN_USAGE_ID,
+        NAME_ALREADY_EXISTS,
     };
 
     class SecwException : public std::exception
@@ -257,6 +258,32 @@ namespace secw
 
         inline UsageId getUsageId() const { return m_usageId; }
     };
+
+// Name already exist
+    class SecwNameAlreadyExistsException : public SecwException
+    {
+    private:
+        std::string m_name;
+
+        void fillSerializationInfo(cxxtools::SerializationInfo &si) const override
+        {
+            si.addMember("name") <<= m_name;
+        }
+    public:
+        explicit SecwNameAlreadyExistsException(const std::string & name) :
+            SecwException("Document with name '"+name+"' already exist", ErrorCode::NAME_ALREADY_EXISTS),
+            m_name(name)
+        {}
+
+        SecwNameAlreadyExistsException(const cxxtools::SerializationInfo &extraData, const std::string & whatArg) :
+            SecwException(whatArg, ErrorCode::NAME_ALREADY_EXISTS)
+        {
+            extraData.getMember("name") >>= m_name;
+        }
+
+        inline std::string getName() const { return m_name; }
+    };
+
 
 } // namepsace secw
 

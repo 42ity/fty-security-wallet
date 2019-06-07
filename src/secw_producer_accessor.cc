@@ -705,8 +705,47 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
     }
   }
 
-//test 6.3 => updateDocument User and Password
+//test 6.3 => insertNewDocument User and Password
   testNumber = "6.3";
+  testName = "insertNewDocument User and Password -> name already exist";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+    printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    try
+    {
+      UserAndPasswordPtr doc = std::make_shared<UserAndPassword>("Test insert username","username", "password");
+
+      doc->addUsage("discovery_monitoring");
+
+      id = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<Document>(doc));
+
+      throw std::runtime_error("Document has been added");
+    }
+    catch(const SecwNameAlreadyExistsException & e)
+    {
+      if(e.getName() == "Test insert username")
+      {
+        printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+      }
+      else
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: expected name in exception 'Test insert username' received '%s'\n",e.getName().c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 6.4 => updateDocument User and Password
+  testNumber = "6.4";
   testName = "updateDocument User and Password";
   printf("\n-----------------------------------------------------------------------\n");
   {
@@ -739,8 +778,8 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
     }
   }
 
-//test 6.4 => updateDocument User and Password -> retrieve data
-  testNumber = "6.4";
+//test 6.6 => updateDocument User and Password -> retrieve data
+  testNumber = "6.6";
   testName = "updateDocument User and Password -> retrieve data";
   printf("\n-----------------------------------------------------------------------\n");
   {
@@ -772,9 +811,56 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
     }
   }
 
+//test 6.7 => updateDocument User and Password
+  testNumber = "6.7";
+  testName = "updateDocument User and Password -> name already exist";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    try
+    {
+      DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
 
-//test 6.5 => updateDocument User and Password -> bad format
-  testNumber = "6.5";
+      UserAndPasswordPtr doc = UserAndPassword::tryToCast(insertedDoc);
+
+      if(doc == nullptr) throw std::runtime_error("No document retrieved");
+
+      //update name
+      doc->setName("myFirstDoc");
+
+      //update
+      producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(doc));
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      throw std::runtime_error("Document has been updated");
+    }
+    catch(const SecwNameAlreadyExistsException & e)
+    {
+      if(e.getName() == "myFirstDoc")
+      {
+        printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+      }
+      else
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: expected name in exception 'myFirstDoc' received '%s'\n",e.getName().c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 6.8 => updateDocument User and Password -> bad format
+  testNumber = "6.8";
   testName = "updateDocument User and Password -> bad format";
   printf("\n-----------------------------------------------------------------------\n");
   {
@@ -809,8 +895,8 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
     }
   }
 
-//test 6.6 => deleteDocument User and Password
-  testNumber = "6.6";
+//test 6.9 => deleteDocument User and Password
+  testNumber = "6.9";
   testName = "deleteDocument User and Password";
   printf("\n-----------------------------------------------------------------------\n");
   {

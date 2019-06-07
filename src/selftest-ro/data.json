@@ -24,7 +24,7 @@
                             },
                             {
                                 "secw_doc_id": "id_notReadable",
-                                "secw_doc_name": "myFirstDoc",
+                                "secw_doc_name": "mySecondDoc",
                                 "secw_doc_type": "Snmpv3",
                                 "secw_doc_tags": [ "test_tag" ],
                                 "secw_doc_usages": [],
