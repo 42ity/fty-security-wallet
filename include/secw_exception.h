@@ -44,6 +44,9 @@ namespace secw
         ILLEGAL_ACCESS,
         UNKNOWN_USAGE_ID,
         NAME_ALREADY_EXISTS,
+        MLM_CLIENT_IS_NULL,
+        MLM_INTERRUPTED,
+        MLM_FAILED
     };
 
     class SecwException : public std::exception
@@ -284,6 +287,32 @@ namespace secw
         inline std::string getName() const { return m_name; }
     };
 
+// Malamute client is null
+    class SecwMalamuteClientIsNullException : public SecwException
+    {
+    public:
+        explicit SecwMalamuteClientIsNullException() :
+            SecwException("Malamute client is null", ErrorCode::MLM_CLIENT_IS_NULL)
+        {}
+    };
+
+// Malamute Interrupted
+    class SecwMalamuteInterruptedException : public SecwException
+    {
+    public:
+        explicit SecwMalamuteInterruptedException() :
+            SecwException("Malamute interrupted", ErrorCode::MLM_INTERRUPTED)
+        {}
+    };
+
+// Malamute Connection Failed Exception
+    class SecwMalamuteConnectionFailedException : public SecwException
+    {
+    public:
+        explicit SecwMalamuteConnectionFailedException() :
+            SecwException("Malamute Connection Failed", ErrorCode::MLM_FAILED)
+        {}
+    };
 
 } // namepsace secw
 
