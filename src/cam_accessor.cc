@@ -246,6 +246,30 @@ namespace cam
     return counter;
   }
 
+  const std::map<CredentialId, uint32_t> Accessor::getAllCredentialCounter() const
+  {
+    std::map<CredentialId, uint32_t> counters;
+
+    const std::vector<CredentialAssetMapping> mappings = getAllMappings();
+
+    for(const CredentialAssetMapping & mapping : mappings)
+    {
+      if(!mapping.m_credentialId.empty())
+      {
+        if(counters.count(mapping.m_credentialId) == 0)
+        {
+          counters[mapping.m_credentialId] = 1;
+        }
+        else
+        {
+          counters[mapping.m_credentialId] = counters[mapping.m_credentialId] + 1;
+        }
+      }
+    }
+
+    return counters;
+  }
+
   std::vector<std::string> Accessor::sendCommand(const std::string & command, const std::vector<std::string> & frames) const
   {
     mlm_client_t * client = mlm_client_new();
@@ -1400,6 +1424,163 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
     }
 
   } // 8.X
+  
+  //test 9.X
+  {
+    //test 9.1
+    testNumber = "9.1";
+    testName = "getAllCredentialCounter => 3 mappings";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+
+        const std::map<CredentialId, uint32_t> counters = accessor.getAllCredentialCounter();
+        
+        CredentialId credId("credC");
+        
+        if(counters.count(credId) == 0)
+        {
+          throw std::runtime_error("No mapping counted for "+credId);
+        }
+
+        if(counters.at(credId) != 3)
+        {
+          throw std::runtime_error("Expected 3 mappings received "+std::to_string(counters.at(credId)));
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+    //test 9.2
+    testNumber = "9.2";
+    testName = "getAllCredentialCounter => 0 mapping";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        
+        CredentialId credId("XXXXXX");
+        const std::map<CredentialId, uint32_t> counters = accessor.getAllCredentialCounter();
+        
+        if(counters.count(credId) != 0)
+        {
+          throw std::runtime_error("Mapping counted for "+credId);
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+  } // 9.X
+
+  //test 10.X
+  {
+    //test 10.1
+    testNumber = "10.1";
+    testName = "several requests with one accessor";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor0( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+
+        for(uint8_t index = 0; index < 5; index++)
+        {
+          accessor0.getAllCredentialCounter();
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+    //test 10.2
+    testNumber = "10.2";
+    testName = "several requests with creating accessor each time";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        for(uint8_t index = 0; index < 5; index++)
+        {
+          Accessor accessor0( CAM_SELFTEST_CLIENT_ID, 20, endpoint);
+          accessor0.getAllCredentialCounter();
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+     //test 10.3
+    testNumber = "10.3";
+    testName = "several requests with 2 accessors";
+    printf("\n-----------------------------------------------------------------------\n");
+    {
+      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+      try
+      {
+        Accessor accessor0( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor1( CAM_SELFTEST_CLIENT_ID".1", 1000, endpoint);
+
+        for(uint8_t index = 0; index < 5; index++)
+        {
+          accessor0.getAllCredentialCounter();
+          accessor1.getAllCredentialCounter();
+        }
+
+        printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      }
+      catch(const std::exception& e)
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: %s\n",e.what());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+
+  } // 10.X
   
 
   return testsResults;

@@ -80,6 +80,8 @@ namespace cam
 
     uint32_t countCredentialMappingsForCredential(const CredentialId & credentialId) const;
 
+    const std::map<CredentialId, uint32_t> getAllCredentialCounter() const;
+
   
   private:
     ClientId m_clientId;
