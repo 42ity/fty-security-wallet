@@ -21,12 +21,20 @@
 
 #include "cam_accessor.h"
 
+#include <sys/types.h>
+#include <unistd.h>
+
+//Too old glibc :(. <gettid> is available since glibc 2.30
+#include <sys/syscall.h>
+#define gettid() syscall(SYS_gettid)
+
+#include <iomanip> 
+#include <sstream>
+
 #include "cam_helpers.h"
 
 #include <fty_common_mlm.h>
-
 #include "fty_credential_asset_mapping_server.h"
-
 #include "fty_security_wallet.h"
 
 namespace cam
@@ -279,8 +287,16 @@ namespace cam
       mlm_client_destroy(&client);
       throw CamMalamuteClientIsNullException();
     }
+
+    //create a unique sender id: <clientId>.[thread id in hexa]
+    pid_t threadId = gettid();
     
-    int rc = mlm_client_connect (client, m_endPoint.c_str(), m_timeout, m_clientId.c_str());
+    std::stringstream ss;
+    ss << m_clientId << "." << std::setfill('0') << std::setw(sizeof(pid_t)*2) << std::hex << threadId;
+
+    std::string uniqueId = ss.str();
+    
+    int rc = mlm_client_connect (client, m_endPoint.c_str(), m_timeout, uniqueId.c_str());
     
     if (rc != 0)
     {

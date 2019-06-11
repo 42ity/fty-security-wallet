@@ -28,6 +28,16 @@
 
 #include "fty_security_wallet_classes.h"
 
+#include <sys/types.h>
+#include <unistd.h>
+
+//Too old glibc :(. <gettid> is available since glibc 2.30
+#include <sys/syscall.h>
+#define gettid() syscall(SYS_gettid)
+
+#include <iomanip> 
+#include <sstream>
+
 #include "secw_helpers.h"
 
 namespace secw
@@ -37,18 +47,38 @@ namespace secw
                   const std::string & endPoint):
     m_clientId(clientId),
     m_timeout(timeout),
-    m_client(mlm_client_new())
-  {
-    mlm_client_connect(m_client, endPoint.c_str(), m_timeout, m_clientId.c_str());
-  }
+    m_endPoint(endPoint)
+  {}
 
   ClientAccessor:: ~ClientAccessor()
-  {
-    mlm_client_destroy(&m_client);
-  }
+  {}
 
   std::vector<std::string> ClientAccessor::sendCommand(const std::string & command, const std::vector<std::string> & frames) const
   {
+    mlm_client_t * client = mlm_client_new();
+
+    if(client == NULL)
+    {
+      mlm_client_destroy(&client);
+      throw SecwMalamuteClientIsNullException();
+    }
+
+    //create a unique sender id: <clientId>.[thread id in hexa]
+    pid_t threadId = gettid();
+    
+    std::stringstream ss;
+    ss << m_clientId << "." << std::setfill('0') << std::setw(sizeof(pid_t)*2) << std::hex << threadId;
+
+    std::string uniqueId = ss.str();
+    
+    int rc = mlm_client_connect (client, m_endPoint.c_str(), m_timeout, uniqueId.c_str());
+    
+    if (rc != 0)
+    {
+      mlm_client_destroy(&client);
+      throw SecwMalamuteConnectionFailedException();
+    }
+
     //Prepare the request:
     zmsg_t *request = zmsg_new();
     ZuuidGuard  zuuid(zuuid_new ());
@@ -63,11 +93,26 @@ namespace secw
       zmsg_addstr (request, frame.c_str());
     }
 
+    if(zsys_interrupted)
+    {
+      zmsg_destroy(&request);
+      mlm_client_destroy(&client);
+      throw SecwMalamuteInterruptedException();
+    }
+
     //send the message
-    mlm_client_sendto (m_client, SECURITY_WALLET_AGENT, "REQUEST", NULL, m_timeout, &request);
+    mlm_client_sendto (client, SECURITY_WALLET_AGENT, "REQUEST", NULL, m_timeout, &request);
+
+    if(zsys_interrupted)
+    {
+      zmsg_destroy(&request);
+      mlm_client_destroy(&client);
+      throw SecwMalamuteInterruptedException();
+    }
 
     //Get the reply
-    ZmsgGuard recv(mlm_client_recv (m_client));
+    ZmsgGuard recv(mlm_client_recv (client));
+    mlm_client_destroy(&client);
 
     //Get number of frame all the frame
     size_t numberOfFrame = zmsg_size(recv);
@@ -99,11 +144,11 @@ namespace secw
       //It's an error and we will throw directly the exceptions
       if(receivedFrames.size() == 2)
       {
-          SecwException::throwSecwException(receivedFrames.at(1));
+        SecwException::throwSecwException(receivedFrames.at(1));
       }
       else
       {
-          throw SecwProtocolErrorException("Missing data for error");
+        throw SecwProtocolErrorException("Missing data for error");
       }
 
     }

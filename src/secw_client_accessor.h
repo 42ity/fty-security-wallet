@@ -45,7 +45,7 @@ namespace secw
   private:
     ClientId m_clientId;
     uint32_t m_timeout;
-    mutable mlm_client_t * m_client;
+    std::string m_endPoint;
   };
   
 } //namespace secw

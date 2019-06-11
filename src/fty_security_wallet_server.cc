@@ -516,19 +516,19 @@ bool SecurityWalletServer::handleMailbox(zmsg_t *message)
     try
     {
         Subject subject(mlm_client_subject(client()));
-        Sender sender(mlm_client_sender(client()));
+        Sender uniqueSender(mlm_client_sender(client()));
             
         //ignore none "REQUEST" message
         if (subject != "REQUEST")
         {
-            log_warning ("Received mailbox message with subject '%s' from '%s', ignoring", subject.c_str(),sender.c_str());
+            log_warning ("Received mailbox message with subject '%s' from '%s', ignoring", subject.c_str(),uniqueSender.c_str());
             return true;
         }
         
         //Get number of frame all the frame
         size_t numberOfFrame = zmsg_size(message);
         
-        log_debug("Received mailbox message with subject '%s' from '%s' with %i frames", subject.c_str(), sender.c_str(), numberOfFrame);
+        log_debug("Received mailbox message with subject '%s' from '%s' with %i frames", subject.c_str(), uniqueSender.c_str(), numberOfFrame);
 
         
         /*  Message is valid if the header contain at least the following frame:
@@ -589,6 +589,9 @@ bool SecurityWalletServer::handleMailbox(zmsg_t *message)
         }
 
         FctCommandHandler cmdHandler = m_supportedCommands[command];
+
+        //extract the sender from unique sender id: <Sender>.[thread id in hexa]
+        Sender sender = uniqueSender.substr(0, (uniqueSender.size()-(sizeof(pid_t)*2)-1));
         
         //Execute the command
         std::string result = cmdHandler(sender, params);
