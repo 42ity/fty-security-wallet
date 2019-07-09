@@ -6,13 +6,13 @@
 		},
 		{
 			"usage_id": "mass_device_management",
-			"supported_types": [ "Snmpv3" ]							
+			"supported_types": [ "UserAndPassword" ]							
 		}
 	],
     "consumers": [
 		{
 			"client_regex": ".*",
-			"usages": [ "discovery_monitoring" ]							
+			"usages": [ "discovery_monitoring", "mass_device_management" ]							
 		}
 	],
 	"producers": [
