@@ -2,7 +2,7 @@
 	"usages": [
 		{
 			"usage_id": "discovery_monitoring",
-			"supported_types": [ "Snmpv3" ]							
+			"supported_types": [ "Snmpv3", "Snmpv1", "UserAndPassword" ]						
 		},
 		{
 			"usage_id": "mass_device_management",
