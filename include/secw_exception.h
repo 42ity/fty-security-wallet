@@ -44,6 +44,7 @@ namespace secw
         ILLEGAL_ACCESS,
         UNKNOWN_USAGE_ID,
         NAME_ALREADY_EXISTS,
+        NAME_DOES_NOT_EXIST,
         MLM_CLIENT_IS_NULL,
         MLM_INTERRUPTED,
         MLM_FAILED
@@ -274,12 +275,37 @@ namespace secw
         }
     public:
         explicit SecwNameAlreadyExistsException(const std::string & name) :
-            SecwException("Document with name '"+name+"' already exist", ErrorCode::NAME_ALREADY_EXISTS),
+            SecwException("Document with name '"+name+"' already exists", ErrorCode::NAME_ALREADY_EXISTS),
             m_name(name)
         {}
 
         SecwNameAlreadyExistsException(const cxxtools::SerializationInfo &extraData, const std::string & whatArg) :
             SecwException(whatArg, ErrorCode::NAME_ALREADY_EXISTS)
+        {
+            extraData.getMember("name") >>= m_name;
+        }
+
+        inline std::string getName() const { return m_name; }
+    };
+
+// Name does not exist
+    class SecwNameDoesNotExistException : public SecwException
+    {
+    private:
+        std::string m_name;
+
+        void fillSerializationInfo(cxxtools::SerializationInfo &si) const override
+        {
+            si.addMember("name") <<= m_name;
+        }
+    public:
+        explicit SecwNameDoesNotExistException(const std::string & name) :
+            SecwException("Document with name '"+name+"' does not exist", ErrorCode::NAME_DOES_NOT_EXIST),
+            m_name(name)
+        {}
+
+        SecwNameDoesNotExistException(const cxxtools::SerializationInfo &extraData, const std::string & whatArg) :
+            SecwException(whatArg, ErrorCode::NAME_DOES_NOT_EXIST)
         {
             extraData.getMember("name") >>= m_name;
         }

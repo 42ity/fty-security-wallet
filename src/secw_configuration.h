@@ -62,10 +62,12 @@ namespace secw
   using Consumer = Client;
   using Producer = Client;
 
-  class SecwConfiguration
+  class PortfolioConfiguration
   {
   public:
-    explicit SecwConfiguration(const cxxtools::SerializationInfo & si);
+    explicit PortfolioConfiguration(const cxxtools::SerializationInfo & si);
+
+    std::string getPortfolioName() const;
 
     Usage getUsage( const UsageId & usageId ) const;
 
@@ -76,6 +78,7 @@ namespace secw
     std::set<Type> & getSupportedTypes() const;
 
   private:
+    std::string m_portfolioName;
     std::map<UsageId, Usage> m_usages;
     std::set<Type> m_supportedTypes;
 

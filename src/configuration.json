@@ -1,24 +1,39 @@
-{
-	"usages": [
-		{
-			"usage_id": "discovery_monitoring",
-			"supported_types": [ "Snmpv3", "Snmpv1", "UserAndPassword" ]
-		},
-		{
-			"usage_id": "mass_device_management",
-			"supported_types": [ "UserAndPassword" ]							
-		}
-	],
-    "consumers": [
-		{
-			"client_regex": ".*",
-			"usages": [ "discovery_monitoring", "mass_device_management" ]							
-		}
-	],
-	"producers": [
-		{
-			"client_regex": ".*",
-			"usages": [ "discovery_monitoring", "mass_device_management" ]							
-		}
-	]
-}
+[
+	{
+		"portfolio_name": "default",
+		"usages": [
+			{
+				"usage_id": "discovery_monitoring",
+				"supported_types": [
+					"Snmpv3",
+					"Snmpv1",
+					"UserAndPassword"
+				]
+			},
+			{
+				"usage_id": "mass_device_management",
+				"supported_types": [
+					"UserAndPassword"
+				]
+			}
+		],
+		"consumers": [
+			{
+				"client_regex": ".*",
+				"usages": [
+					"discovery_monitoring",
+					"mass_device_management"
+				]
+			}
+		],
+		"producers": [
+			{
+				"client_regex": ".*",
+				"usages": [
+					"discovery_monitoring",
+					"mass_device_management"
+				]
+			}
+		]
+	}
+]

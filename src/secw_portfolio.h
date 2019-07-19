@@ -49,6 +49,7 @@ namespace secw
         void update(const DocumentPtr & doc);
         
         DocumentPtr getDocument(const Id & id) const;
+        DocumentPtr getDocumentByName(const std::string & name) const;
         
         std::vector<DocumentPtr> getListDocuments() const;
 
@@ -62,6 +63,7 @@ namespace secw
 
         //Map containing all the document of the portfolio
         std::map<Id, DocumentPtr > m_documents;
+        std::map<std::string, DocumentPtr > m_mapNameDocuments;
 
         void loadPortfolioVersion1(const cxxtools::SerializationInfo& si);
     };

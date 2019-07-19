@@ -66,7 +66,24 @@ namespace secw
             cxxtools::JsonDeserializer deserializer(input);
             deserializer.deserialize(rootSi);
 
-            m_configuration = std::make_shared<SecwConfiguration>(rootSi);
+            //it's an array
+            for(size_t index = 0; index < rootSi.memberCount(); index++)
+            {
+                const cxxtools::SerializationInfo & portfolioConfigSi  = rootSi.getMember(index);
+                PortfolioConfiguration config(portfolioConfigSi);
+
+                if(m_configurations.count(config.getPortfolioName()) > 0)
+                {
+                    throw std::runtime_error("Portfolio "+config.getPortfolioName()+" already exist in the configuration.");
+                }
+
+                m_configurations.emplace(config.getPortfolioName(), config);
+            }
+
+            if(m_configurations.empty())
+            {
+                throw std::runtime_error("No Portfolio in the configuration.");
+            }
 
         }
         catch(const std::exception& e)
@@ -104,7 +121,26 @@ namespace secw
             else
             {
                 log_info(" No database %s. Creating default database...", m_pathDatabase.c_str());
-                m_portfolios.emplace_back(Portfolio("default"));
+            }
+
+            for(const auto & item : m_configurations)
+            {
+                //check that we have the portfolio in the list
+                bool found = false;
+                for(const auto & portfolio : m_portfolios )
+                {
+                    if(item.first == portfolio.getName())
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                //if it not exist we add it.
+                if(!found)
+                {
+                    m_portfolios.emplace_back(Portfolio(item.first));
+                }
             }
         }
         catch(const std::exception& e)
@@ -146,17 +182,22 @@ namespace secw
     {
         std::vector<std::string> list;
 
-        for( const Portfolio & portfolio : m_portfolios)
+        for( const auto & item : m_configurations)
         {
-            list.push_back(portfolio.getName());
+            list.push_back(item.first);
         }
 
         return list;
     }
 
-    const SecwConfiguration & SecurityWallet::getConfiguration() const
+    const PortfolioConfiguration & SecurityWallet::getConfiguration(const std::string & portfolioName) const
     {
-        return *(m_configuration);
+        if(m_configurations.count(portfolioName) != 1)
+        {
+            throw SecwUnknownPortfolioException(portfolioName);
+        }
+
+        return m_configurations.at(portfolioName);
     }
 
     Portfolio & SecurityWallet::getPortfolio(const std::string & name)

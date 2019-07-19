@@ -69,7 +69,7 @@ namespace secw
      * 
      * @return std::set<UsageId> 
      */
-    std::set<UsageId> getProducerUsages() const;
+    std::set<UsageId> getProducerUsages(const std::string & portfolioName = "default") const;
     
     /**
      * @brief Get the List Documents Without Private Data
@@ -105,6 +105,17 @@ namespace secw
     DocumentPtr getDocumentWithoutPrivateData(
       const std::string & portfolio,
       const Id & id) const;
+
+    /**
+     * @brief Get a Document Without Private Data object
+     * 
+     * @param portfolio name
+     * @param name of the document
+     * @return DocumentPtr on the document.
+     */
+    DocumentPtr getDocumentWithoutPrivateDataByName(
+      const std::string & portfolio,
+      const std::string & name) const;
 
     /**
      * @brief Insert a new document into the server database

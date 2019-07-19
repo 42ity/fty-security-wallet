@@ -53,6 +53,9 @@ SecurityWalletServer::SecurityWalletServer(zsock_t *pipe)
 
     m_supportedCommands[GET_WITHOUT_SECRET] = handleGetDocumentWithoutSecret;
     m_supportedCommands[GET_WITH_SECRET] = handleGetDocumentWithSecret;
+
+    m_supportedCommands[GET_WITHOUT_SECRET_BY_NAME] = handleGetDocumentWithoutSecretByName;
+    m_supportedCommands[GET_WITH_SECRET_BY_NAME] = handleGetDocumentWithSecretByName;
     
     m_supportedCommands[CREATE] = handleCreate;
     m_supportedCommands[DELETE] = handleDelete;
@@ -75,28 +78,44 @@ std::string SecurityWalletServer::handleGetListPortfolio(const Sender & /*sender
     return serialize(si);
 }
 
-std::string SecurityWalletServer::handleGetConsumerUsages(const Sender & sender, const std::vector<std::string> & /*params*/)
+std::string SecurityWalletServer::handleGetConsumerUsages(const Sender & sender, const std::vector<std::string> & params)
 {
     /*
-     * No parameters for this command.
+     * Parameters for this command:
      * 
+     * 0. name of the portfolio
      */
+
+    if(params.size() != 1)
+    {
+        throw SecwBadCommandArgumentException("Command need at 1 argument");
+    }
+
+    const std::string & portfolioName = params[0];
     
     cxxtools::SerializationInfo si;
-    si <<= m_activeWallet->getConfiguration().getUsageIdsForConsummer(sender);
+    si <<= m_activeWallet->getConfiguration(portfolioName).getUsageIdsForConsummer(sender);
     
     return serialize(si);
 }
 
-std::string SecurityWalletServer::handleGetProducerUsages(const Sender & sender, const std::vector<std::string> & /*params*/)
+std::string SecurityWalletServer::handleGetProducerUsages(const Sender & sender, const std::vector<std::string> & params)
 {
     /*
-     * No parameters for this command.
+     * Parameters for this command:
      * 
+     * 0. name of the portfolio
      */
+
+    if(params.size() != 1)
+    {
+        throw SecwBadCommandArgumentException("Command need at 1 argument");
+    }
+
+    const std::string & portfolioName = params[0];
     
     cxxtools::SerializationInfo si;
-    si <<= m_activeWallet->getConfiguration().getUsageIdsForProducer(sender);
+    si <<= m_activeWallet->getConfiguration(portfolioName).getUsageIdsForProducer(sender);
     
     return serialize(si);
 }
@@ -110,14 +129,6 @@ std::string SecurityWalletServer::handleGetDocumentWithSecret(const Sender & sen
      * 0. name of the portfolio
      * 1. document id
      */
-
-    //check global access
-    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration().getUsageIdsForConsummer(sender);
-
-    if( allowedUsageIds.size() == 0)
-    {
-        throw SecwIllegalAccess("You do not have access to this document");
-    }
     
     if(params.size() != 2)
     {
@@ -126,6 +137,14 @@ std::string SecurityWalletServer::handleGetDocumentWithSecret(const Sender & sen
 
     const std::string & portfolioName = params[0];
     const Id & id = params[1];
+
+    //check global access
+    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration(portfolioName).getUsageIdsForConsummer(sender);
+
+    if( allowedUsageIds.size() == 0)
+    {
+        throw SecwIllegalAccess("You do not have access to this document");
+    }
     
     DocumentPtr doc  = m_activeWallet->getPortfolio(portfolioName).getDocument(id);
 
@@ -167,6 +186,71 @@ std::string SecurityWalletServer::handleGetDocumentWithoutSecret(const Sender & 
     return serialize(si);
 }
 
+std::string SecurityWalletServer::handleGetDocumentWithSecretByName(const Sender & sender, const std::vector<std::string> & params)
+{
+    /*
+     * Parameters for this command:
+     * 
+     * 0. name of the portfolio
+     * 1. document name
+     */
+    
+    if(params.size() != 2)
+    {
+        throw SecwBadCommandArgumentException("Command need at 2 arguments");
+    }
+
+    const std::string & portfolioName = params[0];
+    const std::string & name = params[1];
+
+    //check global access
+    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration(portfolioName).getUsageIdsForConsummer(sender);
+
+    if( allowedUsageIds.size() == 0)
+    {
+        throw SecwIllegalAccess("You do not have access to this document");
+    }
+    
+     DocumentPtr doc  = m_activeWallet->getPortfolio(portfolioName).getDocumentByName(name);
+
+    if(!hasCommonUsageIds(allowedUsageIds, doc->getUsageIds()))
+    {
+        throw SecwIllegalAccess("You do not have access to this document");
+    }
+    
+    cxxtools::SerializationInfo si;
+    
+    doc->fillSerializationInfoWithSecret(si);
+    
+    return serialize(si);
+}
+
+std::string SecurityWalletServer::handleGetDocumentWithoutSecretByName(const Sender & sender, const std::vector<std::string> & params)
+{
+    /*
+     * Parameters for this command:
+     * 
+     * 0. name of the portfolio
+     * 1. document name
+     */
+
+    if(params.size() != 2)
+    {
+        throw SecwBadCommandArgumentException("Command need at 2 arguments");
+    }
+
+    const std::string & portfolioName = params[0];
+    const std::string & name = params[1];
+    
+    DocumentPtr doc  = m_activeWallet->getPortfolio(portfolioName).getDocumentByName(name);
+    
+    cxxtools::SerializationInfo si;
+    
+    doc->fillSerializationInfoWithoutSecret(si);
+    
+    return serialize(si);
+}
+
 std::string SecurityWalletServer::handleGetListDocumentsWithSecret(const Sender & sender, const std::vector<std::string> & params)
 {
     /*
@@ -176,21 +260,22 @@ std::string SecurityWalletServer::handleGetListDocumentsWithSecret(const Sender 
      * 1. Usage of documents (optional)
      */
 
-    //check global access
-    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration().getUsageIdsForConsummer(sender);
-
-    if( allowedUsageIds.size() == 0)
-    {
-        throw SecwIllegalAccess("You do not have access to this command");
-    }
-
-    
+   
     if(params.size() < 1)
     {
         throw SecwBadCommandArgumentException("Command need at least argument");
     }
 
     const std::string & portfolioName = params[0];
+
+    //check global access
+    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration(portfolioName).getUsageIdsForConsummer(sender);
+
+    if( allowedUsageIds.size() == 0)
+    {
+        throw SecwIllegalAccess("You do not have access to this command");
+    }
+
 
     std::string debugInfo = "Do GetListDocumentsWithSecret on portfolio <"+portfolioName+">";
     
@@ -258,7 +343,7 @@ std::string SecurityWalletServer::handleGetListDocumentsWithoutSecret(const Send
         usage = params[1];
     }
 
-    auto usageIDs = m_activeWallet->getConfiguration().getAllUsageId();
+    auto usageIDs = m_activeWallet->getConfiguration(portfolioName).getAllUsageId();
     if (!usage.empty() && usageIDs.find(usage) == usageIDs.end()) {
         throw SecwUnknownUsageIDException(usage);
     }
@@ -304,16 +389,16 @@ std::string SecurityWalletServer::handleCreate(const Sender & sender, const std:
         throw SecwBadCommandArgumentException("Command need 2 arguments");
     }
 
+    const std::string & portfolioName = params[0];
+    const std::string & document = params[1];
+
     //check global access
-    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration().getUsageIdsForProducer(sender);
+    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration(portfolioName).getUsageIdsForProducer(sender);
 
     if(allowedUsageIds.size() == 0)
     {
         throw SecwIllegalAccess("You do not have access to this command");
     }
-    
-    const std::string & portfolioName = params[0];
-    const std::string & document = params[1];
     
     log_debug("Do Create on portfolio <%s>", portfolioName.c_str());
     
@@ -359,16 +444,18 @@ std::string SecurityWalletServer::handleDelete(const Sender & sender, const std:
         throw SecwBadCommandArgumentException("Command need 2 arguments");
     }
 
+    const std::string & portfolioName = params[0];
+    const std::string & id = params[1];
+
     //check global access
-    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration().getUsageIdsForProducer(sender);
+    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration(portfolioName).getUsageIdsForProducer(sender);
 
     if(allowedUsageIds.size() == 0)
     {
         throw SecwIllegalAccess("You do not have access to this command");
     } 
 
-    const std::string & portfolioName = params[0];
-    const std::string & id = params[1];
+
     
     log_debug("Do Delete on portfolio <%s> for id <%s>", portfolioName.c_str(), id.c_str());
     
@@ -409,16 +496,18 @@ std::string SecurityWalletServer::handleUpdate(const Sender & sender, const std:
         throw SecwBadCommandArgumentException("Command need 2 arguments");
     }
 
+    const std::string & portfolioName = params[0];
+    const std::string & document = params[1];
+
     //check global access
-    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration().getUsageIdsForProducer(sender);
+    std::set<UsageId> allowedUsageIds = m_activeWallet->getConfiguration(portfolioName).getUsageIdsForProducer(sender);
 
     if(allowedUsageIds.size() == 0)
     {
         throw SecwIllegalAccess("You do not have access to this command");
     }
     
-    const std::string & portfolioName = params[0];
-    const std::string & document = params[1];
+
     
     log_debug("Do Update on portfolio <%s>", portfolioName.c_str());
     

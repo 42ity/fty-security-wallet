@@ -63,10 +63,11 @@ namespace secw
 
     /**
      * @brief Get the List of usages that the consumer can access
+     * @param portfolio name (default value "default")
      * 
      * @return std::set<UsageId> 
      */
-    std::set<UsageId> getConsumerUsages() const;
+    std::set<UsageId> getConsumerUsages(const std::string & portfolioName = "default") const;
     
     /**
      * @brief Get the List Documents With Private Data
@@ -102,6 +103,18 @@ namespace secw
     DocumentPtr getDocumentWithPrivateData(
       const std::string & portfolio,
       const Id & id) const;
+
+
+    /**
+     * @brief Get a Document With Private Data object
+     * 
+     * @param portfolio name
+     * @param name of the document
+     * @return DocumentPtr on the document.
+     */
+    DocumentPtr getDocumentWithPrivateDataByName(
+      const std::string & portfolio,
+      const std::string & name) const;
   
   private:
     std::shared_ptr<ClientAccessor> m_clientAccessor;

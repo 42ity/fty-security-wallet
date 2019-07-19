@@ -38,14 +38,14 @@ namespace secw
         Portfolio & getPortfolio(const std::string & name);
         std::vector<std::string> getPortfolioNames() const;
 
-        const SecwConfiguration & getConfiguration() const;
+        const PortfolioConfiguration & getConfiguration(const std::string & portfolioName = "default") const;
 
         static constexpr const uint8_t SECW_VERSION = 1;
 
     private:
         std::string m_pathDatabase;
         
-        std::shared_ptr<SecwConfiguration> m_configuration;
+        std::map<std::string, PortfolioConfiguration> m_configurations;
         std::vector<Portfolio> m_portfolios;
     };
 

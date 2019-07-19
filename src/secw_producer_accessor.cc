@@ -52,11 +52,11 @@ namespace secw
     return portfolioNames;
   }
 
-  std::set<UsageId> ProducerAccessor::getProducerUsages() const
+  std::set<UsageId> ProducerAccessor::getProducerUsages(const std::string & portfolioName) const
   {
     std::set<UsageId> usages;
 
-    std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_PRODUCER_USAGES,{});
+    std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_PRODUCER_USAGES,{portfolioName});
 
     if(frames.size() < 1)
     {
@@ -121,6 +121,27 @@ namespace secw
     const Id & id) const
   {
     std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_WITHOUT_SECRET, {portfolio,id});
+    
+    //the first frame should contain the data
+    if(frames.size() < 1)
+    {
+      throw SecwProtocolErrorException("Empty answer from server");
+    }
+
+    cxxtools::SerializationInfo si = deserialize(frames.at(0));
+    
+    DocumentPtr document;
+    
+    si >>= document;
+    
+    return document;
+  }
+
+  DocumentPtr ProducerAccessor::getDocumentWithoutPrivateDataByName(
+    const std::string & portfolio,
+    const std::string & name) const
+  {
+    std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_WITHOUT_SECRET_BY_NAME, {portfolio,name});
     
     //the first frame should contain the data
     if(frames.size() < 1)
@@ -429,6 +450,56 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
       printf(" *<=  Test #4.2 > Failed\n");
       printf("Error: %s\n",e.what());
       testsResults.emplace_back (" Test #4.2 getDocumentWithoutPrivateData => SecwDocumentDoNotExistException",false);
+    }
+  }
+  
+ //test 4.3 => getDocumentWithoutPrivateData
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+    printf(" *=>  Test #4.3 getDocumentWithoutPrivateDataByName\n");
+    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    try
+    {
+      DocumentPtr doc = producerAccessor.getDocumentWithoutPrivateDataByName("default", "myFirstDoc");
+
+      if(doc->isContainingPrivateData())
+      {
+        throw std::runtime_error("Document is containing private data");
+      }
+      
+      printf(" *<=  Test #4.3 > OK\n");
+      testsResults.emplace_back (" Test #4.3 getDocumentWithoutPrivateDataByName",true);
+
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #4.3 > Failed\n");
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #4.3 getDocumentWithoutPrivateDataByName",false);
+    }
+  }
+
+//test 4.4 => getDocumentWithoutPrivateDataByName => SecwNameDoesNotExistException
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+    printf(" *=>  Test #4.4 getDocumentWithoutPrivateDataByName => SecwNameDoesNotExistException\n");
+    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    try
+    {
+      producerAccessor.getDocumentWithoutPrivateDataByName("default", "XXXXX-XXXXXXXXX");
+
+      throw std::runtime_error("Document is return");
+    }
+    catch(const SecwNameDoesNotExistException &)
+    {
+      printf(" *<=  Test #4.4 > OK\n");
+      testsResults.emplace_back (" Test #4.4 getDocumentWithoutPrivateDataByName => SecwNameDoesNotExistException",true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #4.4 > Failed\n");
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #4.4 getDocumentWithoutPrivateDataByName => SecwNameDoesNotExistException",false);
     }
   }
 
@@ -811,8 +882,67 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
     }
   }
 
-//test 6.7 => updateDocument User and Password
+//test 6.7 => updateDocument User and Password -> retrieve data getDocumentWithoutPrivateDataByName
   testNumber = "6.7";
+  testName = "updateDocument User and Password -> retrieve data getDocumentWithoutPrivateDataByName";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    try
+    {
+      DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateDataByName("default", "Test update username");
+
+      UserAndPasswordPtr doc = UserAndPassword::tryToCast(insertedDoc);
+
+      if(doc == nullptr) throw std::runtime_error("No document retrieved");
+
+      if(doc->getUsageIds().count("discovery_monitoring") == 0) throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
+      if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
+
+      
+      if(doc->getId() != id ) throw std::runtime_error("Bad document retrieved: id do not match");
+      if(doc->getUsername() != "new_username") throw std::runtime_error("Bad document retrieved: username do not match");
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 6.8 => updateDocument User and Password -> getDocumentWithoutPrivateDataByName => SecwNameDoesNotExistException
+  testNumber = "6.8";
+  testName = "updateDocument User and Password -> getDocumentWithoutPrivateDataByName => SecwNameDoesNotExistException";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+    printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    try
+    {
+      producerAccessor.getDocumentWithoutPrivateDataByName("default", "Test insert username");
+
+      throw std::runtime_error("Document is return");
+    }
+    catch(const SecwNameDoesNotExistException &)
+    {
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 6.9 => updateDocument User and Password
+  testNumber = "6.9";
   testName = "updateDocument User and Password -> name already exist";
   printf("\n-----------------------------------------------------------------------\n");
   {
@@ -859,8 +989,8 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
     }
   }
 
-//test 6.8 => updateDocument User and Password -> bad format
-  testNumber = "6.8";
+//test 6.10 => updateDocument User and Password -> bad format
+  testNumber = "6.10";
   testName = "updateDocument User and Password -> bad format";
   printf("\n-----------------------------------------------------------------------\n");
   {
@@ -895,8 +1025,8 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
     }
   }
 
-//test 6.9 => deleteDocument User and Password
-  testNumber = "6.9";
+//test 6.11 => deleteDocument User and Password
+  testNumber = "6.11";
   testName = "deleteDocument User and Password";
   printf("\n-----------------------------------------------------------------------\n");
   {

@@ -61,6 +61,9 @@ namespace secw
         
         static std::string handleGetDocumentWithSecret(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleGetDocumentWithoutSecret(const Sender & sender, const std::vector<std::string> & params);
+
+        static std::string handleGetDocumentWithSecretByName(const Sender & sender, const std::vector<std::string> & params);
+        static std::string handleGetDocumentWithoutSecretByName(const Sender & sender, const std::vector<std::string> & params);
         
         static std::string handleGetListPortfolio(const Sender & sender, const std::vector<std::string> & params);
 
@@ -85,10 +88,14 @@ namespace secw
         static constexpr const char* GET_PRODUCER_USAGES = "GET_PRODUCER_USAGES";
 
         static constexpr const char* GET_LIST_WITH_SECRET = "GET_LIST_WITH_SECRET";
+        
         static constexpr const char* GET_LIST_WITHOUT_SECRET = "GET_LIST_WITHOUT_SECRET";
 
         static constexpr const char* GET_WITHOUT_SECRET = "GET_WITHOUT_SECRET";
+        static constexpr const char* GET_WITHOUT_SECRET_BY_NAME = "GET_WITHOUT_SECRET_BY_NAME";
+
         static constexpr const char* GET_WITH_SECRET = "GET_WITH_SECRET";
+        static constexpr const char* GET_WITH_SECRET_BY_NAME = "GET_WITH_SECRET_BY_NAME";
 
         static constexpr const char* CREATE = "CREATE";
         static constexpr const char* DELETE = "DELETE";

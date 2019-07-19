@@ -57,11 +57,11 @@ namespace secw
     return portfolioNames;
   }
 
-  std::set<UsageId> ConsumerAccessor::getConsumerUsages() const
+  std::set<UsageId> ConsumerAccessor::getConsumerUsages(const std::string & portfolioName) const
   {
     std::set<UsageId> usages;
 
-    std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_CONSUMER_USAGES,{});
+    std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_CONSUMER_USAGES,{portfolioName});
 
     if(frames.size() < 1)
     {
@@ -126,6 +126,27 @@ namespace secw
     const Id & id) const
   {
     std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_WITH_SECRET, {portfolio,id});
+    
+    //the first frame should contain the data
+    if(frames.size() < 1)
+    {
+      throw SecwProtocolErrorException("Empty answer from server");
+    }
+
+    cxxtools::SerializationInfo si = deserialize(frames.at(0));
+    
+    DocumentPtr document;
+    
+    si >>= document;
+    
+    return document;
+  }
+
+  DocumentPtr ConsumerAccessor::getDocumentWithPrivateDataByName(
+    const std::string & portfolio,
+    const std::string & name) const
+  {
+    std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_WITH_SECRET_BY_NAME, {portfolio,name});
     
     //the first frame should contain the data
     if(frames.size() < 1)
@@ -392,6 +413,56 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test()
       printf(" *<=  Test #4.2 > Failed\n");
       printf("Error: %s\n",e.what());
       testsResults.emplace_back (" Test #4.2 getDocumentWithPrivateData => SecwDocumentDoNotExistException",false);
+    }
+  }
+
+//test 4.3 => getDocumentWithPrivateData
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+    printf(" *=>  Test #4.3 getDocumentWithPrivateDataByName\n");
+    ConsumerAccessor consumerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    try
+    {
+      DocumentPtr doc = consumerAccessor.getDocumentWithPrivateDataByName("default", "myFirstDoc");
+
+      if(!doc->isContainingPrivateData())
+      {
+        throw std::runtime_error("Document is not containing private data");
+      }
+      
+      printf(" *<=  Test #4.3 > OK\n");
+      testsResults.emplace_back (" Test #4.3 getDocumentWithPrivateDataByName",true);
+
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #4.3 > Failed\n");
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #4.3 getDocumentWithPrivateDataByName",false);
+    }
+  }
+
+//test 4.4 => getDocumentWithPrivateDataByName => SecwNameDoesNotExistException
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+    printf(" *=>  Test #4.4 getDocumentWithPrivateDataByName => SecwNameDoesNotExistException\n");
+    ConsumerAccessor consumerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    try
+    {
+      consumerAccessor.getDocumentWithPrivateDataByName("default", "XXXXX-XXXXXXXXX");
+
+      throw std::runtime_error("Document is return");
+    }
+    catch(const SecwNameDoesNotExistException &)
+    {
+      printf(" *<=  Test #4.4 > OK\n");
+      testsResults.emplace_back (" Test #4.4 getDocumentWithPrivateDataByName => SecwNameDoesNotExistException",true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #4.4 > Failed\n");
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #4.4 getDocumentWithPrivateDataByName => SecwNameDoesNotExistException",false);
     }
   }
 
