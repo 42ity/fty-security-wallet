@@ -75,7 +75,7 @@ namespace cam
 
         if(params.size() < 2)
         {
-            throw CamBadCommandArgumentException("", "Command need at least 2 arguments");
+            throw CamBadCommandArgumentException("", "Command needs at least 2 arguments");
         }
 
         const AssetId & assetId = params.at(0);
@@ -101,7 +101,7 @@ namespace cam
         
         if(params.size() < 1)
         {
-            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+            throw CamBadCommandArgumentException("", "Command needs at least 1 argument");
         }
         
         const cxxtools::SerializationInfo si = deserialize(params.at(0));
@@ -134,7 +134,7 @@ namespace cam
 
         if(params.size() < 2)
         {
-            throw CamBadCommandArgumentException("", "Command need at least 2 arguments");
+            throw CamBadCommandArgumentException("", "Command needs at least 2 arguments");
         }
 
         const AssetId & assetId = params.at(0);
@@ -158,7 +158,7 @@ namespace cam
         
         if(params.size() < 1)
         {
-            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+            throw CamBadCommandArgumentException("", "Command needs at least 1 argument");
         }
         
         const cxxtools::SerializationInfo si = deserialize(params.at(0));
@@ -189,7 +189,7 @@ namespace cam
 
         if(params.size() < 1)
         {
-            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+            throw CamBadCommandArgumentException("", "Command needs at least 1 argument");
         }
 
         const cxxtools::SerializationInfo si = deserialize(params.at(0));
@@ -221,7 +221,7 @@ namespace cam
 
         if(params.size() < 1)
         {
-            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+            throw CamBadCommandArgumentException("", "Command needs at least 1 argument");
         }
 
         const cxxtools::SerializationInfo si = deserialize(params.at(0));
@@ -253,7 +253,7 @@ namespace cam
 
         if(params.size() < 1)
         {
-            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+            throw CamBadCommandArgumentException("", "Command needs at least 1 argument");
         }
 
         const cxxtools::SerializationInfo si = deserialize(params.at(0));
@@ -284,7 +284,7 @@ namespace cam
 
         if(params.size() < 1)
         {
-            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+            throw CamBadCommandArgumentException("", "Command needs at least 1 argument");
         }
 
         const cxxtools::SerializationInfo si = deserialize(params.at(0));
@@ -315,7 +315,7 @@ namespace cam
 
         if(params.size() < 1)
         {
-            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+            throw CamBadCommandArgumentException("", "Command needs at least 1 argument");
         }
 
         const AssetId & assetId = params.at(0);
@@ -340,7 +340,7 @@ namespace cam
 
         if(params.size() < 2)
         {
-            throw CamBadCommandArgumentException("", "Command need at least 2 arguments");
+            throw CamBadCommandArgumentException("", "Command needs at least 2 arguments");
         }
 
         const AssetId & assetId = params.at(0);
@@ -382,7 +382,7 @@ namespace cam
 
         if(params.size() < 1)
         {
-            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+            throw CamBadCommandArgumentException("", "Command needs at least 1 argument");
         }
 
         const CredentialId & credentialId = params.at(0);
@@ -406,7 +406,7 @@ namespace cam
 
         if(params.size() < 1)
         {
-            throw CamBadCommandArgumentException("", "Command need at least 1 argument");
+            throw CamBadCommandArgumentException("", "Command needs at least 1 argument");
         }
 
         const CredentialId & credentialId = params.at(0);

@@ -88,7 +88,7 @@ std::string SecurityWalletServer::handleGetConsumerUsages(const Sender & sender,
 
     if(params.size() != 1)
     {
-        throw SecwBadCommandArgumentException("Command need at 1 argument");
+        throw SecwBadCommandArgumentException("Command needs at least 1 argument");
     }
 
     const std::string & portfolioName = params[0];
@@ -109,7 +109,7 @@ std::string SecurityWalletServer::handleGetProducerUsages(const Sender & sender,
 
     if(params.size() != 1)
     {
-        throw SecwBadCommandArgumentException("Command need at 1 argument");
+        throw SecwBadCommandArgumentException("Command needs at least 1 argument");
     }
 
     const std::string & portfolioName = params[0];
@@ -132,7 +132,7 @@ std::string SecurityWalletServer::handleGetDocumentWithSecret(const Sender & sen
     
     if(params.size() != 2)
     {
-        throw SecwBadCommandArgumentException("Command need at 2 arguments");
+        throw SecwBadCommandArgumentException("Command needs at least 2 arguments");
     }
 
     const std::string & portfolioName = params[0];
@@ -171,7 +171,7 @@ std::string SecurityWalletServer::handleGetDocumentWithoutSecret(const Sender & 
 
     if(params.size() != 2)
     {
-        throw SecwBadCommandArgumentException("Command need at 2 arguments");
+        throw SecwBadCommandArgumentException("Command needs at least 2 arguments");
     }
 
     const std::string & portfolioName = params[0];
@@ -197,7 +197,7 @@ std::string SecurityWalletServer::handleGetDocumentWithSecretByName(const Sender
     
     if(params.size() != 2)
     {
-        throw SecwBadCommandArgumentException("Command need at 2 arguments");
+        throw SecwBadCommandArgumentException("Command needs at least 2 arguments");
     }
 
     const std::string & portfolioName = params[0];
@@ -236,7 +236,7 @@ std::string SecurityWalletServer::handleGetDocumentWithoutSecretByName(const Sen
 
     if(params.size() != 2)
     {
-        throw SecwBadCommandArgumentException("Command need at 2 arguments");
+        throw SecwBadCommandArgumentException("Command needs at least 2 arguments");
     }
 
     const std::string & portfolioName = params[0];
@@ -263,7 +263,7 @@ std::string SecurityWalletServer::handleGetListDocumentsWithSecret(const Sender 
    
     if(params.size() < 1)
     {
-        throw SecwBadCommandArgumentException("Command need at least argument");
+        throw SecwBadCommandArgumentException("Command needs at least argument");
     }
 
     const std::string & portfolioName = params[0];
@@ -329,7 +329,7 @@ std::string SecurityWalletServer::handleGetListDocumentsWithoutSecret(const Send
     
     if(params.size() < 1)
     {
-        throw SecwBadCommandArgumentException("Command need at least argument");
+        throw SecwBadCommandArgumentException("Command needs at least argument");
     }
 
     const std::string & portfolioName = params[0];
