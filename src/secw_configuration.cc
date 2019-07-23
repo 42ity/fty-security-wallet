@@ -33,10 +33,12 @@
 namespace secw
 {
 /*-----------------------------------------------------------------------------*/
-/*   SecwConfiguration                                                         */
+/*   PortfolioConfiguration                                                         */
 /*-----------------------------------------------------------------------------*/
-  SecwConfiguration::SecwConfiguration(const cxxtools::SerializationInfo & si)
+  PortfolioConfiguration::PortfolioConfiguration(const cxxtools::SerializationInfo & si)
   {
+    si.getMember("portfolio_name") >>= m_portfolioName;
+
     std::vector<Usage> usages;
     si.getMember("usages") >>= usages;
 
@@ -61,7 +63,7 @@ namespace secw
     }*/
   }
 
-  std::set<UsageId> SecwConfiguration::getAllUsageId() const
+  std::set<UsageId> PortfolioConfiguration::getAllUsageId() const
   {
     std::set<UsageId> usageIds;
 
@@ -72,14 +74,19 @@ namespace secw
 
     return usageIds;
   }
+  
+  std::string PortfolioConfiguration::getPortfolioName() const
+  {
+    return m_portfolioName;
+  }
 
-  Usage SecwConfiguration::getUsage( const UsageId & usageId ) const
+  Usage PortfolioConfiguration::getUsage( const UsageId & usageId ) const
   {
     //TODO check error if none existing usageId
     return m_usages.at(usageId);
   }
 
-  std::set<UsageId> SecwConfiguration::getUsageIdsForConsummer( const ClientId & clientId ) const
+  std::set<UsageId> PortfolioConfiguration::getUsageIdsForConsummer( const ClientId & clientId ) const
   {
     std::set<UsageId> usages;
 
@@ -97,7 +104,7 @@ namespace secw
     return usages;
   }
 
-  std::set<UsageId> SecwConfiguration::getUsageIdsForProducer( const ClientId & clientId ) const
+  std::set<UsageId> PortfolioConfiguration::getUsageIdsForProducer( const ClientId & clientId ) const
   {
     std::set<UsageId> usages;
 

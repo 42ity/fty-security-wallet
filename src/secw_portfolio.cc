@@ -41,16 +41,11 @@ namespace secw
 
     Id Portfolio::add(const DocumentPtr & doc)
     {
-        //make a copy using factory
-        DocumentPtr copyDoc = doc->clone();
 
-        //lazy check to ensure that the name do not exist => name unique by portfolio
-        for( const auto & item : m_documents)
+        //Check to ensure that the name do not exist => name unique by portfolio
+        if(m_mapNameDocuments.count(doc->getName()) > 0)
         {
-            if(item.second->getName() == doc->getName())
-            {
-                throw SecwNameAlreadyExistsException(doc->getName());
-            }
+            throw SecwNameAlreadyExistsException(doc->getName());
         }
 
         //create an id
@@ -62,15 +57,26 @@ namespace secw
         }
         while(m_documents.count(id) != 0); //the id already exist, so we get a new one
 
+        //make a copy using factory
+        DocumentPtr copyDoc = doc->clone();
+
         copyDoc->m_id = id;
         
         m_documents[id] = copyDoc;
+        m_mapNameDocuments[copyDoc->getName()] = copyDoc;
 
         return id;
     }
 
     void Portfolio::remove(const Id & id)
     {
+        //Check if document exist
+        if(m_documents.count(id) < 1)
+        {
+            throw SecwDocumentDoNotExistException(id);
+        }
+
+        m_mapNameDocuments.erase(m_documents[id]->getName());
         m_documents.erase(id);
     }
     
@@ -84,16 +90,25 @@ namespace secw
             throw SecwDocumentDoNotExistException(id);
         }
 
-        //lazy check to ensure that the name do not exist => name unique by portfolio
-        for( const auto & item : m_documents)
+        DocumentPtr oldDoc = m_documents[id];
+
+        //ensure that if the name is modified, the new name do not already exist
+        if(doc->getName() != oldDoc->getName())
         {
-            if( (item.first != id) && (item.second->getName() == doc->getName()))
+            if(m_mapNameDocuments.count(doc->getName()) > 0)
             {
                 throw SecwNameAlreadyExistsException(doc->getName());
             }
+
+            m_mapNameDocuments.erase(oldDoc->getName());
+
+
         }
 
-        m_documents[id] = doc->clone();
+        DocumentPtr copyDoc =  doc->clone();
+
+        m_documents[id] = copyDoc;
+        m_mapNameDocuments[copyDoc->getName()] = copyDoc;
     }
     
     
@@ -105,6 +120,16 @@ namespace secw
         }
             
         return m_documents.at(id)->clone();
+    }
+
+    DocumentPtr Portfolio::getDocumentByName(const std::string & name) const
+    {
+        if(m_mapNameDocuments.count(name) < 1)
+        {
+            throw SecwNameDoesNotExistException(name);
+        }
+            
+        return m_mapNameDocuments.at(name)->clone();
     }
 
     std::vector<DocumentPtr> Portfolio::getListDocuments() const
@@ -134,6 +159,7 @@ namespace secw
 
         //remove former content
         m_documents.clear();
+        m_mapNameDocuments.clear();
 
         switch(version)
         {
@@ -170,6 +196,8 @@ namespace secw
                     doc->validate();
 
                     m_documents[doc->getId()] = doc;
+                    m_mapNameDocuments[doc->getName()] = doc;
+
                     count++;
                 }
                 catch(const std::exception& e)

@@ -76,6 +76,7 @@ namespace secw
             case ILLEGAL_ACCESS:                throw SecwIllegalAccess(whatArg);
             case UNKNOWN_USAGE_ID:              throw SecwUnknownUsageIDException(extraData, whatArg);
             case NAME_ALREADY_EXISTS:           throw SecwNameAlreadyExistsException(extraData, whatArg);
+            case NAME_DOES_NOT_EXIST:          throw SecwNameDoesNotExistException(extraData, whatArg);
             default: throw SecwException(whatArg);
         }
     }
