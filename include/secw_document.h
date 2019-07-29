@@ -187,7 +187,7 @@ namespace secw
   void operator>>= (const std::string& str, DocumentPtr & doc);
 
   //add a stream operator to display the document in debug for example
-  std::ostream& operator<< (std::ostream& os, const DocumentPtr & doc);
+  //std::ostream& operator<< (std::ostream& os, const DocumentPtr & doc);
   std::ostream& operator<< (std::ostream& os, const Document & doc);
   std::ostream& operator<< (std::ostream& os, const std::vector<DocumentPtr> & docs);
 

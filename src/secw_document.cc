@@ -316,11 +316,11 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
         }
     }
 
-    std::ostream& operator<< (std::ostream& os, const DocumentPtr & doc)
+    /*std::ostream& operator<< (std::ostream& os, const DocumentPtr & doc)
     {
         os << *(doc);
         return os;
-    }
+    }*/
 
     std::ostream& operator<< (std::ostream& os, const Document & doc)
     {
