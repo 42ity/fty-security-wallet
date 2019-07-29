@@ -262,6 +262,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
             std::stringstream output;
 
             cxxtools::JsonSerializer serializer(output);
+            serializer.beautify(true);
             serializer.serialize(si);
 
             str = output.str();
@@ -306,6 +307,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
             std::stringstream output;
 
             cxxtools::JsonSerializer serializer(output);
+            serializer.beautify(true);
             serializer.serialize(si);
 
             str = output.str();
