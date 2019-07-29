@@ -15,6 +15,12 @@
 				"supported_types": [
 					"UserAndPassword"
 				]
+			},
+			{
+				"usage_id": "user_script",
+				"supported_types": [
+					"UserAndPassword"
+				]
 			}
 		],
 		"consumers": [
@@ -23,6 +29,12 @@
 				"usages": [
 					"discovery_monitoring",
 					"mass_device_management"
+				]
+			},
+			{
+				"client_regex": "_bios-script",
+				"usages": [
+					"user_script"
 				]
 			}
 		],
