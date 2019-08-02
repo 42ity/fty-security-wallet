@@ -28,16 +28,23 @@
 
 #include "fty_security_wallet_classes.h"
 
+//Too old glibc :(. <gettid> is available since glibc 2.30
+#include <sys/syscall.h>
+#define gettid() syscall(SYS_gettid)
+
+#include <iomanip>
+#include <sstream>
+#include <cxxtools/jsonserializer.h>
+
 #include "secw_exception.h"
 #include "secw_security_wallet.h"
 #include "secw_helpers.h"
 
-#include <sstream>
-#include <cxxtools/jsonserializer.h>
-
 using namespace secw;
 
 std::shared_ptr<SecurityWallet> SecurityWalletServer::m_activeWallet = std::shared_ptr<SecurityWallet>(nullptr);
+
+std::string SecurityWalletServer::m_endpoint;
 
 SecurityWalletServer::SecurityWalletServer(zsock_t *pipe)
     : mlm::MlmAgent(pipe)
@@ -375,6 +382,54 @@ std::string SecurityWalletServer::handleGetListDocumentsWithoutSecret(const Send
     return result;
 }
 
+
+void
+SecurityWalletServer::sendNotification (const std::string & subject, const std::string & payload)
+{
+    mlm_client_t * client = mlm_client_new();
+
+    if(client == NULL)
+    {
+      mlm_client_destroy(&client);
+      throw SecwMalamuteClientIsNullException();
+    }
+
+    //create a unique sender id: SECURITY_WALLET_AGENT.[thread id in hexa]
+    pid_t threadId = gettid();
+
+    std::stringstream ss;
+    ss << SECURITY_WALLET_AGENT  << "." << std::setfill('0') << std::setw(sizeof(pid_t)*2) << std::hex << threadId;
+
+    std::string uniqueId = ss.str();
+
+    int rc = mlm_client_connect (client, m_endpoint.c_str(), 1000, uniqueId.c_str());
+
+    if (rc != 0)
+    {
+      mlm_client_destroy(&client);
+      throw SecwMalamuteConnectionFailedException();
+    }
+
+    rc = mlm_client_set_producer (client, SECW_NOTIFICATIONS);
+    if (rc != 0)
+    {
+        mlm_client_destroy (&client);
+        throw SecwMalamuteInterruptedException();
+    }
+
+    zmsg_t *notification = zmsg_new ();
+    zmsg_addstr (notification, payload.c_str ());
+    rc = mlm_client_send (client, subject.c_str (), &notification);
+
+    if (rc != 0)
+    {
+      zmsg_destroy(&notification);
+      mlm_client_destroy(&client);
+      throw SecwMalamuteInterruptedException();
+    }
+}
+
+
 std::string SecurityWalletServer::handleCreate(const Sender & sender, const std::vector<std::string> & params)
 {
     /*
@@ -427,6 +482,8 @@ std::string SecurityWalletServer::handleCreate(const Sender & sender, const std:
     
     m_activeWallet->save();
 
+    std::string payload = "{ \"action\" : \"CREATED\" }";
+    sendNotification ("CREATE", payload);
     return result;
 }
 
@@ -478,7 +535,9 @@ std::string SecurityWalletServer::handleDelete(const Sender & sender, const std:
     portfolio.remove(id);
     
     m_activeWallet->save();
-    
+
+    std::string payload = "{ \"action\" : \"DELETED\" }";
+    sendNotification ("DELETE", payload);
     return "OK";
 }
 
@@ -546,7 +605,9 @@ std::string SecurityWalletServer::handleUpdate(const Sender & sender, const std:
     
     //do the update
     portfolio.update(copyOfExistingDoc);
-    
+
+    std::string payload = "{ \"action\" : \"UPDATED\" }";
+    sendNotification ("UPDATE", payload);
     return "OK";
 }
 
@@ -577,6 +638,7 @@ bool SecurityWalletServer::handlePipe(zmsg_t *message)
         ZstrGuard name(zmsg_popstr (message));
         if (endpoint && name) {
             connect(endpoint,name);
+            m_endpoint = endpoint.get();
         }
     }
     else if (streq (actor_command, "STORAGE_CONFIGURATION_PATH"))
