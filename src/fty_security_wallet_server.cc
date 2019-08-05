@@ -427,6 +427,8 @@ SecurityWalletServer::sendNotification (const std::string & subject, const std::
       mlm_client_destroy(&client);
       throw SecwMalamuteInterruptedException();
     }
+
+    mlm_client_destroy (&client);
 }
 
 
