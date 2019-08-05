@@ -438,22 +438,34 @@ SecurityWalletServer::sendNotification (const std::string & payload)
 void
 SecurityWalletServer::sendNotificationOnCreate (const std::string & portfolio, const DocumentPtr newDocument)
 {
-    std::string payload = "{ \"action\" : \"CREATED\" }";
-    sendNotification(payload);
+    cxxtools::SerializationInfo rootSi;
+    rootSi.addMember("action") <<= "CREATED";
+    rootSi.addMember("portfolio") <<= portfolio;
+    rootSi.addMember("old_data");
+    newDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("new_data"));
+    sendNotification(serialize(rootSi));
 }
 
 void
 SecurityWalletServer::sendNotificationOnDelete (const std::string & portfolio, const DocumentPtr oldDocument)
 {
-    std::string payload = "{ \"action\" : \"DELETED\" }";
-    sendNotification(payload);
+    cxxtools::SerializationInfo rootSi;
+    rootSi.addMember("action") <<= "DELETED";
+    rootSi.addMember("portfolio") <<= portfolio;
+    rootSi.addMember("new_data");
+    oldDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("old_data"));
+    sendNotification(serialize(rootSi));
 }
 
 void
 SecurityWalletServer::sendNotificationOnUpdate (const std::string & portfolio, const DocumentPtr oldDocument, const DocumentPtr newDocument)
 {
-    std::string payload = "{ \"action\" : \"UPDATED\" }";
-    sendNotification(payload);
+    cxxtools::SerializationInfo rootSi;
+    rootSi.addMember("action") <<= "UPDATED";
+    rootSi.addMember("portfolio") <<= portfolio;
+    oldDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("old_data"));
+    newDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("new_data"));
+    sendNotification(serialize(rootSi));
 }
 
 std::string SecurityWalletServer::handleCreate(const Sender & sender, const std::vector<std::string> & params)
