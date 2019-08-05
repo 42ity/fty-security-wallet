@@ -438,34 +438,64 @@ SecurityWalletServer::sendNotification (const std::string & payload)
 void
 SecurityWalletServer::sendNotificationOnCreate (const std::string & portfolio, const DocumentPtr newDocument)
 {
-    cxxtools::SerializationInfo rootSi;
-    rootSi.addMember("action") <<= "CREATED";
-    rootSi.addMember("portfolio") <<= portfolio;
-    rootSi.addMember("old_data");
-    newDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("new_data"));
-    sendNotification(serialize(rootSi));
+    try
+    {
+        cxxtools::SerializationInfo rootSi;
+        rootSi.addMember("action") <<= "CREATED";
+        rootSi.addMember("portfolio") <<= portfolio;
+        rootSi.addMember("old_data");
+        newDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("new_data"));
+        sendNotification(serialize(rootSi));
+    }
+    catch (const std::exception &e)
+    {
+        log_error ("Error while sending notification about document create: %s", e.what());
+    }
+    catch (...) {
+        log_error ("Error while sending notification about document create: unknown error");
+    }
 }
 
 void
 SecurityWalletServer::sendNotificationOnDelete (const std::string & portfolio, const DocumentPtr oldDocument)
 {
-    cxxtools::SerializationInfo rootSi;
-    rootSi.addMember("action") <<= "DELETED";
-    rootSi.addMember("portfolio") <<= portfolio;
-    rootSi.addMember("new_data");
-    oldDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("old_data"));
-    sendNotification(serialize(rootSi));
+    try
+    {
+        cxxtools::SerializationInfo rootSi;
+        rootSi.addMember("action") <<= "DELETED";
+        rootSi.addMember("portfolio") <<= portfolio;
+        rootSi.addMember("new_data");
+        oldDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("old_data"));
+        sendNotification(serialize(rootSi));
+    }
+    catch (const std::exception &e)
+    {
+        log_error ("Error while sending notification about document delete: %s", e.what());
+    }
+    catch (...) {
+        log_error ("Error while sending notification about document delete: unknown error");
+    }
 }
 
 void
 SecurityWalletServer::sendNotificationOnUpdate (const std::string & portfolio, const DocumentPtr oldDocument, const DocumentPtr newDocument)
 {
-    cxxtools::SerializationInfo rootSi;
-    rootSi.addMember("action") <<= "UPDATED";
-    rootSi.addMember("portfolio") <<= portfolio;
-    oldDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("old_data"));
-    newDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("new_data"));
-    sendNotification(serialize(rootSi));
+    try
+    {
+        cxxtools::SerializationInfo rootSi;
+        rootSi.addMember("action") <<= "UPDATED";
+        rootSi.addMember("portfolio") <<= portfolio;
+        oldDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("old_data"));
+        newDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("new_data"));
+        sendNotification(serialize(rootSi));
+    }
+    catch (const std::exception &e)
+    {
+        log_error ("Error while sending notification about document update: %s", e.what());
+    }
+    catch (...) {
+        log_error ("Error while sending notification about document update: unknown error");
+    }
 }
 
 std::string SecurityWalletServer::handleCreate(const Sender & sender, const std::vector<std::string> & params)
