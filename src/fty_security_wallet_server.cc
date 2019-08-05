@@ -648,7 +648,7 @@ std::string SecurityWalletServer::handleUpdate(const Sender & sender, const std:
     //recover the existing
     DocumentPtr copyOfExistingDoc = portfolio.getDocument(doc->getId());
     //clone the old document for notification purposes
-    DocumentPtr notificationCopyOfExistingDoc = copyOfExistingDoc->clone ();
+    DocumentPtr docBeforeUpdate = copyOfExistingDoc->clone ();
 
     //std::cerr << "Existing data:\n" << copyOfExistingDoc << std::endl;
     
@@ -674,7 +674,7 @@ std::string SecurityWalletServer::handleUpdate(const Sender & sender, const std:
     //do the update
     portfolio.update(copyOfExistingDoc);
 
-    sendNotificationOnUpdate (portfolioName, notificationCopyOfExistingDoc, doc);
+    sendNotificationOnUpdate (portfolioName, docBeforeUpdate, doc);
     return "OK";
 }
 
