@@ -384,7 +384,7 @@ std::string SecurityWalletServer::handleGetListDocumentsWithoutSecret(const Send
 
 
 void
-SecurityWalletServer::sendNotification (const std::string & subject, const std::string & payload)
+SecurityWalletServer::sendNotification (const std::string & payload)
 {
     mlm_client_t * client = mlm_client_new();
 
@@ -419,7 +419,7 @@ SecurityWalletServer::sendNotification (const std::string & subject, const std::
 
     zmsg_t *notification = zmsg_new ();
     zmsg_addstr (notification, payload.c_str ());
-    rc = mlm_client_send (client, subject.c_str (), &notification);
+    rc = mlm_client_send (client, "NOTIFICATION", &notification);
 
     if (rc != 0)
     {
@@ -431,6 +431,26 @@ SecurityWalletServer::sendNotification (const std::string & subject, const std::
     mlm_client_destroy (&client);
 }
 
+void
+SecurityWalletServer::sendNotificationOnCreate (const std::string & portfolio, const DocumentPtr newDocument)
+{
+    std::string payload = "{ \"action\" : \"CREATED\" }";
+    sendNotification(payload);
+}
+
+void
+SecurityWalletServer::sendNotificationOnDelete (const std::string & portfolio, const DocumentPtr oldDocument)
+{
+    std::string payload = "{ \"action\" : \"DELETED\" }";
+    sendNotification(payload);
+}
+
+void
+SecurityWalletServer::sendNotificationOnUpdate (const std::string & portfolio, const DocumentPtr oldDocument, const DocumentPtr newDocument)
+{
+    std::string payload = "{ \"action\" : \"UPDATED\" }";
+    sendNotification(payload);
+}
 
 std::string SecurityWalletServer::handleCreate(const Sender & sender, const std::vector<std::string> & params)
 {
@@ -484,8 +504,7 @@ std::string SecurityWalletServer::handleCreate(const Sender & sender, const std:
     
     m_activeWallet->save();
 
-    std::string payload = "{ \"action\" : \"CREATED\" }";
-    sendNotification ("CREATE", payload);
+    sendNotificationOnCreate(portfolioName, doc);
     return result;
 }
 
@@ -538,8 +557,7 @@ std::string SecurityWalletServer::handleDelete(const Sender & sender, const std:
     
     m_activeWallet->save();
 
-    std::string payload = "{ \"action\" : \"DELETED\" }";
-    sendNotification ("DELETE", payload);
+    sendNotificationOnDelete(portfolioName, doc);
     return "OK";
 }
 
@@ -608,8 +626,7 @@ std::string SecurityWalletServer::handleUpdate(const Sender & sender, const std:
     //do the update
     portfolio.update(copyOfExistingDoc);
 
-    std::string payload = "{ \"action\" : \"UPDATED\" }";
-    sendNotification ("UPDATE", payload);
+    sendNotificationOnUpdate (portfolioName, copyOfExistingDoc, doc);
     return "OK";
 }
 

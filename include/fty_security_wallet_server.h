@@ -74,9 +74,14 @@ namespace secw
         static std::string handleCreate(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleDelete(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleUpdate(const Sender & sender, const std::vector<std::string> & params);
-        
+
+        //Notification
+        static void sendNotification (const std::string & payload);
+        static void sendNotificationOnCreate (const std::string & portfolio, const DocumentPtr newDocument);
+        static void sendNotificationOnDelete (const std::string & portfolio, const DocumentPtr oldDocument);
+        static void sendNotificationOnUpdate (const std::string & portfolio, const DocumentPtr oldDocument, const DocumentPtr newDocument);
+
         //Helpers
-        static void sendNotification (const std::string & subject, const std::string & payload);
         static zmsg_t *generateErrorMsg(const std::string & correlationId, const std::string & errPayload);
         
         static std::string serializeListDocumentsPrivate(const std::string & portfolioName, const std::set<UsageId> & usages);
