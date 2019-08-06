@@ -9,6 +9,6 @@ Installation model
 
 <install>
     <item type = "systemd-tmpfiles" />
-    <item path = "/etc/fty/fty-security-wallet" name = "../configuration.json" />
+    <item path = "/etc/fty/fty-security-wallet" name = "../src/configuration.json" />
     <item path = "/usr/share/bios/setup/" name = "../src/30-secw-update-database-right.sh" />
 </install>
