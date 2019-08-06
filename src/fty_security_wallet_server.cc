@@ -711,8 +711,6 @@ bool SecurityWalletServer::handlePipe(zmsg_t *message)
         // send startup notification
         cxxtools::SerializationInfo si;
         si.addMember("action") <<= "STARTED";
-        si.addMember("old_data");
-        si.addMember("new_data");
         sendNotification(serialize(si));
 
     }
