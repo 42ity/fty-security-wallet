@@ -6,7 +6,7 @@ PartOf=bios.target
 
 [Service]
 Type=simple
-User=bios
+User=secw-daemon
 EnvironmentFile=-@prefix@/share/fty/etc/default/fty
 EnvironmentFile=-@prefix@/share/fty/etc/default/fty__%n.conf
 EnvironmentFile=-@sysconfdir@/default/fty
