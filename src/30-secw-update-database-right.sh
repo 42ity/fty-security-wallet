@@ -26,7 +26,7 @@ getent group "${SECW_GROUP}" >/dev/null \
 || die "The '${SECW_GROUP}' group account is not defined in this system"
 
 chown ${SECW_USER}:${SECW_GROUP} "${SECW_DIR}"
-chmod 0771 "${SECW_DIR}"
+chmod 0700 "${SECW_DIR}"
 
 if [ -f "${SECW_DIR}/${SECW_DB}" ]; then
     chown ${SECW_USER}:${SECW_GROUP} "${SECW_DIR}/${SECW_DB}"
