@@ -40,6 +40,8 @@
 
 #include <iomanip>
 #include <sstream>
+#include <thread>
+#include <cxxtools/jsondeserializer.h>
 
 #include "secw_helpers.h"
 
@@ -159,4 +161,120 @@ namespace secw
     return receivedFrames;
   }
 
+  void
+  ClientAccessor::notificationListener(void) noexcept
+  {
+      if (m_startCallback == nullptr && m_createCallback == nullptr && m_updateCallback == nullptr && m_deleteCallback == nullptr)
+          return;
+
+      try {
+          mlm_client_t *client = mlm_client_new ();
+
+          if(client == NULL)
+          {
+              mlm_client_destroy(&client);
+              throw SecwMalamuteClientIsNullException();
+          }
+
+          //create a unique sender id: SECURITY_WALLET_AGENT.[thread id in hexa]
+          pid_t threadId = gettid();
+
+          std::stringstream ss;
+          ss << SECURITY_WALLET_AGENT  << "." << std::setfill('0') << std::setw(sizeof(pid_t)*2) << std::hex << threadId;
+
+          std::string uniqueId = ss.str();
+
+          int rc = mlm_client_connect (client, m_endPoint.c_str(), 1000, uniqueId.c_str());
+
+          if (rc != 0)
+          {
+              mlm_client_destroy(&client);
+              throw SecwMalamuteConnectionFailedException();
+          }
+
+          rc = mlm_client_set_consumer (client, SECW_NOTIFICATIONS, ".*");
+          if (rc != 0)
+          {
+              mlm_client_destroy (&client);
+              throw SecwMalamuteInterruptedException();
+          }
+
+          zpoller_t *poller = zpoller_new (mlm_client_msgpipe (client), NULL);
+
+          while (!zsys_interrupted)
+          {
+              void *which = zpoller_wait (poller, -1);
+              if (which == mlm_client_msgpipe (client)) {
+                  if (mlm_client_subject (client) == "NOTIFICATIONS") {
+                      ZmsgGuard msg (mlm_client_recv (client));
+                      ZstrGuard notification (zmsg_popstr (msg));
+
+                      std::istringstream iss (notification.get ());
+                      cxxtools::JsonDeserializer jd (iss);
+                      cxxtools::SerializationInfo si;
+                      jd.deserialize (si);
+
+                      std::string action, portfolio;
+                      si.getMember ("action") >>= action;
+                      si.getMember ("portfolio") >>= portfolio;
+
+                      DocumentPtr old_data, new_data;
+
+                      /*if (action == "STARTED")
+                        m_startCallback ();
+                      else */
+                     if (action == "CREATED") {
+                        si.getMember ("new_data") >>= new_data;
+                        m_createCallback (portfolio, new_data);
+                      }
+                      /*else if (action == "UPDATED") {
+                        si.getMember ("old_data") >>= old_data;
+                        si.getMember ("new_data") >>= new_data;
+                        m_updateCallback (portfolio, old_data, new_data);
+                      }
+                      else if (action == "DELETED") {
+                        si.getMember ("old_data") >>= old_data;
+                        m_deleteCallback (portfolio, old_data);
+                      }
+                      else
+                        throw SecwProtocolErrorException("Unknown action");*/
+                  }
+                  else {
+                    throw SecwProtocolErrorException("Unknown subject");
+                  }
+              }
+              else {
+                throw SecwProtocolErrorException("Unexpected message");
+              }
+          }
+      }
+      catch (const std::exception &e)
+      {
+          log_error ("Error during notification processing: %s", e.what());
+      }
+      catch (...)
+      {
+          log_error ("Error during notification processing: unknown error");
+      }
+  }
+
+    void ClientAccessor::setCallbackOnCreate (std::function<void(const std::string&, DocumentPtr)>& createCallback)
+    {
+        //check if we are setting ourselves to nullptr
+        if (createCallback == nullptr) {
+        // if yes, check if there are other callbacks
+        //   if there aren't, check if notification thread is running and kill it
+        //   if there are, kill the notification thread and restart it
+        }
+        //if no, check if notification thread is running
+        else {
+            if (m_notificationThreadIsRunning) {
+        // if it is, kill it and restart it
+            }
+            else {
+        // if it isn't, start it
+                m_notificationThread = std::thread (std::bind (&ClientAccessor::notificationListener, this));
+            }
+        }
+    }
 } //namespace secw

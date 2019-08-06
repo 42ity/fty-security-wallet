@@ -25,7 +25,8 @@
 #include "secw_document.h"
 #include "secw_exception.h"
 
-#include "cxxtools/serializationinfo.h"
+#include <cxxtools/serializationinfo.h>
+#include <thread>
 
 namespace secw
 {
@@ -42,14 +43,14 @@ namespace secw
 
     std::vector<std::string> sendCommand(const std::string & command, const std::vector<std::string> & frames) const;
 
-    void setCallbackOnUpdate (std::function<void(const std::string&, DocumentPtr, DocumentPtr)> updateCallback)
-    { m_updateCallback = updateCallback; }
-    void setCallbackOnCreate (std::function<void(const std::string&, DocumentPtr)> createCallback)
-    { m_createCallback = createCallback; }
-    void setCallbackOnDelete (std::function<void(const std::string&, DocumentPtr)> deleteCallback)
-    { m_deleteCallback = deleteCallback; }
-    void setCallbackOnStart (std::function<void(void)> startCallback)
-    { m_startCallback = startCallback; }
+    //void setCallbackOnUpdate (std::function<void(const std::string&, DocumentPtr, DocumentPtr)>& updateCallback=nullptr);
+    //{ m_updateCallback = updateCallback; }
+    void setCallbackOnCreate (std::function<void(const std::string&, DocumentPtr)>& createCallback=nullptr);
+    //{ m_createCallback = createCallback; }
+    //void setCallbackOnDelete (std::function<void(const std::string&, DocumentPtr)>& deleteCallback=nullptr);
+    //{ m_deleteCallback = deleteCallback; }
+    //void setCallbackOnStart (std::function<void(void)>& startCallback=nullptr);
+    //{ m_startCallback = startCallback; }
 
   private:
     ClientId m_clientId;
@@ -62,9 +63,10 @@ namespace secw
     std::function<void(const std::string&, DocumentPtr)> m_deleteCallback;
     std::function<void(void)> m_startCallback;
 
-    void notificationListener (void);
-  };
+    std::thread m_notificationThread;
+    void notificationListener(void) noexcept;
 
+  };
 } //namespace secw
 
 //  @interface
