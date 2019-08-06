@@ -27,17 +27,28 @@
 */
 
 #include "fty_security_wallet_classes.h"
+#include <sys/types.h>
+#include <gnu/libc-version.h>
+
+//gettid() is available since glibc 2.30
+#if ((__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 30))
+#include <sys/syscall.h>
+#define gettid() syscall(SYS_gettid)
+#endif
+
+#include <iomanip>
+#include <sstream>
+#include <cxxtools/jsonserializer.h>
 
 #include "secw_exception.h"
 #include "secw_security_wallet.h"
 #include "secw_helpers.h"
 
-#include <sstream>
-#include <cxxtools/jsonserializer.h>
-
 using namespace secw;
 
 std::shared_ptr<SecurityWallet> SecurityWalletServer::m_activeWallet = std::shared_ptr<SecurityWallet>(nullptr);
+
+std::string SecurityWalletServer::m_endpoint;
 
 SecurityWalletServer::SecurityWalletServer(zsock_t *pipe)
     : mlm::MlmAgent(pipe)
@@ -375,6 +386,118 @@ std::string SecurityWalletServer::handleGetListDocumentsWithoutSecret(const Send
     return result;
 }
 
+
+void
+SecurityWalletServer::sendNotification (const std::string & payload)
+{
+    mlm_client_t * client = mlm_client_new();
+
+    if(client == NULL)
+    {
+      mlm_client_destroy(&client);
+      throw SecwMalamuteClientIsNullException();
+    }
+
+    //create a unique sender id: SECURITY_WALLET_AGENT.[thread id in hexa]
+    pid_t threadId = gettid();
+
+    std::stringstream ss;
+    ss << SECURITY_WALLET_AGENT  << "." << std::setfill('0') << std::setw(sizeof(pid_t)*2) << std::hex << threadId;
+
+    std::string uniqueId = ss.str();
+
+    int rc = mlm_client_connect (client, m_endpoint.c_str(), 1000, uniqueId.c_str());
+
+    if (rc != 0)
+    {
+      mlm_client_destroy(&client);
+      throw SecwMalamuteConnectionFailedException();
+    }
+
+    rc = mlm_client_set_producer (client, SECW_NOTIFICATIONS);
+    if (rc != 0)
+    {
+        mlm_client_destroy (&client);
+        throw SecwMalamuteInterruptedException();
+    }
+
+    zmsg_t *notification = zmsg_new ();
+    zmsg_addstr (notification, payload.c_str ());
+    rc = mlm_client_send (client, "NOTIFICATION", &notification);
+
+    if (rc != 0)
+    {
+      zmsg_destroy(&notification);
+      mlm_client_destroy(&client);
+      throw SecwMalamuteInterruptedException();
+    }
+
+    mlm_client_destroy (&client);
+}
+
+void
+SecurityWalletServer::sendNotificationOnCreate (const std::string & portfolio, const DocumentPtr newDocument)
+{
+    try
+    {
+        cxxtools::SerializationInfo rootSi;
+        rootSi.addMember("action") <<= "CREATED";
+        rootSi.addMember("portfolio") <<= portfolio;
+        rootSi.addMember("old_data");
+        newDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("new_data"));
+        sendNotification(serialize(rootSi));
+    }
+    catch (const std::exception &e)
+    {
+        log_error ("Error while sending notification about document create: %s", e.what());
+    }
+    catch (...) {
+        log_error ("Error while sending notification about document create: unknown error");
+    }
+}
+
+void
+SecurityWalletServer::sendNotificationOnDelete (const std::string & portfolio, const DocumentPtr oldDocument)
+{
+    try
+    {
+        cxxtools::SerializationInfo rootSi;
+        rootSi.addMember("action") <<= "DELETED";
+        rootSi.addMember("portfolio") <<= portfolio;
+        rootSi.addMember("new_data");
+        oldDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("old_data"));
+        sendNotification(serialize(rootSi));
+    }
+    catch (const std::exception &e)
+    {
+        log_error ("Error while sending notification about document delete: %s", e.what());
+    }
+    catch (...) {
+        log_error ("Error while sending notification about document delete: unknown error");
+    }
+}
+
+void
+SecurityWalletServer::sendNotificationOnUpdate (const std::string & portfolio, const DocumentPtr oldDocument, const DocumentPtr newDocument)
+{
+    try
+    {
+        cxxtools::SerializationInfo rootSi;
+        rootSi.addMember("action") <<= "UPDATED";
+        rootSi.addMember("portfolio") <<= portfolio;
+        oldDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("old_data"));
+        newDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("new_data"));
+        sendNotification(serialize(rootSi));
+    }
+    catch (const std::exception &e)
+    {
+        log_error ("Error while sending notification about document update: %s", e.what());
+    }
+    catch (...) {
+        log_error ("Error while sending notification about document update: unknown error");
+    }
+}
+
 std::string SecurityWalletServer::handleCreate(const Sender & sender, const std::vector<std::string> & params)
 {
     /*
@@ -427,6 +550,7 @@ std::string SecurityWalletServer::handleCreate(const Sender & sender, const std:
     
     m_activeWallet->save();
 
+    sendNotificationOnCreate(portfolioName, doc);
     return result;
 }
 
@@ -478,7 +602,8 @@ std::string SecurityWalletServer::handleDelete(const Sender & sender, const std:
     portfolio.remove(id);
     
     m_activeWallet->save();
-    
+
+    sendNotificationOnDelete(portfolioName, doc);
     return "OK";
 }
 
@@ -522,6 +647,8 @@ std::string SecurityWalletServer::handleUpdate(const Sender & sender, const std:
     
     //recover the existing
     DocumentPtr copyOfExistingDoc = portfolio.getDocument(doc->getId());
+    //clone the old document for notification purposes
+    DocumentPtr docBeforeUpdate = copyOfExistingDoc->clone ();
 
     //std::cerr << "Existing data:\n" << copyOfExistingDoc << std::endl;
     
@@ -546,7 +673,8 @@ std::string SecurityWalletServer::handleUpdate(const Sender & sender, const std:
     
     //do the update
     portfolio.update(copyOfExistingDoc);
-    
+
+    sendNotificationOnUpdate (portfolioName, docBeforeUpdate, doc);
     return "OK";
 }
 
@@ -577,6 +705,7 @@ bool SecurityWalletServer::handlePipe(zmsg_t *message)
         ZstrGuard name(zmsg_popstr (message));
         if (endpoint && name) {
             connect(endpoint,name);
+            m_endpoint = endpoint.get();
         }
     }
     else if (streq (actor_command, "STORAGE_CONFIGURATION_PATH"))

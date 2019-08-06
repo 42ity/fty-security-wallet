@@ -29,13 +29,16 @@
 #include "fty_security_wallet_classes.h"
 
 #include <sys/types.h>
+#include <gnu/libc-version.h>
 #include <unistd.h>
 
-//Too old glibc :(. <gettid> is available since glibc 2.30
+//gettid() is available since glibc 2.30
+#if ((__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 30))
 #include <sys/syscall.h>
 #define gettid() syscall(SYS_gettid)
+#endif
 
-#include <iomanip> 
+#include <iomanip>
 #include <sstream>
 
 #include "secw_helpers.h"

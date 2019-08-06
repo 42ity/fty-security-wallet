@@ -49,7 +49,8 @@ namespace secw
     private:
         bool handleMailbox(zmsg_t *message) override;
         bool handlePipe(zmsg_t *message) override;
-        
+
+        static std::string m_endpoint;
         // List of supported commands with a reference to the handler for this command.
         std::map<Command, FctCommandHandler> m_supportedCommands;
 
@@ -73,7 +74,13 @@ namespace secw
         static std::string handleCreate(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleDelete(const Sender & sender, const std::vector<std::string> & params);
         static std::string handleUpdate(const Sender & sender, const std::vector<std::string> & params);
-        
+
+        //Notification
+        static void sendNotification (const std::string & payload);
+        static void sendNotificationOnCreate (const std::string & portfolio, const DocumentPtr newDocument);
+        static void sendNotificationOnDelete (const std::string & portfolio, const DocumentPtr oldDocument);
+        static void sendNotificationOnUpdate (const std::string & portfolio, const DocumentPtr oldDocument, const DocumentPtr newDocument);
+
         //Helpers
         static zmsg_t *generateErrorMsg(const std::string & correlationId, const std::string & errPayload);
         

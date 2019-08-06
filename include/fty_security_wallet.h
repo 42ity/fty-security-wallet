@@ -31,6 +31,7 @@
 #define DEFAULT_STORAGE_CONFIGURATION_PATH  "/etc/fty/fty-security-wallet/configuration.json"
 #define DEFAULT_ENDPOINT      "ipc://@/malamute"
 #define DEFAULT_LOG_CONFIG    "/etc/fty/ftylog.cfg"
+#define SECW_NOTIFICATIONS "_SECW_NOTIFICATIONS"
 
 #define MAPPING_AGENT "credential-asset-mapping"
 #define DEFAULT_STORAGE_MAPPING_PATH  "/etc/fty/fty-security-wallet/mapping.json"
