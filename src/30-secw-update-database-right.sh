@@ -28,9 +28,12 @@ getent group "${SECW_GROUP}" >/dev/null \
 chown ${SECW_USER}:${SECW_GROUP} "${SECW_DIR}"
 chmod 0771 "${SECW_DIR}"
 
-chown ${SECW_USER}:${SECW_GROUP} "${SECW_DIR}/${SECW_DB}"
-chmod 0600 "${SECW_DIR}/${SECW_DB}"
+if [ -f "${SECW_DIR}/${SECW_DB}" ]; then
+    chown ${SECW_USER}:${SECW_GROUP} "${SECW_DIR}/${SECW_DB}"
+    chmod 0600 "${SECW_DIR}/${SECW_DB}"
+fi
 
-chown ${SECW_USER}:${SECW_GROUP} "${SECW_DIR}/${CAM_DB}"
-chmod 0600 "${SECW_DIR}/${CAM_DB}"
-
+if [ -f "${SECW_DIR}/${SECW_DB}" ]; then
+    chown ${SECW_USER}:${SECW_GROUP} "${SECW_DIR}/${CAM_DB}"
+    chmod 0600 "${SECW_DIR}/${SECW_DB}"
+fi
