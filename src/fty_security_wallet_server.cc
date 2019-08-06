@@ -707,6 +707,14 @@ bool SecurityWalletServer::handlePipe(zmsg_t *message)
             connect(endpoint,name);
             m_endpoint = endpoint.get();
         }
+
+        // send startup notification
+        cxxtools::SerializationInfo si;
+        si.addMember("action") <<= "STARTED";
+        si.addMember("old_data");
+        si.addMember("new_data");
+        sendNotification(serialize(si));
+
     }
     else if (streq (actor_command, "STORAGE_CONFIGURATION_PATH"))
     {
