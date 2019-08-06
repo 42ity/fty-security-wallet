@@ -33,7 +33,7 @@ if [ -f "${SECW_DIR}/${SECW_DB}" ]; then
     chmod 0600 "${SECW_DIR}/${SECW_DB}"
 fi
 
-if [ -f "${SECW_DIR}/${SECW_DB}" ]; then
+if [ -f "${SECW_DIR}/${CAM_DB}" ]; then
     chown ${SECW_USER}:${SECW_GROUP} "${SECW_DIR}/${CAM_DB}"
-    chmod 0600 "${SECW_DIR}/${SECW_DB}"
+    chmod 0600 "${SECW_DIR}/${CAM_DB}"
 fi
