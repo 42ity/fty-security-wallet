@@ -222,14 +222,14 @@ namespace secw
       void *which = zpoller_wait (poller, -1);
       if (which == mlm_client_msgpipe (client))
       {
+        ZmsgGuard msg (mlm_client_recv (client));
+
         //check if we need to leave the loop
         if(m_stopRequested)
         {
           std::cerr << "notificationHandler: Stopping..." << std::endl;
           break;
         }
-
-        ZmsgGuard msg (mlm_client_recv (client));
 
         //Get number of frame all the frame
         size_t numberOfFrame = zmsg_size(msg);
