@@ -27,10 +27,32 @@
 namespace secw
 {
   using ClientId = std::string;
-  
+
+    /**
+     * @brief Callback for create notification
+     *
+     * @param portfolio name
+     * @param created document
+     */
   using CreatedCallback = std::function<void(const std::string&, DocumentPtr)> ;
+    /**
+     * @brief Callback for update notification
+     *
+     * @param portfolio name
+     * @param old document
+     * @param new document
+     */
   using UpdatedCallback = std::function<void(const std::string&, DocumentPtr, DocumentPtr)> ;
+    /**
+     * @brief Callback for delete notification
+     *
+     * @param portfolio name
+     * @param deleted document
+     */
   using DeletedCallback = std::function<void(const std::string&, DocumentPtr)> ;
+    /**
+     * @brief Callback for startup notification
+     */
   using StartedCallback = std::function<void()>;
 
   class ClientAccessor;
@@ -153,9 +175,29 @@ namespace secw
       const std::string & portfolio,
       const Id & id) const;
 
+    /**
+     * @brief Set callback for update notification
+     *
+     * @param callback
+     */
     void setCallbackOnUpdate(UpdatedCallback updatedCallback = nullptr);
+    /**
+     * @brief Set callback for create notification
+     *
+     * @param callback
+     */
     void setCallbackOnCreate(CreatedCallback createdCallback= nullptr);
+    /**
+     * @brief Set callback for delete notification
+     *
+     * @param callback
+     */
     void setCallbackOnDelete(DeletedCallback deletedCallback= nullptr);
+    /**
+     * @brief Set callback for startup notification
+     *
+     * @param callback
+     */
     void setCallbackOnStart(StartedCallback startedCallback= nullptr);
   
   private:
