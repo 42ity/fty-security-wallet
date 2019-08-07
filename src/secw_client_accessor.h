@@ -29,6 +29,7 @@
 #include <thread>
 #include <mutex>
 #include <functional>
+#include <condition_variable>
 
 namespace secw
 {
@@ -71,6 +72,7 @@ namespace secw
     bool m_stopRequested = false;
     void notificationHandler();
     std::mutex m_handlerFunctionStarting;
+    std::condition_variable m_handlerFunctionThreadStarted;
     std::mutex m_handlerFunctionLock;
 
     //funtions to start or stop the thread

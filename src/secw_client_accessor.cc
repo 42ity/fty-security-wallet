@@ -182,7 +182,7 @@ namespace secw
     if(client == NULL)
     {
         mlm_client_destroy(&client);
-        m_handlerFunctionStarting.unlock();
+        m_handlerFunctionThreadStarted.notify_all();
         throw SecwMalamuteClientIsNullException();
     }
 
@@ -199,7 +199,7 @@ namespace secw
     if (rc != 0)
     {
         mlm_client_destroy(&client);
-        m_handlerFunctionStarting.unlock();
+        m_handlerFunctionThreadStarted.notify_all();
         throw SecwMalamuteConnectionFailedException();
     }
 
@@ -207,7 +207,7 @@ namespace secw
     if (rc != 0)
     {
         mlm_client_destroy (&client);
-        m_handlerFunctionStarting.unlock();
+        m_handlerFunctionThreadStarted.notify_all();
         throw SecwMalamuteInterruptedException();
     }
 
@@ -215,7 +215,7 @@ namespace secw
 
     std::cerr << "notificationHandler: init... Done." << std::endl;
 
-    m_handlerFunctionStarting.unlock();
+    m_handlerFunctionThreadStarted.notify_all();
 
     while (!zsys_interrupted)
     {
@@ -347,17 +347,15 @@ namespace secw
     //2. update the thread
     if(shouldBeRunning && (!m_notificationThread.joinable()))
     {
+      std::unique_lock<std::mutex> lock(m_handlerFunctionStarting);
       std::cerr << "Start the callback handler ...." << std::endl;
 
       //start
       m_stopRequested = false;
-      m_handlerFunctionStarting.lock(); //the notification handler will release the mutex when the init will be finish.
 
       m_notificationThread = std::thread(std::bind(&ClientAccessor::notificationHandler, this));
 
-      //wait until it's started
-      m_handlerFunctionStarting.lock();
-      m_handlerFunctionStarting.unlock();
+      m_handlerFunctionThreadStarted.wait(lock);
       std::cerr << "Start the callback handler .... Done." << std::endl;
     }
     else if((!shouldBeRunning) && m_notificationThread.joinable())
