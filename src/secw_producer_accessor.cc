@@ -191,6 +191,26 @@ namespace secw
     m_clientAccessor->sendCommand(SecurityWalletServer::DELETE, {portfolio,id});
   }
 
+  void ProducerAccessor::setCallbackOnUpdate(UpdatedCallback updatedCallback)
+  {
+    m_clientAccessor->setCallbackOnUpdate(updatedCallback);
+  }
+
+  void ProducerAccessor::setCallbackOnCreate(CreatedCallback createdCallback)
+  {
+    m_clientAccessor->setCallbackOnCreate(createdCallback);
+  }
+
+  void ProducerAccessor::setCallbackOnDelete(DeletedCallback deletedCallback)
+  {
+    m_clientAccessor->setCallbackOnDelete(deletedCallback);
+  }
+
+  void ProducerAccessor::setCallbackOnStart(StartedCallback startedCallback)
+  {
+    m_clientAccessor->setCallbackOnStart(startedCallback);
+  }
+
 } //namespace secw
 
 //  --------------------------------------------------------------------------
@@ -198,6 +218,55 @@ namespace secw
 //  --------------------------------------------------------------------------
 
 #define SELFTEST_CLIENT_ID "secw-client-test"
+
+//callback for test
+secw::DocumentPtr g_newDoc;
+secw::DocumentPtr g_oldDoc;
+std::string g_portfolio;
+std::string g_action;
+
+std::mutex g_lock;
+
+void callbackCreate(const std::string& portfolio, secw::DocumentPtr newDoc)
+{
+  std::cerr << "callback CREATED" << std::endl;
+  
+  g_action = "CREATED";
+  g_portfolio = portfolio;
+  g_newDoc = newDoc->clone();
+
+  g_lock.unlock();
+}
+
+void callbackUpdated(const std::string& portfolio, secw::DocumentPtr oldDoc, secw::DocumentPtr newDoc)
+{
+  std::cerr << "callback UPDATED" << std::endl;
+
+  g_action = "UPDATED";
+  g_portfolio = portfolio;
+  g_newDoc = newDoc->clone();
+  g_oldDoc = oldDoc->clone();
+
+  g_lock.unlock();
+}
+
+void callbackDeleted(const std::string& portfolio, secw::DocumentPtr oldDoc)
+{
+  std::cerr << "callback DELETED" << std::endl;
+
+  g_action = "DELETED";
+  g_portfolio = portfolio;
+  g_oldDoc = oldDoc->clone();
+
+  g_lock.unlock(); 
+}
+
+/*void callbackStarted() Cannot be tested here
+{
+  g_action = "STARTED";
+  g_lock.unlock();
+}*/
+
 
 std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
 {
@@ -512,6 +581,10 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   {
     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
     ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+
+    //register the callback on create
+    producerAccessor.setCallbackOnCreate(callbackCreate);
+
     try
     {
       Snmpv3Ptr snmpv3Doc = std::make_shared<Snmpv3>("Test insert snmpv3",
@@ -524,15 +597,32 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
 
       snmpv3Doc->addUsage("discovery_monitoring");
 
+      //lock to wait for the callback => the callback will unlock it if called properly
+      g_lock.lock();
+      g_action = "";
+      g_portfolio = "";
+      g_newDoc = nullptr;
+
       id = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<Document>(snmpv3Doc));
 
-      //check that the doc is inserted
+      //wait for the callback to finish
+      g_lock.lock();
+      g_lock.unlock();
+
+      //check that the doc is inserted and the callback called
+      if(g_action != "CREATED") throw std::runtime_error("Wrong action in the callback");
+      if(g_portfolio != "default") throw std::runtime_error("Wrong portfolio in the created callback");
+      if(g_newDoc == nullptr) throw std::runtime_error("No new data in the created callback");
+      if(g_newDoc->getId() != id) throw std::runtime_error("Wrong id in the new document in the created callback");
+      if(g_newDoc->getName() != "Test insert snmpv3") throw std::runtime_error("Wrong name in the new document in the created callback");
 
       printf(" *<=  Test #%s > OK\n", testNumber.c_str());
       testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
     }
     catch(const std::exception& e)
     {
+      g_lock.try_lock();
+      g_lock.unlock();
       printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
       printf("Error: %s\n",e.what());
       testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
@@ -584,6 +674,10 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
     ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+
+    //register the callback on update
+    producerAccessor.setCallbackOnUpdate(callbackUpdated);
+
     try
     {
       DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
@@ -597,8 +691,29 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
       snmpv3->setSecurityName("test update security snmpv3");
       snmpv3->setPrivPassword("new password");
 
+      //lock to wait for the callback => the callback will unlock it if called properly
+      g_lock.lock();
+      g_action = "";
+      g_portfolio = "";
+      g_oldDoc = nullptr;
+      g_newDoc = nullptr;
+
       //update
       producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(snmpv3));
+
+      //wait for the callback to finish
+      g_lock.lock();
+      g_lock.unlock();
+
+      //check that the doc is inserted and the callback called
+      if(g_action != "UPDATED") throw std::runtime_error("Wrong action in the callback");
+      if(g_portfolio != "default") throw std::runtime_error("Wrong portfolio in the updated callback");
+      if(g_oldDoc == nullptr) throw std::runtime_error("No old data in the updated callback");
+      if(g_oldDoc->getId() != id) throw std::runtime_error("Wrong id in the old document in the updated callback");
+      if(g_oldDoc->getName() != "Test insert snmpv3") throw std::runtime_error("Wrong name in the old document in the updated callback");
+      if(g_newDoc == nullptr) throw std::runtime_error("No new data in the updated callback");
+      if(g_newDoc->getId() != id) throw std::runtime_error("Wrong id in the new document in the updated callback");
+      if(g_newDoc->getName() != "Test update snmpv3") throw std::runtime_error("Wrong name in the new document in the updated callback");
 
       printf(" *<=  Test #%s > OK\n", testNumber.c_str());
       testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -655,6 +770,10 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
     ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+
+    //register the callback on update
+    producerAccessor.setCallbackOnUpdate(callbackUpdated);
+
     try
     {
      DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
@@ -666,8 +785,16 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
       //update with wrong data
       snmpv3->setSecurityName("");
 
+      g_action = "";
+      g_portfolio = "";
+      g_newDoc = nullptr;
+
       //update
       producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(snmpv3));
+
+      if(g_action != "") throw std::runtime_error("Non-empty action");
+      if(g_portfolio != "") throw std::runtime_error("Non-empty portfolio");
+      if(g_newDoc != nullptr) throw std::runtime_error("Non-empty data");
 
       throw std::runtime_error("Document has been updated");
     }
@@ -691,9 +818,30 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
     ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+
+    //register the callback on create
+    producerAccessor.setCallbackOnDelete(callbackDeleted);
+
     try
     {
+      //lock to wait for the callback => the callback will unlock it if called properly
+      g_lock.lock();
+      g_action = "";
+      g_portfolio = "";
+      g_oldDoc = nullptr;
+
       producerAccessor.deleteDocument("default", id);
+
+      //wait for the callback to finish
+      g_lock.lock();
+      g_lock.unlock();
+
+      //check that the doc is inserted and the callback called
+      if(g_action != "DELETED") throw std::runtime_error("Wrong action in the callback");
+      if(g_portfolio != "default") throw std::runtime_error("Wrong portfolio in the deleted callback");
+      if(g_oldDoc == nullptr) throw std::runtime_error("No old data in the deleted callback");
+      if(g_oldDoc->getId() != id) throw std::runtime_error("Wrong id in the old document in the deleted callback");
+      if(g_oldDoc->getName() != "Test update snmpv3") throw std::runtime_error("Wrong name in the old document in the deleted callback");
 
       //check that the document is removed
       std::vector<Id> ids = {id};

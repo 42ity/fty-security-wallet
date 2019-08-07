@@ -162,6 +162,26 @@ namespace secw
     
     return document;
   }
+  
+  void ConsumerAccessor::setCallbackOnUpdate(UpdatedCallback updatedCallback)
+  {
+    m_clientAccessor->setCallbackOnUpdate(updatedCallback);
+  }
+
+  void ConsumerAccessor::setCallbackOnCreate(CreatedCallback createdCallback)
+  {
+    m_clientAccessor->setCallbackOnCreate(createdCallback);
+  }
+
+  void ConsumerAccessor::setCallbackOnDelete(DeletedCallback deletedCallback)
+  {
+    m_clientAccessor->setCallbackOnDelete(deletedCallback);
+  }
+
+  void ConsumerAccessor::setCallbackOnStart(StartedCallback startedCallback)
+  {
+    m_clientAccessor->setCallbackOnStart(startedCallback);
+  }
 
 } //namespace secw
 

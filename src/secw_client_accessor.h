@@ -25,12 +25,20 @@
 #include "secw_document.h"
 #include "secw_exception.h"
 
-#include "cxxtools/serializationinfo.h"
+#include <cxxtools/serializationinfo.h>
+#include <thread>
+#include <mutex>
+#include <functional>
 
 namespace secw
 {
   using ClientId = std::string;
-  
+
+  using CreatedCallback = std::function<void(const std::string&, DocumentPtr)> ;
+  using UpdatedCallback = std::function<void(const std::string&, DocumentPtr, DocumentPtr)> ;
+  using DeletedCallback = std::function<void(const std::string&, DocumentPtr)> ;
+  using StartedCallback = std::function<void()>;
+
   class ClientAccessor
   {
   public:
@@ -41,13 +49,34 @@ namespace secw
     ~ClientAccessor();
 
     std::vector<std::string> sendCommand(const std::string & command, const std::vector<std::string> & frames) const;
-    
+
+    void setCallbackOnUpdate(UpdatedCallback updatedCallback = nullptr);
+    void setCallbackOnCreate(CreatedCallback createdCallback= nullptr);
+    void setCallbackOnDelete(DeletedCallback deletedCallback= nullptr);
+    void setCallbackOnStart(StartedCallback startedCallback= nullptr);
+
   private:
     ClientId m_clientId;
     uint32_t m_timeout;
     std::string m_endPoint;
+
+    //callbacks
+    UpdatedCallback m_updatedCallback;
+    CreatedCallback m_createdCallback;
+    DeletedCallback m_deletedCallback;
+    StartedCallback m_startedCallback;
+
+    //thread which handle notification and call the correct callback.
+    std::thread m_notificationThread;
+    bool m_stopRequested = false;
+    void notificationHandler();
+    std::mutex m_handlerFunctionStarting;
+    std::mutex m_handlerFunctionLock;
+
+    //funtions to start or stop the thread
+    void updateNotificationThread();
+
   };
-  
 } //namespace secw
 
 //  @interface
