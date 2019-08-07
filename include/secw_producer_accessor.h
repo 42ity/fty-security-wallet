@@ -27,6 +27,11 @@
 namespace secw
 {
   using ClientId = std::string;
+  
+  using CreatedCallback = std::function<void(const std::string&, DocumentPtr)> ;
+  using UpdatedCallback = std::function<void(const std::string&, DocumentPtr, DocumentPtr)> ;
+  using DeletedCallback = std::function<void(const std::string&, DocumentPtr)> ;
+  using StartedCallback = std::function<void()>;
 
   class ClientAccessor;
   
@@ -147,6 +152,11 @@ namespace secw
     void deleteDocument(
       const std::string & portfolio,
       const Id & id) const;
+
+    void setCallbackOnUpdate(UpdatedCallback updatedCallback = nullptr);
+    void setCallbackOnCreate(CreatedCallback createdCallback= nullptr);
+    void setCallbackOnDelete(DeletedCallback deletedCallback= nullptr);
+    void setCallbackOnStart(StartedCallback startedCallback= nullptr);
   
   private:
     std::shared_ptr<ClientAccessor> m_clientAccessor;

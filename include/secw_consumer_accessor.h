@@ -22,9 +22,16 @@
 #ifndef SECW_CONSUMER_ACCESSOR_H_INCLUDED
 #define SECW_CONSUMER_ACCESSOR_H_INCLUDED
 
+#include <functional>
+
 namespace secw
 {
   using ClientId = std::string;
+
+  using CreatedCallback = std::function<void(const std::string&, DocumentPtr)> ;
+  using UpdatedCallback = std::function<void(const std::string&, DocumentPtr, DocumentPtr)> ;
+  using DeletedCallback = std::function<void(const std::string&, DocumentPtr)> ;
+  using StartedCallback = std::function<void()>;
 
   class ClientAccessor;
   
@@ -115,6 +122,12 @@ namespace secw
     DocumentPtr getDocumentWithPrivateDataByName(
       const std::string & portfolio,
       const std::string & name) const;
+
+    void setCallbackOnUpdate(UpdatedCallback updatedCallback = nullptr);
+    void setCallbackOnCreate(CreatedCallback createdCallback= nullptr);
+    void setCallbackOnDelete(DeletedCallback deletedCallback= nullptr);
+    void setCallbackOnStart(StartedCallback startedCallback= nullptr);
+
   
   private:
     std::shared_ptr<ClientAccessor> m_clientAccessor;

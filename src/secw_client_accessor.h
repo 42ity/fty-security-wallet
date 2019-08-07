@@ -27,10 +27,17 @@
 
 #include <cxxtools/serializationinfo.h>
 #include <thread>
+#include <mutex>
+#include <functional>
 
 namespace secw
 {
   using ClientId = std::string;
+
+  using CreatedCallback = std::function<void(const std::string&, DocumentPtr)> ;
+  using UpdatedCallback = std::function<void(const std::string&, DocumentPtr, DocumentPtr)> ;
+  using DeletedCallback = std::function<void(const std::string&, DocumentPtr)> ;
+  using StartedCallback = std::function<void()>;
 
   class ClientAccessor
   {
@@ -43,14 +50,10 @@ namespace secw
 
     std::vector<std::string> sendCommand(const std::string & command, const std::vector<std::string> & frames) const;
 
-    //void setCallbackOnUpdate (std::function<void(const std::string&, DocumentPtr, DocumentPtr)>& updateCallback=nullptr);
-    //{ m_updateCallback = updateCallback; }
-    void setCallbackOnCreate (std::function<void(const std::string&, DocumentPtr)>& createCallback=nullptr);
-    //{ m_createCallback = createCallback; }
-    //void setCallbackOnDelete (std::function<void(const std::string&, DocumentPtr)>& deleteCallback=nullptr);
-    //{ m_deleteCallback = deleteCallback; }
-    //void setCallbackOnStart (std::function<void(void)>& startCallback=nullptr);
-    //{ m_startCallback = startCallback; }
+    void setCallbackOnUpdate(UpdatedCallback updatedCallback = nullptr);
+    void setCallbackOnCreate(CreatedCallback createdCallback= nullptr);
+    void setCallbackOnDelete(DeletedCallback deletedCallback= nullptr);
+    void setCallbackOnStart(StartedCallback startedCallback= nullptr);
 
   private:
     ClientId m_clientId;
@@ -58,13 +61,20 @@ namespace secw
     std::string m_endPoint;
 
     //callbacks
-    std::function<void(const std::string&, DocumentPtr, DocumentPtr)> m_updateCallback;
-    std::function<void(const std::string&, DocumentPtr)> m_createCallback;
-    std::function<void(const std::string&, DocumentPtr)> m_deleteCallback;
-    std::function<void(void)> m_startCallback;
+    UpdatedCallback m_updatedCallback;
+    CreatedCallback m_createdCallback;
+    DeletedCallback m_deletedCallback;
+    StartedCallback m_startedCallback;
 
+    //thread which handle notification and call the correct callback.
     std::thread m_notificationThread;
-    void notificationListener(void) noexcept;
+    bool m_stopRequested = false;
+    void notificationHandler();
+    std::mutex m_handlerFunctionStarting;
+    std::mutex m_handlerFunctionLock;
+
+    //funtions to start or stop the thread
+    void updateNotificationThread();
 
   };
 } //namespace secw
