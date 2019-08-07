@@ -423,8 +423,10 @@ SecurityWalletServer::sendNotification (const std::string & payload)
 
     zmsg_t *notification = zmsg_new ();
     zmsg_addstr (notification, payload.c_str ());
+
     rc = mlm_client_send (client, "NOTIFICATION", &notification);
 
+    std::cerr << "NOTIFICATION SENT:" << payload << std::endl;
     if (rc != 0)
     {
       zmsg_destroy(&notification);
@@ -545,13 +547,13 @@ std::string SecurityWalletServer::handleCreate(const Sender & sender, const std:
         }
     }
     
-    //prepare result
-    std::string result = portfolio.add(doc);
+    //prepare result => new id
+    std::string newId = portfolio.add(doc);
     
     m_activeWallet->save();
 
-    sendNotificationOnCreate(portfolioName, doc);
-    return result;
+    sendNotificationOnCreate(portfolioName, portfolio.getDocument(newId));
+    return newId;
 }
 
 std::string SecurityWalletServer::handleDelete(const Sender & sender, const std::vector<std::string> & params)

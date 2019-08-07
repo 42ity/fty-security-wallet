@@ -222,8 +222,6 @@ namespace secw
       void *which = zpoller_wait (poller, -1);
       if (which == mlm_client_msgpipe (client))
       {
-        std::cerr << "notificationHandler: Message received." << std::endl;
-
         //check if we need to leave the loop
         if(m_stopRequested)
         {
@@ -231,13 +229,19 @@ namespace secw
           break;
         }
 
+        ZmsgGuard msg (mlm_client_recv (client));
+
+        //Get number of frame all the frame
+        size_t numberOfFrame = zmsg_size(msg);
+
         try
         {
           //treat only the notification
-          if (mlm_client_subject (client) == "NOTIFICATIONS")
+          if (numberOfFrame == 1)
           {
-            ZmsgGuard msg (mlm_client_recv (client));
             ZstrGuard notification (zmsg_popstr (msg));
+
+            std::cerr << "notificationHandler: Notification received." << std::endl;
 
             cxxtools::SerializationInfo si = deserialize(std::string(notification.get()));
             
@@ -320,8 +324,6 @@ namespace secw
         }
 
       }
-
-      
     }
 
     zpoller_destroy(&poller);
