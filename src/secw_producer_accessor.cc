@@ -229,8 +229,6 @@ std::mutex g_lock;
 
 void callbackCreate(const std::string& portfolio, secw::DocumentPtr newDoc)
 {
-  std::cerr << "callback CREATED" << std::endl;
-  
   g_action = "CREATED";
   g_portfolio = portfolio;
   g_newDoc = newDoc->clone();
@@ -240,8 +238,6 @@ void callbackCreate(const std::string& portfolio, secw::DocumentPtr newDoc)
 
 void callbackUpdated(const std::string& portfolio, secw::DocumentPtr oldDoc, secw::DocumentPtr newDoc)
 {
-  std::cerr << "callback UPDATED" << std::endl;
-
   g_action = "UPDATED";
   g_portfolio = portfolio;
   g_newDoc = newDoc->clone();
@@ -252,8 +248,6 @@ void callbackUpdated(const std::string& portfolio, secw::DocumentPtr oldDoc, sec
 
 void callbackDeleted(const std::string& portfolio, secw::DocumentPtr oldDoc)
 {
-  std::cerr << "callback DELETED" << std::endl;
-
   g_action = "DELETED";
   g_portfolio = portfolio;
   g_oldDoc = oldDoc->clone();

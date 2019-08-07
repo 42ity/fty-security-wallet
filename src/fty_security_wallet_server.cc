@@ -426,7 +426,6 @@ SecurityWalletServer::sendNotification (const std::string & payload)
 
     rc = mlm_client_send (client, "NOTIFICATION", &notification);
 
-    std::cerr << "NOTIFICATION SENT:" << payload << std::endl;
     if (rc != 0)
     {
       zmsg_destroy(&notification);
