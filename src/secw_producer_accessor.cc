@@ -770,6 +770,10 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
     ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+
+    //register the callback on update
+    producerAccessor.setCallbackOnUpdate(callbackUpdated);
+
     try
     {
      DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
@@ -781,8 +785,16 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
       //update with wrong data
       snmpv3->setSecurityName("");
 
+      g_action = "";
+      g_portfolio = "";
+      g_newDoc = nullptr;
+
       //update
       producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(snmpv3));
+
+      if(g_action != "") throw std::runtime_error("Non-empty action");
+      if(g_portfolio != "") throw std::runtime_error("Non-empty portfolio");
+      if(g_newDoc != nullptr) throw std::runtime_error("Non-empty data");
 
       throw std::runtime_error("Document has been updated");
     }
