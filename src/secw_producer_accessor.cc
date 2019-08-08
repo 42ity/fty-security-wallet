@@ -25,7 +25,11 @@
 @discuss
 @end
 */
+#include <chrono>
 #include "fty_security_wallet_classes.h"
+
+#define TEST_TIMEOUT 5
+
 namespace secw
 {
   ProducerAccessor::ProducerAccessor(	const ClientId & clientId,
@@ -226,39 +230,44 @@ std::string g_portfolio;
 std::string g_action;
 
 std::mutex g_lock;
+std::condition_variable g_condvar;
 
 void callbackCreate(const std::string& portfolio, secw::DocumentPtr newDoc)
 {
+  std::unique_lock<std::mutex> lock(g_lock);
+  log_debug ("callback CREATED");
   g_action = "CREATED";
   g_portfolio = portfolio;
   g_newDoc = newDoc->clone();
-
-  g_lock.unlock();
+  g_condvar.notify_all();
 }
 
 void callbackUpdated(const std::string& portfolio, secw::DocumentPtr oldDoc, secw::DocumentPtr newDoc)
 {
+  std::unique_lock<std::mutex> lock(g_lock);
+  log_debug ("callback UPDATED");
   g_action = "UPDATED";
   g_portfolio = portfolio;
   g_newDoc = newDoc->clone();
   g_oldDoc = oldDoc->clone();
-
-  g_lock.unlock();
+  g_condvar.notify_all();
 }
 
 void callbackDeleted(const std::string& portfolio, secw::DocumentPtr oldDoc)
 {
+  std::unique_lock<std::mutex> lock(g_lock);
+  log_debug ("callback DELETED");
   g_action = "DELETED";
   g_portfolio = portfolio;
   g_oldDoc = oldDoc->clone();
-
-  g_lock.unlock(); 
+  g_condvar.notify_all();
 }
 
 /*void callbackStarted() Cannot be tested here
 {
+  std::unique_lock<std::mutex> lock(g_lock);
   g_action = "STARTED";
-  g_lock.unlock();
+  g_condvar.notify_all();
 }*/
 
 
@@ -591,8 +600,8 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
 
       snmpv3Doc->addUsage("discovery_monitoring");
 
-      //lock to wait for the callback => the callback will unlock it if called properly
-      g_lock.lock();
+      //lock to wait for the callback => the callback will notify this thread if called properly
+      std::unique_lock<std::mutex> lock(g_lock);
       g_action = "";
       g_portfolio = "";
       g_newDoc = nullptr;
@@ -600,8 +609,11 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
       id = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<Document>(snmpv3Doc));
 
       //wait for the callback to finish
-      g_lock.lock();
-      g_lock.unlock();
+      if (g_condvar.wait_for(lock, std::chrono::seconds(TEST_TIMEOUT)) == std::cv_status::timeout)
+      {
+          throw std::runtime_error ("Timed out when waiting for callback to finish");
+
+      }
 
       //check that the doc is inserted and the callback called
       if(g_action != "CREATED") throw std::runtime_error("Wrong action in the callback");
@@ -615,8 +627,6 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
     }
     catch(const std::exception& e)
     {
-      g_lock.try_lock();
-      g_lock.unlock();
       printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
       printf("Error: %s\n",e.what());
       testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
@@ -685,8 +695,8 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
       snmpv3->setSecurityName("test update security snmpv3");
       snmpv3->setPrivPassword("new password");
 
-      //lock to wait for the callback => the callback will unlock it if called properly
-      g_lock.lock();
+      //lock to wait for the callback => the callback will notify this thread if called properly
+      std::unique_lock<std::mutex> lock(g_lock);
       g_action = "";
       g_portfolio = "";
       g_oldDoc = nullptr;
@@ -696,8 +706,10 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
       producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(snmpv3));
 
       //wait for the callback to finish
-      g_lock.lock();
-      g_lock.unlock();
+      if (g_condvar.wait_for(lock, std::chrono::seconds(TEST_TIMEOUT)) == std::cv_status::timeout)
+      {
+          throw std::runtime_error ("Timed out when waiting for callback to finish");
+      }
 
       //check that the doc is inserted and the callback called
       if(g_action != "UPDATED") throw std::runtime_error("Wrong action in the callback");
@@ -818,8 +830,8 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
 
     try
     {
-      //lock to wait for the callback => the callback will unlock it if called properly
-      g_lock.lock();
+      //lock to wait for the callback => the callback will notify this thread if called properly
+      std::unique_lock<std::mutex> lock(g_lock);
       g_action = "";
       g_portfolio = "";
       g_oldDoc = nullptr;
@@ -827,8 +839,10 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
       producerAccessor.deleteDocument("default", id);
 
       //wait for the callback to finish
-      g_lock.lock();
-      g_lock.unlock();
+      if (g_condvar.wait_for(lock, std::chrono::seconds(TEST_TIMEOUT)) == std::cv_status::timeout)
+      {
+          throw std::runtime_error ("Timed out when waiting for callback to finish");
+      }
 
       //check that the doc is inserted and the callback called
       if(g_action != "DELETED") throw std::runtime_error("Wrong action in the callback");
