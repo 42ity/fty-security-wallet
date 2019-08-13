@@ -98,14 +98,16 @@ typedef struct _secw_producer_accessor_t secw_producer_accessor_t;
 #define SECW_PRODUCER_ACCESSOR_T_DEFINED
 typedef struct _secw_consumer_accessor_t secw_consumer_accessor_t;
 #define SECW_CONSUMER_ACCESSOR_T_DEFINED
+typedef struct _secw_security_wallet_server_t secw_security_wallet_server_t;
+#define SECW_SECURITY_WALLET_SERVER_T_DEFINED
 typedef struct _secw_snmpv3_t secw_snmpv3_t;
 #define SECW_SNMPV3_T_DEFINED
 typedef struct _secw_snmpv1_t secw_snmpv1_t;
 #define SECW_SNMPV1_T_DEFINED
 typedef struct _secw_user_and_password_t secw_user_and_password_t;
 #define SECW_USER_AND_PASSWORD_T_DEFINED
-typedef struct _fty_security_wallet_server_t fty_security_wallet_server_t;
-#define FTY_SECURITY_WALLET_SERVER_T_DEFINED
+typedef struct _fty_security_wallet_mlm_agent_t fty_security_wallet_mlm_agent_t;
+#define FTY_SECURITY_WALLET_MLM_AGENT_T_DEFINED
 #endif // FTY_SECURITY_WALLET_BUILD_DRAFT_API
 
 
@@ -119,10 +121,11 @@ typedef struct _fty_security_wallet_server_t fty_security_wallet_server_t;
 #include "secw_exception.h"
 #include "secw_producer_accessor.h"
 #include "secw_consumer_accessor.h"
+#include "secw_security_wallet_server.h"
 #include "secw_snmpv3.h"
 #include "secw_snmpv1.h"
 #include "secw_user_and_password.h"
-#include "fty_security_wallet_server.h"
+#include "fty_security_wallet_mlm_agent.h"
 #endif // FTY_SECURITY_WALLET_BUILD_DRAFT_API
 
 #ifdef FTY_SECURITY_WALLET_BUILD_DRAFT_API

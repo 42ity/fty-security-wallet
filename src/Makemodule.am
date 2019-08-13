@@ -32,10 +32,11 @@ src_libfty_security_wallet_la_SOURCES += \
     src/secw_exception.cc \
     src/secw_producer_accessor.cc \
     src/secw_consumer_accessor.cc \
+    src/secw_security_wallet_server.cc \
     src/secw_snmpv3.cc \
     src/secw_snmpv1.cc \
     src/secw_user_and_password.cc \
-    src/fty_security_wallet_server.cc
+    src/fty_security_wallet_mlm_agent.cc
 
 endif
 

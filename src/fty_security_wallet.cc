@@ -104,7 +104,7 @@ int main (int argc, char *argv [])
     log_info(SECURITY_WALLET_AGENT " starting");
 
     //start broker agent
-    zactor_t *secw_server = zactor_new (fty_security_wallet_server, (void *)endpoint);
+    zactor_t *secw_server = zactor_new (fty_security_wallet_mlm_agent, (void *)endpoint);
     //set configuration parameters
     zstr_sendx (secw_server, "STORAGE_CONFIGURATION_PATH", storage_access_path.get(), NULL);
     zstr_sendx (secw_server, "STORAGE_DATABASE_PATH", storage_database_path.get(), NULL);
