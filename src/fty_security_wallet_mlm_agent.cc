@@ -46,15 +46,11 @@
 using namespace secw;
 using namespace std::placeholders;
 
-std::shared_ptr<SecurityWalletServer> SecurityWalletMlmAgent::m_secwServer = std::shared_ptr<SecurityWalletServer>(nullptr);
-
-static std::string g_storageconfigurationPath = DEFAULT_STORAGE_CONFIGURATION_PATH;
-static std::string g_storageDatabasePath = DEFAULT_STORAGE_DATABASE_PATH;
-
-static std::string g_endpoint = DEFAULT_ENDPOINT;
-
 SecurityWalletMlmAgent::SecurityWalletMlmAgent(zsock_t *pipe)
-    : mlm::MlmAgent(pipe)
+    :   mlm::MlmAgent(pipe),
+        m_storageconfigurationPath(DEFAULT_STORAGE_CONFIGURATION_PATH),
+        m_storageDatabasePath(DEFAULT_STORAGE_DATABASE_PATH),
+        m_endpoint(DEFAULT_ENDPOINT)
 {}
 
 bool SecurityWalletMlmAgent::handlePipe(zmsg_t *message)
@@ -69,29 +65,34 @@ bool SecurityWalletMlmAgent::handlePipe(zmsg_t *message)
     }
     else if (streq (actor_command, "CONNECT"))
     {
+        ZstrGuard endpoint(zmsg_popstr(message));
+        m_endpoint = std::string(endpoint.get());
+        
+        ZstrGuard name(zmsg_popstr (message));
+        
         m_secwServer = std::make_shared<SecurityWalletServer>
-                            (   g_storageconfigurationPath,
-                                g_storageDatabasePath,
-                                std::bind(&SecurityWalletMlmAgent::publishOnBus, this, "NOTIFICATION", _1)
+                            (   m_storageconfigurationPath,
+                                m_storageDatabasePath,
+                                std::bind(&SecurityWalletMlmAgent::publishOnBus, this, _1)
                             );
         
-        log_debug("Wallet found in %s",g_storageDatabasePath.c_str());
-
-        ZstrGuard g_endpoint(zmsg_popstr(message));
-        ZstrGuard name(zmsg_popstr (message));
-        if (g_endpoint && name) {
-            connect(g_endpoint,name);
+        log_debug("Wallet found in %s", m_storageDatabasePath.c_str());
+        
+        
+        if (name)
+        {
+            connect(m_endpoint.c_str() ,name);
         }
     }
     else if (streq (actor_command, "STORAGE_CONFIGURATION_PATH"))
     {
         ZstrGuard storage_access_path(zmsg_popstr(message));
-        g_storageconfigurationPath = std::string(storage_access_path.get());
+        m_storageconfigurationPath = std::string(storage_access_path.get());
     }
     else if (streq (actor_command, "STORAGE_DATABASE_PATH"))
     {
         ZstrGuard storage_database_path(zmsg_popstr(message));
-        g_storageDatabasePath = std::string(storage_database_path.get());
+        m_storageDatabasePath = std::string(storage_database_path.get());
     }
     else
     {
@@ -245,7 +246,7 @@ bool SecurityWalletMlmAgent::handleMailbox(zmsg_t *message)
     return true;
 }
 
-void SecurityWalletMlmAgent::publishOnBus(const std::string & messageType, const std::string & payload)
+void SecurityWalletMlmAgent::publishOnBus(const std::string & payload)
 {
     //std::cerr << "Publish on Bus <" << messageType << ">:" << payload << std::endl;
     
@@ -265,7 +266,7 @@ void SecurityWalletMlmAgent::publishOnBus(const std::string & messageType, const
 
     std::string uniqueId = ss.str();
 
-    int rc = mlm_client_connect (client, g_endpoint.c_str(), 1000, uniqueId.c_str());
+    int rc = mlm_client_connect (client, m_endpoint.c_str(), 1000, uniqueId.c_str());
 
     if (rc != 0)
     {
@@ -283,7 +284,7 @@ void SecurityWalletMlmAgent::publishOnBus(const std::string & messageType, const
     zmsg_t *notification = zmsg_new ();
     zmsg_addstr (notification, payload.c_str ());
 
-    rc = mlm_client_send (client, messageType.c_str(), &notification);
+    rc = mlm_client_send (client, "NOTIFICATION", &notification);
 
     if (rc != 0)
     {

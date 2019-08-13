@@ -23,6 +23,7 @@
 #define FTY_SECURITY_WALLET_MLM_AGENT_H_INCLUDED
 
 #include "fty_common_mlm_agent.h"
+#include "fty_security_wallet_classes.h"
 
 #include <functional>
 
@@ -43,7 +44,11 @@ namespace secw
     {
     private:
         //attributs
-        static std::shared_ptr<SecurityWalletServer> m_secwServer;
+        std::string m_storageconfigurationPath;
+        std::string m_storageDatabasePath;
+        std::string m_endpoint;
+        std::shared_ptr<SecurityWalletServer> m_secwServer;
+
 
     public:
         explicit SecurityWalletMlmAgent(zsock_t *pipe);
@@ -53,7 +58,7 @@ namespace secw
         bool handlePipe(zmsg_t *message) override;
      
         //Notification function
-        void publishOnBus(const std::string & messageType, const std::string & payload);
+        void publishOnBus(const std::string & payload);
 
         //Helpers
         static zmsg_t *generateErrorMsg(const std::string & correlationId, const std::string & errPayload);
@@ -64,7 +69,7 @@ namespace secw
 } // namespace secw
 
 //  @interface
-//  Create an fty_security_wallet_mlmagent actor
+//  Create an fty_security_wallet_mlm_agent actor
 FTY_SECURITY_WALLET_EXPORT void 
     fty_security_wallet_mlm_agent(zsock_t *pipe, void *endpoint);
 
