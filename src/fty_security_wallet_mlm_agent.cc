@@ -127,21 +127,20 @@ bool SecurityWalletMlmAgent::handleMailbox(zmsg_t *message)
         
         /*  Message is valid if the header contain at least the following frame:
          * 0. Correlation id
-         * 1. Command
+         * 1. data
          */
         
         //TODO define a maximum to avoid DOS
         
         ZstrGuard ptrCorrelationId( zmsg_popstr(message) );
-        ZstrGuard ptrCommand( zmsg_popstr(message) );
         
-        std::vector<std::string> params;
+        std::vector<std::string> payload;
     
         //we unstack all the other starting by the 3rd one.
-        for(size_t index = 2; index < numberOfFrame; index++)
+        for(size_t index = 1; index < numberOfFrame; index++)
         {
             ZstrGuard param( zmsg_popstr(message) );
-            params.push_back( std::string(param.get()) );
+            payload.push_back( std::string(param.get()) );
         }
         
         //Ensure the presence of data from the request
@@ -152,95 +151,45 @@ bool SecurityWalletMlmAgent::handleMailbox(zmsg_t *message)
         
         if(correlationId.empty())
         {
-            throw SecwProtocolErrorException("Correlation id frame is empty");
+            //no correlation id, it's a bad frame we ignore it
+            throw std::runtime_error("Correlation id frame is empty");
         }
         
-        Command command;
-        
-        if(ptrCommand != nullptr)
-        {
-            command = Command(ptrCommand.get());
-        }
-              
-        if (command.empty())
-        {
-            throw SecwProtocolErrorException("Command frame is empty");
-        }
-        
-        // Don't reply to ERROR messages
-        if (command == "ERROR")
-        {
-            log_warning ("Received <%s> message from '%s', ignoring", command.c_str(),
-                mlm_client_sender (client()) );
-            
-            return true;
-        }
-
         //extract the sender from unique sender id: <Sender>.[thread id in hexa]
         Sender sender = uniqueSender.substr(0, (uniqueSender.size()-(sizeof(pid_t)*2)-1));
         
-        //Execute the command
-        std::string result = m_secwServer->runCommand(command, sender, params);
+        //Execute the request
+        std::vector<std::string> results = m_secwServer->handleRequest(sender, payload);
 
-        //send the result
-        zmsg_t *reply = zmsg_new();
-        
-        zmsg_addstr (reply, correlationId.c_str());
-        zmsg_addstr (reply, result.c_str());
-
-        int rv = mlm_client_sendto (client(), mlm_client_sender (client()),
-                            "REPLY", NULL, 1000, &reply);
-        if (rv != 0)
+        //send the result if it's not empty
+        if(!results.empty())
         {
-            log_error ("s_handle_mailbox: failed to send reply to %s ",
-                    mlm_client_sender (client()));
-        }
+            zmsg_t *reply = zmsg_new();
+        
+            zmsg_addstr (reply, correlationId.c_str());
+            
+            for(const std::string & result : results)
+            {
+                zmsg_addstr (reply, result.c_str());
+            }
 
-    }
-    catch(SecwException &e)
-    {
-        log_warning("%s", e.what());
-        
-        //send the error
-        zmsg_t *reply = generateErrorMsg(correlationId, e.toJson());
-        
-        int rv = mlm_client_sendto (client(), mlm_client_sender (client()),
+            int rv = mlm_client_sendto (client(), mlm_client_sender (client()),
                                 "REPLY", NULL, 1000, &reply);
-        if (rv != 0)
-        {
-            log_error ("secw_handle_mailbox: failed to send reply to %s ",
+            if (rv != 0)
+            {
+                log_error ("s_handle_mailbox: failed to send reply to %s ",
                         mlm_client_sender (client()));
+            }
         }
+        
     }
     catch (std::exception &e)
     {
         log_error("Unexpected error: %s", e.what());
-        
-        //send the error
-        zmsg_t *reply = generateErrorMsg(correlationId, "");
-        
-        int rv = mlm_client_sendto (client(), mlm_client_sender (client()),
-                                "REPLY", NULL, 1000, &reply);
-        if (rv != 0)
-        {
-            log_error ("secw_handle_mailbox: failed to send reply to %s ",
-                        mlm_client_sender (client()));
-        }
     }
     catch (...) //show must go one => Log and ignore the unknown error
     {
         log_error("Unexpected error: unknown");
-        
-        //send the error
-        zmsg_t *reply = generateErrorMsg(correlationId, "");
-        
-        int rv = mlm_client_sendto (client(), mlm_client_sender (client()),
-                                "REPLY", NULL, 1000, &reply);
-        if (rv != 0)
-        {
-            log_error ("secw_handle_mailbox: failed to send reply to %s ",
-                        mlm_client_sender (client()));
-        }
     }
 
     return true;
@@ -296,17 +245,6 @@ void SecurityWalletMlmAgent::publishOnBus(const std::string & payload)
     mlm_client_destroy (&client);
     
     //std::cerr << "Publish on Bus Done!" << std::endl;
-}
-
-/* Helpers section */
-
-zmsg_t * SecurityWalletMlmAgent::generateErrorMsg( const std::string & correlationId,  const std::string & errPayload)
-{
-    zmsg_t *error = zmsg_new();
-    zmsg_addstr (error, correlationId.c_str());
-    zmsg_addstr (error, "ERROR");
-    zmsg_addstr (error, errPayload.c_str());
-    return error;
 }
 
 /* external interface */

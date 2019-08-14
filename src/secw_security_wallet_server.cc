@@ -67,17 +67,56 @@ SecurityWalletServer::SecurityWalletServer( const std::string & configurationPat
     m_supportedCommands[UPDATE] = std::bind(&SecurityWalletServer::handleUpdate, this, _1, _2);
 }
 
-std::string SecurityWalletServer::runCommand(const Command & cmd, const Sender & sender, const std::vector<std::string> & params)
+std::vector<std::string> SecurityWalletServer::handleRequest(const Sender & sender, const std::vector<std::string> & payload)
 {
-    //check if the command exist in the system
-    if( m_supportedCommands.count(cmd) == 0)
+    try
     {
-        throw SecwUnsupportedCommandException(cmd + " not supported");
-    }
+        if(payload.size() == 0)
+        {
+            throw SecwProtocolErrorException("Command frame is empty");
+        }
+        
+        Command cmd = payload.at(0);
+        
+        if(cmd == "ERROR" || cmd == "OK")
+        {
+            //avoid loop
+            return {};
+        }
+        
+        //check if the command exist in the system
+        if( m_supportedCommands.count(cmd) == 0)
+        {
+            throw SecwUnsupportedCommandException(cmd + " not supported");
+        }
 
-    FctCommandHandler cmdHandler = m_supportedCommands[cmd];
+        FctCommandHandler cmdHandler = m_supportedCommands[cmd];
+        
+        // Declaring new vector 
+        std::vector<std::string> params; 
+  
+        // Copying vector by copy function 
+        std::copy(payload.begin()+1, payload.end(), back_inserter(params)); 
     
-    return cmdHandler(sender, params);
+        std::string result = cmdHandler(sender, params);
+    
+        return {result};
+    }
+    catch(SecwException &e)
+    {
+        log_warning("%s", e.what());
+        return {"ERROR", e.toJson()};
+    }
+    catch (std::exception &e)
+    {
+        log_error("Unexpected error: %s", e.what());
+        return {"ERROR",""};
+    }
+    catch (...) //show must go one => Log and ignore the unknown error
+    {
+        log_error("Unexpected error: unknown");
+        return {"ERROR",""};
+    }
 }
 
 

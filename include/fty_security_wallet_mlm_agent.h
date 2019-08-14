@@ -1,5 +1,5 @@
 /*  =========================================================================
-    fty_security_wallet_mlmagent - Security Wallet malamute agent
+    fty_security_wallet_mlm_agent - Security Wallet malamute agent
 
     Copyright (C) 2019 Eaton
 
@@ -23,7 +23,6 @@
 #define FTY_SECURITY_WALLET_MLM_AGENT_H_INCLUDED
 
 #include "fty_common_mlm_agent.h"
-#include "fty_security_wallet_classes.h"
 
 #include <functional>
 
@@ -33,7 +32,6 @@
  */
 namespace secw
 {
-    using Command   = std::string;
     using Sender    = std::string;
     using Subject   = std::string;
 
@@ -59,10 +57,6 @@ namespace secw
      
         //Notification function
         void publishOnBus(const std::string & payload);
-
-        //Helpers
-        static zmsg_t *generateErrorMsg(const std::string & correlationId, const std::string & errPayload);
-
     };
 
 

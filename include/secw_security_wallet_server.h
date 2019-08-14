@@ -48,7 +48,7 @@ namespace secw
                                         const std::string & databasePath,
                                         FctNotifier notifier = nullptr);
         
-        std::string runCommand(const Command & cmd, const Sender & sender, const std::vector<std::string> & params);
+        std::vector<std::string> handleRequest(const Sender & sender, const std::vector<std::string> & payload);
 
     private:
         // List of supported commands with a reference to the handler for this command.
