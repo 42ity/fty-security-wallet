@@ -22,8 +22,6 @@
 #ifndef SECW_SECURITY_WALLET_SERVER_H_INCLUDED
 #define SECW_SECURITY_WALLET_SERVER_H_INCLUDED
 
-#include "fty_common_mlm_agent.h"
-
 #include <functional>
 #include "secw_security_wallet.h"
 

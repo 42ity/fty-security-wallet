@@ -41,6 +41,10 @@ typedef struct _cam_credential_asset_mapping_storage_t cam_credential_asset_mapp
 typedef struct _cam_helpers_t cam_helpers_t;
 #define CAM_HELPERS_T_DEFINED
 #endif
+#ifndef SECW_SECURITY_WALLET_SERVER_T_DEFINED
+typedef struct _secw_security_wallet_server_t secw_security_wallet_server_t;
+#define SECW_SECURITY_WALLET_SERVER_T_DEFINED
+#endif
 #ifndef SECW_SECURITY_WALLET_T_DEFINED
 typedef struct _secw_security_wallet_t secw_security_wallet_t;
 #define SECW_SECURITY_WALLET_T_DEFINED
@@ -68,6 +72,7 @@ typedef struct _secw_configuration_t secw_configuration_t;
 
 #include "cam_credential_asset_mapping_storage.h"
 #include "cam_helpers.h"
+#include "secw_security_wallet_server.h"
 #include "secw_security_wallet.h"
 #include "secw_portfolio.h"
 #include "secw_client_accessor.h"

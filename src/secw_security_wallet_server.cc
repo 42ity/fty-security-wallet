@@ -92,11 +92,8 @@ std::vector<std::string> SecurityWalletServer::handleRequest(const Sender & send
         FctCommandHandler cmdHandler = m_supportedCommands[cmd];
         
         // Declaring new vector 
-        std::vector<std::string> params; 
+        std::vector<std::string> params(payload.begin()+1, payload.end());
   
-        // Copying vector by copy function 
-        std::copy(payload.begin()+1, payload.end(), back_inserter(params)); 
-    
         std::string result = cmdHandler(sender, params);
     
         return {result};

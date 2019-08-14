@@ -161,6 +161,8 @@
     <class name = "cam_helpers" private = "1" selftest = "0">List of helper functions use a bit everywhere</class>
 
     <!-- Note: Secw class -->
+    <class name = "secw_security_wallet_server" private = "1" selftest = "0">Security Wallet Server</class>
+    
     <class name = "secw_security_wallet" private = "1" selftest = "0">Security wallet to manage the storage and access</class>
     <class name = "secw_portfolio" private = "1" selftest = "0">Portfolio to handle documents in the agent</class>
 
@@ -174,8 +176,6 @@
     
     <class name = "secw_producer_accessor" selftest = "0">Accessor to return documents from the agent</class>
     <class name = "secw_consumer_accessor" selftest = "0">Accessor to return documents from the agent</class>
-
-    <class name = "secw_security_wallet_server" selftest = "0">Security Wallet Server</class>
     
     <!-- Note: Add new supported types here and modify secw_document.cc to handle then in the Document factory -->
     <class name = "secw_snmpv3" selftest = "0">Document parsers for snmpv3 document</class>

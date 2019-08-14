@@ -16,7 +16,6 @@ include_HEADERS += \
     secw_exception.h \
     secw_producer_accessor.h \
     secw_consumer_accessor.h \
-    secw_security_wallet_server.h \
     secw_snmpv3.h \
     secw_snmpv1.h \
     secw_user_and_password.h \
