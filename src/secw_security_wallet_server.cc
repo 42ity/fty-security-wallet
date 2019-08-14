@@ -32,7 +32,6 @@
 #include <cxxtools/jsonserializer.h>
 
 #include "secw_exception.h"
-#include "secw_security_wallet.h"
 #include "secw_configuration.h"
 #include "secw_document.h"
 
