@@ -64,7 +64,7 @@ int main (int argc, char *argv [])
                 ++argn;
             }
         }
-
+        
         // Parse config file
         std::string secw_actor_name(SECURITY_WALLET_AGENT);
         std::string endpoint(DEFAULT_ENDPOINT);
