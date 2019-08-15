@@ -36,19 +36,31 @@
 
 #include "cam_helpers.h"
 
-#include <fty_common_mlm.h>
+#include "fty_common_mlm.h"
+
 #include "fty_credential_asset_mapping_server.h"
 #include "fty_security_wallet.h"
 
 namespace cam
 {
-  Accessor::Accessor(const ClientId & clientId,
-                  uint32_t timeout,
-                  const std::string & endPoint):
-    m_clientId(clientId),
-    m_timeout(timeout),
-    m_endPoint(endPoint)
-  {}
+  Accessor::Accessor( fty::SyncClient & requestClient)
+    : m_mlmClient(), m_requestClient(requestClient)
+  {
+  }
+  
+  Accessor::Accessor(   const ClientId & clientId,
+                        uint32_t timeout,
+                        const std::string & endPoint)
+    : m_mlmClient(std::make_shared<mlm::MlmSyncClient>
+                        (   clientId,
+                            MAPPING_AGENT,
+                            timeout,
+                            endPoint
+                        )),
+     m_requestClient(*m_mlmClient)
+  {
+      
+  }
 
   Accessor::~Accessor()
   {}
@@ -283,88 +295,10 @@ namespace cam
 
   std::vector<std::string> Accessor::sendCommand(const std::string & command, const std::vector<std::string> & frames) const
   {
-    mlm_client_t * client = mlm_client_new();
-
-    if(client == NULL)
-    {
-      mlm_client_destroy(&client);
-      throw CamMalamuteClientIsNullException();
-    }
-
-    //create a unique sender id: <clientId>.[thread id in hexa]
-    pid_t threadId = gettid();
+    std::vector<std::string> payload = {command};
+    std::copy(frames.begin(), frames.end(), back_inserter(payload));
     
-    std::stringstream ss;
-    ss << m_clientId << "." << std::setfill('0') << std::setw(sizeof(pid_t)*2) << std::hex << threadId;
-
-    std::string uniqueId = ss.str();
-    
-    int rc = mlm_client_connect (client, m_endPoint.c_str(), m_timeout, uniqueId.c_str());
-    
-    if (rc != 0)
-    {
-      mlm_client_destroy(&client);
-      throw CamMalamuteConnectionFailedException();
-    }
-
-    //Prepare the request:
-    zmsg_t *request = zmsg_new();
-    ZuuidGuard  zuuid(zuuid_new ());
-    zmsg_addstr (request, zuuid_str_canonical (zuuid));
-
-    //add the command
-    zmsg_addstr (request, command.c_str());
-
-    //add all the extra frames
-    for(const std::string & frame : frames )
-    {
-      zmsg_addstr (request, frame.c_str());
-    }
-
-    if(zsys_interrupted)
-    {
-      zmsg_destroy(&request);
-      mlm_client_destroy(&client);
-      throw CamMalamuteInterruptedException();
-    }
-
-    //send the message
-    mlm_client_sendto (client, MAPPING_AGENT, "REQUEST", NULL, m_timeout, &request);
-
-    if(zsys_interrupted)
-    {
-      zmsg_destroy(&request);
-      mlm_client_destroy(&client);
-      throw CamMalamuteInterruptedException();
-    }
-
-    //Get the reply
-    ZmsgGuard recv(mlm_client_recv (client));
-    mlm_client_destroy(&client);
-
-    //Get number of frame all the frame
-    size_t numberOfFrame = zmsg_size(recv);
-
-    if(numberOfFrame < 2)
-    {
-      throw CamProtocolErrorException("Wrong number of frame");
-    }
-
-    //Check the message
-    ZstrGuard str(zmsg_popstr (recv));
-    if(!streq (str, zuuid_str_canonical (zuuid)))
-    {
-      throw CamProtocolErrorException("Mismatch correlation id");
-    }
-
-    std::vector<std::string> receivedFrames;
-
-    //we unstack all the other frame starting by the 2rd one.
-    for(size_t index = 1; index < numberOfFrame; index++)
-    {
-      ZstrGuard frame( zmsg_popstr(recv) );
-      receivedFrames.push_back( std::string(frame.get()) );
-    }
+    std::vector<std::string> receivedFrames = m_requestClient.syncRequestWithReply(payload);
 
     //check if the first frame we get is an error
     if(receivedFrames[0] == "ERROR")
