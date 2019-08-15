@@ -19,7 +19,7 @@ include_HEADERS += \
     secw_snmpv3.h \
     secw_snmpv1.h \
     secw_user_and_password.h \
-    fty_security_wallet_server.h
+    fty_security_wallet_mlm_agent.h
 
 endif
 

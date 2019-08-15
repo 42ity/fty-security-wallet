@@ -42,7 +42,7 @@ all_tests [] = {
 #ifdef FTY_SECURITY_WALLET_BUILD_DRAFT_API
 // Tests for draft public classes:
     { "fty_credential_asset_mapping_server", fty_credential_asset_mapping_server_test, false, true, NULL },
-    { "fty_security_wallet_server", fty_security_wallet_server_test, false, true, NULL },
+    { "fty_security_wallet_mlm_agent", fty_security_wallet_mlm_agent_test, false, true, NULL },
 #endif // FTY_SECURITY_WALLET_BUILD_DRAFT_API
     {NULL, NULL, 0, 0, NULL}          //  Sentinel
 };
