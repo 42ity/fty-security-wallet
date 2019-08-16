@@ -32,10 +32,22 @@
 
 namespace secw
 {
+  ProducerAccessor::ProducerAccessor( fty::SyncClient & requestClient)
+  {
+      m_clientAccessor = std::make_shared<ClientAccessor>(requestClient);
+  }
+  
+  ProducerAccessor::ProducerAccessor( fty::SyncClient & requestClient, fty::StreamSubscriber & subscriberClient)
+  {
+      m_clientAccessor = std::make_shared<ClientAccessor>(requestClient, subscriberClient);
+  }
+  
   ProducerAccessor::ProducerAccessor(	const ClientId & clientId,
                                       uint32_t timeout,
                                       const std::string & endPoint):
-    m_clientAccessor(std::make_shared<ClientAccessor>(clientId, timeout, endPoint))
+    m_mlmSyncClient(std::make_shared<mlm::MlmSyncClient>(clientId, SECURITY_WALLET_AGENT, timeout, endPoint)),
+    m_mlmStreamClient(std::make_shared<mlm::MlmStreamClient>(clientId, SECW_NOTIFICATIONS, timeout, endPoint)),
+    m_clientAccessor(std::make_shared<ClientAccessor>(*m_mlmSyncClient, *m_mlmStreamClient))
   {}
 
   std::vector<std::string> ProducerAccessor::getPortfolioList() const

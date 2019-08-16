@@ -61,7 +61,7 @@ namespace secw
    * @brief Give Producer access: 
    * A producer has a list of usageId define by the server configuration.
    * A producer can retrieve any documents from the server.
-   * A producer can add or remove in usageIds of the document only if those usageids are in the list define for him.
+   * A producer can add or remove in usageIds of the document only if those usage ids are in the list define for him.
    * A producer can write any part of a document part of the documents.
    * 
    * A customer can only read the public part of document.
@@ -73,7 +73,12 @@ namespace secw
   class ProducerAccessor
   {
   public:
+      
+    explicit ProducerAccessor( fty::SyncClient & requestClient);
+    explicit ProducerAccessor( fty::SyncClient & requestClient, fty::StreamSubscriber & subscriberClient);
+    
   /**
+   * @depricated
    * @brief Construct a new Producer Accessor
    * 
    * @param clientId 
@@ -201,6 +206,10 @@ namespace secw
     void setCallbackOnStart(StartedCallback startedCallback= nullptr);
   
   private:
+    //for backward compatibility
+    std::shared_ptr<mlm::MlmSyncClient> m_mlmSyncClient;
+    std::shared_ptr<mlm::MlmStreamClient> m_mlmStreamClient;  
+    
     std::shared_ptr<ClientAccessor> m_clientAccessor;
   };
   

@@ -24,6 +24,9 @@
 
 #include <functional>
 
+#include "fty_common_client.h"
+#include "fty_common_mlm_sync_client.h"
+
 namespace secw
 {
   using ClientId = std::string;
@@ -72,7 +75,12 @@ namespace secw
   class ConsumerAccessor
   {
   public:
+      
+    explicit ConsumerAccessor( fty::SyncClient & requestClient);
+    explicit ConsumerAccessor( fty::SyncClient & requestClient, fty::StreamSubscriber & subscriberClient);
+    
     /**
+     * @deprecated
      * @brief Construct a new Consumer Accessor object
      * 
      * @param clientId 
@@ -172,6 +180,11 @@ namespace secw
 
   
   private:
+    //for backward compatibility
+    std::shared_ptr<mlm::MlmSyncClient> m_mlmSyncClient;
+    std::shared_ptr<mlm::MlmStreamClient> m_mlmStreamClient;
+    
+    
     std::shared_ptr<ClientAccessor> m_clientAccessor;
   };
   

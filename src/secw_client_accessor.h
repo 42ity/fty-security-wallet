@@ -25,11 +25,11 @@
 #include "secw_document.h"
 #include "secw_exception.h"
 
+#include "fty_common_client.h"
+
 #include <cxxtools/serializationinfo.h>
-#include <thread>
 #include <mutex>
 #include <functional>
-#include <condition_variable>
 
 namespace secw
 {
@@ -43,9 +43,8 @@ namespace secw
   class ClientAccessor
   {
   public:
-    explicit ClientAccessor(const ClientId & clientId,
-                uint32_t timeout,
-                const std::string & endPoint);
+    explicit ClientAccessor( fty::SyncClient & requestClient);
+    explicit ClientAccessor( fty::SyncClient & requestClient, fty::StreamSubscriber & subscriberClient);
 
     ~ClientAccessor();
 
@@ -57,25 +56,22 @@ namespace secw
     void setCallbackOnStart(StartedCallback startedCallback= nullptr);
 
   private:
-    ClientId m_clientId;
-    uint32_t m_timeout;
-    std::string m_endPoint;
-
+    fty::SyncClient & m_requestClient;
+    fty::StreamSubscriber * const m_ptrStreamClient;
+    
     //callbacks
     UpdatedCallback m_updatedCallback;
     CreatedCallback m_createdCallback;
     DeletedCallback m_deletedCallback;
     StartedCallback m_startedCallback;
 
-    //thread which handle notification and call the correct callback.
-    std::thread m_notificationThread;
-    bool m_stopRequested = false;
-    void notificationHandler();
-    std::mutex m_handlerFunctionStarting;
-    std::condition_variable m_handlerFunctionThreadStarted;
+    bool m_isRegistered = false;
+    uint32_t m_registrationId = 0;
+    
+    //function take care about the callback => will called in another thread
+    void callbackHandler( const std::vector<std::string> & payload);
     std::mutex m_handlerFunctionLock;
-
-    //funtions to start or stop the thread
+    
     void updateNotificationThread();
 
   };
