@@ -143,6 +143,9 @@ namespace secw
       std::unique_lock<std::mutex> lock(m_handlerFunctionLock);
       m_createdCallback = createdCallback;
     }
+    
+    //2. Update thread if needed
+    updateNotificationThread();
 
   }
 
@@ -260,11 +263,11 @@ namespace secw
         }
         catch(const std::exception& e)
         {
-          log_error("Error during notification processing: %s", e.what());
+          log_error("Error during security wallet notification processing: %s", e.what());
         }
         catch (...) //Show Must Go On => Log errors and continue
         {
-          log_error("Error during notification processing: unknown error");
+          log_error("Error during security wallet notification processing: unknown error");
         }
   }
 

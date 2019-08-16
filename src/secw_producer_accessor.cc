@@ -28,8 +28,6 @@
 #include <chrono>
 #include "fty_security_wallet_classes.h"
 
-#define TEST_TIMEOUT 5
-
 namespace secw
 {
   ProducerAccessor::ProducerAccessor( fty::SyncClient & requestClient)
@@ -234,6 +232,7 @@ namespace secw
 //  --------------------------------------------------------------------------
 
 #define SELFTEST_CLIENT_ID "secw-client-test"
+#define TEST_TIMEOUT 5
 
 //callback for test
 secw::DocumentPtr g_newDoc;
@@ -289,6 +288,10 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
 
   static const char* endpoint = "inproc://fty-security-walletg-test";
   
+  //create the 2 Client
+  mlm::MlmSyncClient syncClient(SELFTEST_CLIENT_ID, SECURITY_WALLET_AGENT, 1000, endpoint);
+  mlm::MlmStreamClient streamClient(SELFTEST_CLIENT_ID, SECW_NOTIFICATIONS, 1000, endpoint);
+  
   using namespace secw;
 
   printf(" ** secw_producer_accessor_test: \n");
@@ -301,7 +304,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #1.1 getPortfolioList\n");
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       std::vector<std::string> portfolio = producerAccessor.getPortfolioList();
@@ -330,7 +333,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   {
     printf(" *=>  Test #1.2 SecwUnknownPortfolioException\n");
     std::string portfolioName("XXXXX");
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       producerAccessor.getDocumentWithoutPrivateData(portfolioName, "XXXXX-XXXXXXXXX");
@@ -363,7 +366,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #2.1 getProducerUsages\n");
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       std::set<std::string> usages = producerAccessor.getProducerUsages();
@@ -401,7 +404,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #3.1 getListDocumentsWithoutPrivateData\n");
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       std::vector<DocumentPtr> doc = producerAccessor.getListDocumentsWithoutPrivateData("default");
@@ -432,7 +435,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #3.2 getListDocumentsWithoutPrivateData usage=discovery_monitoring");
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       std::vector<DocumentPtr> doc = producerAccessor.getListDocumentsWithoutPrivateData("default", "discovery_monitoring");
@@ -465,7 +468,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       std::vector<Id> ids = {"id_readable", "id_notReadable"};
@@ -491,7 +494,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #4.1 getDocumentWithoutPrivateData\n");
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       DocumentPtr doc = producerAccessor.getDocumentWithoutPrivateData("default", "id_readable");
@@ -517,7 +520,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #4.2 getDocumentWithoutPrivateData => SecwDocumentDoNotExistException\n");
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       producerAccessor.getDocumentWithoutPrivateData("default", "XXXXX-XXXXXXXXX");
@@ -541,7 +544,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #4.3 getDocumentWithoutPrivateDataByName\n");
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       DocumentPtr doc = producerAccessor.getDocumentWithoutPrivateDataByName("default", "myFirstDoc");
@@ -567,7 +570,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #4.4 getDocumentWithoutPrivateDataByName => SecwNameDoesNotExistException\n");
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       producerAccessor.getDocumentWithoutPrivateDataByName("default", "XXXXX-XXXXXXXXX");
@@ -595,7 +598,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
 
     //register the callback on create
     producerAccessor.setCallbackOnCreate(callbackCreate);
@@ -651,7 +654,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
@@ -689,7 +692,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
 
     //register the callback on update
     producerAccessor.setCallbackOnUpdate(callbackUpdated);
@@ -750,7 +753,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
@@ -787,7 +790,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
 
     //register the callback on update
     producerAccessor.setCallbackOnUpdate(callbackUpdated);
@@ -835,7 +838,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
 
     //register the callback on create
     producerAccessor.setCallbackOnDelete(callbackDeleted);
@@ -887,7 +890,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       UserAndPasswordPtr doc = std::make_shared<UserAndPassword>("Test insert username","username", "password");
@@ -915,7 +918,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
@@ -950,7 +953,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       UserAndPasswordPtr doc = std::make_shared<UserAndPassword>("Test insert username","username", "password");
@@ -989,7 +992,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
@@ -1023,7 +1026,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
@@ -1056,7 +1059,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateDataByName("default", "Test update username");
@@ -1089,7 +1092,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       producerAccessor.getDocumentWithoutPrivateDataByName("default", "Test insert username");
@@ -1115,7 +1118,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
@@ -1163,7 +1166,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
      DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
@@ -1199,7 +1202,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       producerAccessor.deleteDocument("default", id);
@@ -1229,7 +1232,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       Snmpv1Ptr doc = std::make_shared<Snmpv1>("Test insert snmpv1","community");
@@ -1257,7 +1260,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
@@ -1292,7 +1295,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
@@ -1325,7 +1328,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
@@ -1359,7 +1362,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
      DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
@@ -1395,7 +1398,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
      printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-    ProducerAccessor producerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
       producerAccessor.deleteDocument("default", id);
