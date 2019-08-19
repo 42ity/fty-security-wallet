@@ -1,5 +1,5 @@
 /*  =========================================================================
-    fty_security_wallet_mlmagent - Security Wallet malamute agent
+    fty_security_wallet_mlm_agent - Security Wallet malamute agent
 
     Copyright (C) 2019 Eaton
 
@@ -29,6 +29,8 @@
 #include "secw_security_wallet_server.h"
 #include "secw_security_wallet.h"
 #include "secw_helpers.h"
+
+#include "fty_common_mlm_stream_client.h"
 
 #include <sys/types.h>
 #include <gnu/libc-version.h>
@@ -197,52 +199,10 @@ bool SecurityWalletMlmAgent::handleMailbox(zmsg_t *message)
 
 void SecurityWalletMlmAgent::publishOnBus(const std::string & payload)
 {
+    mlm::MlmStreamClient streamClient(SECURITY_WALLET_AGENT, SECW_NOTIFICATIONS, 1000, m_endpoint);
     //std::cerr << "Publish on Bus <" << messageType << ">:" << payload << std::endl;
     
-    mlm_client_t * client = mlm_client_new();
-
-    if(client == NULL)
-    {
-      mlm_client_destroy(&client);
-      throw SecwMalamuteClientIsNullException();
-    }
-
-    //create a unique sender id: SECURITY_WALLET_AGENT.[thread id in hexa]
-    pid_t threadId = gettid();
-
-    std::stringstream ss;
-    ss << SECURITY_WALLET_AGENT  << "." << std::setfill('0') << std::setw(sizeof(pid_t)*2) << std::hex << threadId;
-
-    std::string uniqueId = ss.str();
-
-    int rc = mlm_client_connect (client, m_endpoint.c_str(), 1000, uniqueId.c_str());
-
-    if (rc != 0)
-    {
-      mlm_client_destroy(&client);
-      throw SecwMalamuteConnectionFailedException();
-    }
-
-    rc = mlm_client_set_producer (client, SECW_NOTIFICATIONS);
-    if (rc != 0)
-    {
-        mlm_client_destroy (&client);
-        throw SecwMalamuteInterruptedException();
-    }
-
-    zmsg_t *notification = zmsg_new ();
-    zmsg_addstr (notification, payload.c_str ());
-
-    rc = mlm_client_send (client, "NOTIFICATION", &notification);
-
-    if (rc != 0)
-    {
-      zmsg_destroy(&notification);
-      mlm_client_destroy(&client);
-      throw SecwMalamuteInterruptedException();
-    }
-
-    mlm_client_destroy (&client);
+    streamClient.publish({payload});
     
     //std::cerr << "Publish on Bus Done!" << std::endl;
 }
