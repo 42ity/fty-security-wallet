@@ -31,150 +31,34 @@
 #include "secw_helpers.h"
 
 #include "fty_common_mlm_stream_client.h"
+#include "fty_common_mlm_basic_mailbox_server.h"
 
-#include <sys/types.h>
-#include <gnu/libc-version.h>
 
-//gettid() is available since glibc 2.30
-#if ((__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 30))
-#include <sys/syscall.h>
-#define gettid() syscall(SYS_gettid)
-#endif
-
-#include <iomanip>
 #include <sstream>
 #include <cxxtools/jsonserializer.h>
 
-using namespace secw;
-
-SecurityWalletMlmAgent::SecurityWalletMlmAgent(zsock_t *pipe,
-                                        const std::string & endpoint,
-                                        const std::string & storageconfigurationPath,
-                                        const std::string & storageDatabasePath,
-                                        fty::StreamPublisher & notificationStream)
-    :   mlm::MlmAgent(pipe),
-        m_endpoint(endpoint),
-        m_secwServer(new SecurityWalletServer
-                                (   storageconfigurationPath,
-                                    storageDatabasePath,
-                                    notificationStream
-                                )
-                    )
-{
-    connect(m_endpoint.c_str(), SECURITY_WALLET_AGENT);
-}
-
-bool SecurityWalletMlmAgent::handleMailbox(zmsg_t *message)
-{
-    std::string correlationId;
-      
-    //try to address the request
-    try
-    {
-        Subject subject(mlm_client_subject(client()));
-        Sender uniqueSender(mlm_client_sender(client()));
-            
-        //ignore none "REQUEST" message
-        if (subject != "REQUEST")
-        {
-            log_warning ("Received mailbox message with subject '%s' from '%s', ignoring", subject.c_str(),uniqueSender.c_str());
-            return true;
-        }
-        
-        //Get number of frame all the frame
-        size_t numberOfFrame = zmsg_size(message);
-        
-        log_debug("Received mailbox message with subject '%s' from '%s' with %i frames", subject.c_str(), uniqueSender.c_str(), numberOfFrame);
-
-        
-        /*  Message is valid if the header contain at least the following frame:
-         * 0. Correlation id
-         * 1. data
-         */
-        
-        //TODO define a maximum to avoid DOS
-        
-        ZstrGuard ptrCorrelationId( zmsg_popstr(message) );
-        
-        std::vector<std::string> payload;
-    
-        //we unstack all the other starting by the 3rd one.
-        for(size_t index = 1; index < numberOfFrame; index++)
-        {
-            ZstrGuard param( zmsg_popstr(message) );
-            payload.push_back( std::string(param.get()) );
-        }
-        
-        //Ensure the presence of data from the request
-        if(ptrCorrelationId != nullptr)
-        {
-            correlationId = std::string(ptrCorrelationId.get());
-        }
-        
-        if(correlationId.empty())
-        {
-            //no correlation id, it's a bad frame we ignore it
-            throw std::runtime_error("Correlation id frame is empty");
-        }
-        
-        //extract the sender from unique sender id: <Sender>.[thread id in hexa]
-        Sender sender = uniqueSender.substr(0, (uniqueSender.size()-(sizeof(pid_t)*2)-1));
-        
-        //Execute the request
-        std::vector<std::string> results = m_secwServer->handleRequest(sender, payload);
-
-        //send the result if it's not empty
-        if(!results.empty())
-        {
-            zmsg_t *reply = zmsg_new();
-        
-            zmsg_addstr (reply, correlationId.c_str());
-            
-            for(const std::string & result : results)
-            {
-                zmsg_addstr (reply, result.c_str());
-            }
-
-            int rv = mlm_client_sendto (client(), mlm_client_sender (client()),
-                                "REPLY", NULL, 1000, &reply);
-            if (rv != 0)
-            {
-                log_error ("s_handle_mailbox: failed to send reply to %s ",
-                        mlm_client_sender (client()));
-            }
-        }
-        
-    }
-    catch (std::exception &e)
-    {
-        log_error("Unexpected error: %s", e.what());
-    }
-    catch (...) //show must go one => Log and ignore the unknown error
-    {
-        log_error("Unexpected error: unknown");
-    }
-
-    return true;
-}
-
-/* external interface */
-
 void fty_security_wallet_mlm_agent(zsock_t *pipe, void *args)
 {
-    const secw::Arguments & arguments = *static_cast<secw::Arguments*>(args);
+    using Arguments = std::map<std::string, std::string>;
     
+    const Arguments & arguments = *static_cast<Arguments*>(args);
+    
+    //create a stream publisher for notification
     mlm::MlmStreamClient notificationStream(SECURITY_WALLET_AGENT, SECW_NOTIFICATIONS, 1000, arguments.at("ENDPOINT"));
-        
-    secw::SecurityWalletMlmAgent agent(   pipe, 
-                                    arguments.at("ENDPOINT"),
-                                    arguments.at("STORAGE_CONFIGURATION_PATH"),
-                                    arguments.at("STORAGE_DATABASE_PATH"),
-                                    notificationStream
-                                );
+    
+    //create the server
+    secw::SecurityWalletServer server(  arguments.at("STORAGE_CONFIGURATION_PATH"),
+                                        arguments.at("STORAGE_DATABASE_PATH"),
+                                        notificationStream);
+    
+    //launch the agent
+    mlm::MlmBasicMailboxServer agent(  pipe, 
+                                       server,
+                                       SECURITY_WALLET_AGENT,
+                                       arguments.at("ENDPOINT")
+                                    );
     agent.mainloop();
 }
-
-
 
 
 //  --------------------------------------------------------------------------

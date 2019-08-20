@@ -24,44 +24,6 @@
 
 #include "fty_common_mlm_agent.h"
 
-#include <functional>
-
-#include <cxxtools/serializationinfo.h>
-/**
- * \brief Agent SecurityWalletMlmAgent main server actor
- */
-namespace secw
-{
-    using Sender    = std::string;
-    using Subject   = std::string;
-    
-    using Arguments = std::map<std::string, std::string>;
-
-
-    class SecurityWalletServer;
-
-    class SecurityWalletMlmAgent final : public mlm::MlmAgent
-    {
-    private:
-        //attributs
-        std::string m_endpoint;
-        std::shared_ptr<SecurityWalletServer> m_secwServer;
-
-
-    public:
-        explicit SecurityWalletMlmAgent(zsock_t *pipe,
-                                        const std::string & endpoint,
-                                        const std::string & storageconfigurationPath,
-                                        const std::string & storageDatabasePath,
-                                        fty::StreamPublisher & notificationStream);
-
-    private:
-        bool handleMailbox(zmsg_t *message) override;
-    };
-
-
-} // namespace secw
-
 //  @interface
 //  Create an security wallet actor
 void 

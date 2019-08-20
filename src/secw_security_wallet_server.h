@@ -24,7 +24,9 @@
 
 #include <functional>
 #include "secw_security_wallet.h"
+
 #include "fty_common_client.h"
+#include "fty_common_sync_server.h"
 
 #include <cxxtools/serializationinfo.h>
 /**
@@ -34,11 +36,10 @@ namespace secw
 {
     using Command   = std::string;
     using Sender    = std::string;
-    using Subject   = std::string;
     
     using FctCommandHandler = std::function<std::string (const Sender &, const std::vector<std::string> &)>;
 
-    class SecurityWalletServer final
+    class SecurityWalletServer final : public fty::SyncServer
     {
 
     public:
@@ -46,7 +47,7 @@ namespace secw
                                         const std::string & databasePath,
                                         fty::StreamPublisher & streamPublisher);
         
-        std::vector<std::string> handleRequest(const Sender & sender, const std::vector<std::string> & payload);
+        std::vector<std::string> handleRequest(const Sender & sender, const std::vector<std::string> & payload) override;
 
     private:
         // List of supported commands with a reference to the handler for this command.
