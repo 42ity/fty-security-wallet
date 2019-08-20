@@ -191,6 +191,6 @@ namespace secw
 } //namespace secw
 
 //  @interface
-std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test();
+std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::SyncClient & syncClient, fty::StreamSubscriber & streamClient);
 
 #endif

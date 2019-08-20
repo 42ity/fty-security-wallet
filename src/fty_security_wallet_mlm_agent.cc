@@ -46,62 +46,22 @@
 #include <cxxtools/jsonserializer.h>
 
 using namespace secw;
-using namespace std::placeholders;
 
-SecurityWalletMlmAgent::SecurityWalletMlmAgent(zsock_t *pipe)
+SecurityWalletMlmAgent::SecurityWalletMlmAgent(zsock_t *pipe,
+                                        const std::string & endpoint,
+                                        const std::string & storageconfigurationPath,
+                                        const std::string & storageDatabasePath,
+                                        fty::StreamPublisher & notificationStream)
     :   mlm::MlmAgent(pipe),
-        m_storageconfigurationPath(DEFAULT_STORAGE_CONFIGURATION_PATH),
-        m_storageDatabasePath(DEFAULT_STORAGE_DATABASE_PATH),
-        m_endpoint(DEFAULT_ENDPOINT)
-{}
-
-bool SecurityWalletMlmAgent::handlePipe(zmsg_t *message)
+        m_endpoint(endpoint),
+        m_secwServer(new SecurityWalletServer
+                                (   storageconfigurationPath,
+                                    storageDatabasePath,
+                                    notificationStream
+                                )
+                    )
 {
-    bool rv = true;
-    ZstrGuard actor_command(zmsg_popstr(message));
-
-    // $TERM actor command implementation is required by zactor_t interface.
-    if (streq(actor_command, "$TERM"))
-    {
-        rv = false;
-    }
-    else if (streq (actor_command, "CONNECT"))
-    {
-        ZstrGuard endpoint(zmsg_popstr(message));
-        m_endpoint = std::string(endpoint.get());
-        
-        ZstrGuard name(zmsg_popstr (message));
-        
-        m_secwServer = std::make_shared<SecurityWalletServer>
-                            (   m_storageconfigurationPath,
-                                m_storageDatabasePath,
-                                std::bind(&SecurityWalletMlmAgent::publishOnBus, this, _1)
-                            );
-        
-        log_debug("Wallet found in %s", m_storageDatabasePath.c_str());
-        
-        
-        if (name)
-        {
-            connect(m_endpoint.c_str() ,name);
-        }
-    }
-    else if (streq (actor_command, "STORAGE_CONFIGURATION_PATH"))
-    {
-        ZstrGuard storage_access_path(zmsg_popstr(message));
-        m_storageconfigurationPath = std::string(storage_access_path.get());
-    }
-    else if (streq (actor_command, "STORAGE_DATABASE_PATH"))
-    {
-        ZstrGuard storage_database_path(zmsg_popstr(message));
-        m_storageDatabasePath = std::string(storage_database_path.get());
-    }
-    else
-    {
-        log_error("Unknown pipe command '%s'", actor_command.get());
-    }
-
-    return rv;
+    connect(m_endpoint.c_str(), SECURITY_WALLET_AGENT);
 }
 
 bool SecurityWalletMlmAgent::handleMailbox(zmsg_t *message)
@@ -197,21 +157,20 @@ bool SecurityWalletMlmAgent::handleMailbox(zmsg_t *message)
     return true;
 }
 
-void SecurityWalletMlmAgent::publishOnBus(const std::string & payload)
-{
-    mlm::MlmStreamClient streamClient(SECURITY_WALLET_AGENT, SECW_NOTIFICATIONS, 1000, m_endpoint);
-    //std::cerr << "Publish on Bus <" << messageType << ">:" << payload << std::endl;
-    
-    streamClient.publish({payload});
-    
-    //std::cerr << "Publish on Bus Done!" << std::endl;
-}
-
 /* external interface */
 
 void fty_security_wallet_mlm_agent(zsock_t *pipe, void *args)
 {
-    SecurityWalletMlmAgent agent(pipe);
+    const secw::Arguments & arguments = *static_cast<secw::Arguments*>(args);
+    
+    mlm::MlmStreamClient notificationStream(SECURITY_WALLET_AGENT, SECW_NOTIFICATIONS, 1000, arguments.at("ENDPOINT"));
+        
+    secw::SecurityWalletMlmAgent agent(   pipe, 
+                                    arguments.at("ENDPOINT"),
+                                    arguments.at("STORAGE_CONFIGURATION_PATH"),
+                                    arguments.at("STORAGE_DATABASE_PATH"),
+                                    notificationStream
+                                );
     agent.mainloop();
 }
 
@@ -219,18 +178,9 @@ void fty_security_wallet_mlm_agent(zsock_t *pipe, void *args)
 
 
 //  --------------------------------------------------------------------------
-//  Self test of this class
+//  Self test
 
-// If your selftest reads SCMed fixture data, please keep it in
-// src/selftest-ro; if your test creates filesystem objects, please
-// do so under src/selftest-rw.
-// The following pattern is suggested for C selftest code:
-//    char *filename = NULL;
-//    filename = zsys_sprintf ("%s/%s", SELFTEST_DIR_RO, "mytemplate.file");
-//    assert (filename);
-//    ... use the "filename" for I/O ...
-//    zstr_free (&filename);
-// This way the same "filename" variable can be reused for many subtests.
+
 #define SELFTEST_DIR_RO "src/selftest-ro"
 #define SELFTEST_DIR_RW "src/selftest-rw"
 
@@ -247,8 +197,7 @@ void fty_security_wallet_mlm_agent(zsock_t *pipe, void *args)
 void
 fty_security_wallet_mlm_agent_test (bool verbose)
 {
-    std::vector<std::pair<std::string,bool>> testsServerResults;
-    printf ("\n ** fty_security_wallet_mlm_agent: \n");
+    printf ("\n\n ** fty_security_wallet_mlm_agent: \n\n");
     assert (SELFTEST_DIR_RO);
     assert (SELFTEST_DIR_RW);
 
@@ -274,87 +223,34 @@ fty_security_wallet_mlm_agent_test (bool verbose)
         source.close();
     }
 
+    //create the broker 
     zactor_t *broker = zactor_new (mlm_server, (void*) "Malamute");
     zstr_sendx (broker, "BIND", endpoint, NULL);
     if (verbose)
         zstr_send (broker, "VERBOSE");
     
-    zactor_t *server = zactor_new (fty_security_wallet_mlm_agent, (void *)endpoint);
-    //set configuration parameters
-    zstr_sendx (server, "STORAGE_CONFIGURATION_PATH", SELFTEST_DIR_RW"/configuration.json", NULL);
-    zstr_sendx (server, "STORAGE_DATABASE_PATH", SELFTEST_DIR_RW"/data.json", NULL);
-    zstr_sendx (server, "CONNECT", endpoint, SECURITY_WALLET_AGENT, NULL);
-
-    mlm_client_t *client = mlm_client_new();
-    mlm_client_connect (client, endpoint, 1000, "secw-server-test");
-
-    //test 1 => Invalid REQUEST command
-    printf("\n-----------------------------------------------------------------------\n");
-    try
-    {
-        log_debug ("*=> Test #1 Invalid REQUEST command");
-            
-        zmsg_t *request = zmsg_new();
-        ZuuidGuard  zuuid(zuuid_new ());
-        zmsg_addstr (request, zuuid_str_canonical (zuuid));
-        zmsg_addstr (request, "NON_EXISTENT_COMMAND");
-        mlm_client_sendto (client, SECURITY_WALLET_AGENT, "REQUEST", NULL, 1000, &request);
-
-        ZmsgGuard recv(mlm_client_recv (client));
-        if(zmsg_size (recv) != 3)
-        {
-            throw std::runtime_error("Bad number of frames received");
-        }
-        ZstrGuard str(zmsg_popstr (recv));
-        if(!streq (str, zuuid_str_canonical (zuuid)))
-        {
-            throw std::runtime_error("Bad correlation id received");
-        }
-
-        str = zmsg_popstr (recv);
-        if(!streq (str, "ERROR"))
-        {
-            throw std::runtime_error("Bad message type received: "+std::string(str));
-        }
-
-        testsServerResults.emplace_back("Test #1 Invalid REQUEST command",true);
-
-    }
-    catch(const std::exception& e)
-    {
-        log_debug(" *<= Test #1 > Failed");
-        log_debug("Error: %s\n\n",e.what());
-
-        testsServerResults.emplace_back("Test #1 Invalid REQUEST command",false);
-    }
+    //setup parameters for the agent
+    std::map<std::string, std::string> paramsSecw;
     
-    //end of the server tests
-    mlm_client_destroy(&client);
+    paramsSecw["STORAGE_CONFIGURATION_PATH"] = SELFTEST_DIR_RW"/configuration.json";
+    paramsSecw["STORAGE_DATABASE_PATH"] = SELFTEST_DIR_RW"/data.json";
+    paramsSecw["AGENT_NAME"] = SECURITY_WALLET_AGENT;
+    paramsSecw["ENDPOINT"] = endpoint;
+    
+    zactor_t *server = zactor_new (fty_security_wallet_mlm_agent, static_cast<void*>(&paramsSecw));
+  
+    //create the 2 Clients
+    mlm::MlmSyncClient syncClient("secw-server-test", SECURITY_WALLET_AGENT, 1000, endpoint);
+    mlm::MlmStreamClient streamClient("secw-server-test", SECW_NOTIFICATIONS, 1000, endpoint);
 
     //Tests from the lib
-    std::vector<std::pair<std::string,bool>> testLibConsumerResults = secw_consumer_accessor_test();
-    std::vector<std::pair<std::string,bool>> testLibProducerResults = secw_producer_accessor_test();
+    std::vector<std::pair<std::string,bool>> testLibConsumerResults = secw_consumer_accessor_test(syncClient, streamClient);
+    std::vector<std::pair<std::string,bool>> testLibProducerResults = secw_producer_accessor_test(syncClient, streamClient);
 
     printf("\n-----------------------------------------------------------------------\n");
     
     uint32_t testsPassed = 0;
     uint32_t testsFailed = 0;
-    
-    //Print all the result
-    printf("\n\tTests from the server:\n");
-    for(const auto & result : testsServerResults)
-    {
-        if(result.second)
-        {
-            printf(ANSI_COLOR_GREEN"\tOK " ANSI_COLOR_RESET "\t%s\n",result.first.c_str());
-            testsPassed++;
-        }
-        else
-        {
-            printf(ANSI_COLOR_RED"\tNOK" ANSI_COLOR_RESET "\t%s\n",result.first.c_str());
-            testsFailed++;
-        }
-    }
     
     printf("\n\tTests from the lib: Consumer part\n");
     for(const auto & result : testLibConsumerResults)

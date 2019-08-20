@@ -24,6 +24,7 @@
 
 #include <functional>
 #include "secw_security_wallet.h"
+#include "fty_common_client.h"
 
 #include <cxxtools/serializationinfo.h>
 /**
@@ -36,7 +37,6 @@ namespace secw
     using Subject   = std::string;
     
     using FctCommandHandler = std::function<std::string (const Sender &, const std::vector<std::string> &)>;
-    using FctNotifier = std::function<void (const std::string &)>;
 
     class SecurityWalletServer final
     {
@@ -44,7 +44,7 @@ namespace secw
     public:
         explicit SecurityWalletServer(  const std::string & configurationPath,
                                         const std::string & databasePath,
-                                        FctNotifier notifier = nullptr);
+                                        fty::StreamPublisher & streamPublisher);
         
         std::vector<std::string> handleRequest(const Sender & sender, const std::vector<std::string> & payload);
 
@@ -53,7 +53,7 @@ namespace secw
         std::map<Command, FctCommandHandler> m_supportedCommands;
 
         SecurityWallet m_activeWallet;
-        FctNotifier m_notifier;
+        fty::StreamPublisher & m_streamPublisher;
         
         //Handler for all supported commands
         std::string handleGetListDocumentsWithSecret(const Sender & sender, const std::vector<std::string> & params);

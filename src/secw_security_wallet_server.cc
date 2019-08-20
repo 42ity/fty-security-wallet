@@ -42,9 +42,9 @@ using namespace std::placeholders;
 
 SecurityWalletServer::SecurityWalletServer( const std::string & configurationPath,
                                             const std::string & databasePath,
-                                            FctNotifier notifier)
+                                            fty::StreamPublisher & streamPublisher)
     :   m_activeWallet(configurationPath, databasePath),
-        m_notifier(notifier)
+        m_streamPublisher(streamPublisher)
 {
     //initiate the commands handlers
     m_supportedCommands[GET_PORTFOLIO_LIST] = std::bind(&SecurityWalletServer::handleGetListPortfolio, this, _1, _2);
@@ -431,8 +431,6 @@ std::string SecurityWalletServer::handleGetListDocumentsWithoutSecret(const Send
 void
 SecurityWalletServer::sendNotificationOnCreate (const std::string & portfolio, const DocumentPtr newDocument)
 {
-    if(!m_notifier) return; //we do not have notifier function
-
     try
     {
         cxxtools::SerializationInfo rootSi;
@@ -440,7 +438,8 @@ SecurityWalletServer::sendNotificationOnCreate (const std::string & portfolio, c
         rootSi.addMember("portfolio") <<= portfolio;
         rootSi.addMember("old_data");
         newDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("new_data"));
-        m_notifier(serialize(rootSi));
+        
+        m_streamPublisher.publish({serialize(rootSi)});
     }
     catch (const std::exception &e)
     {
@@ -454,8 +453,6 @@ SecurityWalletServer::sendNotificationOnCreate (const std::string & portfolio, c
 void
 SecurityWalletServer::sendNotificationOnDelete (const std::string & portfolio, const DocumentPtr oldDocument)
 {
-    if(!m_notifier) return; //we do not have notifier function
-
     try
     {
         cxxtools::SerializationInfo rootSi;
@@ -463,7 +460,8 @@ SecurityWalletServer::sendNotificationOnDelete (const std::string & portfolio, c
         rootSi.addMember("portfolio") <<= portfolio;
         rootSi.addMember("new_data");
         oldDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("old_data"));
-        m_notifier(serialize(rootSi));
+        
+        m_streamPublisher.publish({serialize(rootSi)});
     }
     catch (const std::exception &e)
     {
@@ -477,8 +475,6 @@ SecurityWalletServer::sendNotificationOnDelete (const std::string & portfolio, c
 void
 SecurityWalletServer::sendNotificationOnUpdate (const std::string & portfolio, const DocumentPtr oldDocument, const DocumentPtr newDocument)
 {
-    if(!m_notifier) return; //we do not have notifier function
-
     try
     {
         cxxtools::SerializationInfo rootSi;
@@ -486,7 +482,8 @@ SecurityWalletServer::sendNotificationOnUpdate (const std::string & portfolio, c
         rootSi.addMember("portfolio") <<= portfolio;
         oldDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("old_data"));
         newDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("new_data"));
-        m_notifier(serialize(rootSi));
+        
+        m_streamPublisher.publish({serialize(rootSi)});
     }
     catch (const std::exception &e)
     {

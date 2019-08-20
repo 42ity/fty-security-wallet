@@ -231,7 +231,6 @@ namespace secw
 //  Test of this class => This is used by fty_security_wallet_server_test
 //  --------------------------------------------------------------------------
 
-#define SELFTEST_CLIENT_ID "secw-client-test"
 #define TEST_TIMEOUT 5
 
 //callback for test
@@ -282,15 +281,9 @@ void callbackDeleted(const std::string& portfolio, secw::DocumentPtr oldDoc)
 }*/
 
 
-std::vector<std::pair<std::string,bool>> secw_producer_accessor_test()
+std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::SyncClient & syncClient, fty::StreamSubscriber & streamClient)
 {
   std::vector<std::pair<std::string,bool>> testsResults;
-
-  static const char* endpoint = "inproc://fty-security-walletg-test";
-  
-  //create the 2 Client
-  mlm::MlmSyncClient syncClient(SELFTEST_CLIENT_ID, SECURITY_WALLET_AGENT, 1000, endpoint);
-  mlm::MlmStreamClient streamClient(SELFTEST_CLIENT_ID, SECW_NOTIFICATIONS, 1000, endpoint);
   
   using namespace secw;
 

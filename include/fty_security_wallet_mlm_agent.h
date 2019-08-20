@@ -34,6 +34,8 @@ namespace secw
 {
     using Sender    = std::string;
     using Subject   = std::string;
+    
+    using Arguments = std::map<std::string, std::string>;
 
 
     class SecurityWalletServer;
@@ -42,33 +44,31 @@ namespace secw
     {
     private:
         //attributs
-        std::string m_storageconfigurationPath;
-        std::string m_storageDatabasePath;
         std::string m_endpoint;
         std::shared_ptr<SecurityWalletServer> m_secwServer;
 
 
     public:
-        explicit SecurityWalletMlmAgent(zsock_t *pipe);
+        explicit SecurityWalletMlmAgent(zsock_t *pipe,
+                                        const std::string & endpoint,
+                                        const std::string & storageconfigurationPath,
+                                        const std::string & storageDatabasePath,
+                                        fty::StreamPublisher & notificationStream);
 
     private:
         bool handleMailbox(zmsg_t *message) override;
-        bool handlePipe(zmsg_t *message) override;
-     
-        //Notification function
-        void publishOnBus(const std::string & payload);
     };
 
 
 } // namespace secw
 
 //  @interface
-//  Create an fty_security_wallet_mlm_agent actor
-FTY_SECURITY_WALLET_EXPORT void 
+//  Create an security wallet actor
+void 
     fty_security_wallet_mlm_agent(zsock_t *pipe, void *endpoint);
 
-//  Self test of this class
-FTY_SECURITY_WALLET_EXPORT void
+//  Self test
+void
     fty_security_wallet_mlm_agent_test (bool verbose);
 
 #endif
