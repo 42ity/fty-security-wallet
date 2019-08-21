@@ -11,7 +11,6 @@ include_HEADERS += \
     cam_credential_asset_mapping.h \
     cam_accessor.h \
     cam_exception.h \
-    fty_credential_asset_mapping_server.h \
     secw_document.h \
     secw_exception.h \
     secw_producer_accessor.h \
@@ -19,6 +18,7 @@ include_HEADERS += \
     secw_snmpv3.h \
     secw_snmpv1.h \
     secw_user_and_password.h \
+    fty_credential_asset_mapping_mlm_agent.h \
     fty_security_wallet_mlm_agent.h
 
 endif

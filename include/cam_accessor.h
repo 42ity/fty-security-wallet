@@ -99,7 +99,7 @@ namespace cam
   
 } //namespace cam
 
-std::vector<std::pair<std::string,bool>> cam_accessor_test();
+std::vector<std::pair<std::string,bool>> cam_accessor_test(fty::SyncClient & syncClient);
 
 #endif
 

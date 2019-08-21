@@ -88,8 +88,6 @@ typedef struct _cam_accessor_t cam_accessor_t;
 #define CAM_ACCESSOR_T_DEFINED
 typedef struct _cam_exception_t cam_exception_t;
 #define CAM_EXCEPTION_T_DEFINED
-typedef struct _fty_credential_asset_mapping_server_t fty_credential_asset_mapping_server_t;
-#define FTY_CREDENTIAL_ASSET_MAPPING_SERVER_T_DEFINED
 typedef struct _secw_document_t secw_document_t;
 #define SECW_DOCUMENT_T_DEFINED
 typedef struct _secw_exception_t secw_exception_t;
@@ -104,6 +102,8 @@ typedef struct _secw_snmpv1_t secw_snmpv1_t;
 #define SECW_SNMPV1_T_DEFINED
 typedef struct _secw_user_and_password_t secw_user_and_password_t;
 #define SECW_USER_AND_PASSWORD_T_DEFINED
+typedef struct _fty_credential_asset_mapping_mlm_agent_t fty_credential_asset_mapping_mlm_agent_t;
+#define FTY_CREDENTIAL_ASSET_MAPPING_MLM_AGENT_T_DEFINED
 typedef struct _fty_security_wallet_mlm_agent_t fty_security_wallet_mlm_agent_t;
 #define FTY_SECURITY_WALLET_MLM_AGENT_T_DEFINED
 #endif // FTY_SECURITY_WALLET_BUILD_DRAFT_API
@@ -114,7 +114,6 @@ typedef struct _fty_security_wallet_mlm_agent_t fty_security_wallet_mlm_agent_t;
 #include "cam_credential_asset_mapping.h"
 #include "cam_accessor.h"
 #include "cam_exception.h"
-#include "fty_credential_asset_mapping_server.h"
 #include "secw_document.h"
 #include "secw_exception.h"
 #include "secw_producer_accessor.h"
@@ -122,6 +121,7 @@ typedef struct _fty_security_wallet_mlm_agent_t fty_security_wallet_mlm_agent_t;
 #include "secw_snmpv3.h"
 #include "secw_snmpv1.h"
 #include "secw_user_and_password.h"
+#include "fty_credential_asset_mapping_mlm_agent.h"
 #include "fty_security_wallet_mlm_agent.h"
 #endif // FTY_SECURITY_WALLET_BUILD_DRAFT_API
 

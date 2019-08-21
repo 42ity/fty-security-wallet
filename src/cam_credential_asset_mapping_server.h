@@ -1,5 +1,5 @@
 /*  =========================================================================
-    fty_credential_asset_mapping_server - Credential Asset Mapping Server
+    cam_credential_asset_mapping_server - Credential Asset Mapping Server
 
     Copyright (C) 2019 Eaton
 
@@ -19,17 +19,17 @@
     =========================================================================
 */
 
-#ifndef FTY_CREDENTIAL_ASSET_MAPPING_SERVER_H_INCLUDED
-#define FTY_CREDENTIAL_ASSET_MAPPING_SERVER_H_INCLUDED
-
-#include "cam_credential_asset_mapping.h"
-
-#include <czmq.h>
-#include <malamute.h>
-#include <fty_common_mlm.h>
+#ifndef CAM_CREDENTIAL_ASSET_MAPPING_SERVER_H_INCLUDED
+#define CAM_CREDENTIAL_ASSET_MAPPING_SERVER_H_INCLUDED
 
 #include <functional>
 
+#include "cam_credential_asset_mapping_storage.h"
+
+#include "fty_common_client.h"
+#include "fty_common_sync_server.h"
+
+#include <cxxtools/serializationinfo.h>
 /**
  * \brief Agent CredentialAssetMappingServer main server actor
  */
@@ -42,42 +42,34 @@ namespace cam
     
     using FctCommandHandler = std::function<std::string (const Sender &, const std::vector<std::string> &)>;
 
-    class CredentialAssetMappingStorage;
-
-    class CredentialAssetMappingServer final : public mlm::MlmAgent
+    class CredentialAssetMappingServer final : public fty::SyncServer
     {
 
     public:
-        explicit CredentialAssetMappingServer(zsock_t *pipe);
-
-    private:
-        bool handleMailbox(zmsg_t *message) override;
-        bool handlePipe(zmsg_t *message) override;
+        explicit CredentialAssetMappingServer(const std::string & storagePath);
+        
+        std::vector<std::string> handleRequest(const Sender & sender, const std::vector<std::string> & payload) override;
         
         // List of supported commands with a reference to the handler for this command.
         std::map<Command, FctCommandHandler> m_supportedCommands;
 
-        static std::shared_ptr<CredentialAssetMappingStorage> m_activeMapping;
+        CredentialAssetMappingStorage m_activeMapping;
         
         //Handler for all supported commands
-        static std::string handleCreateMapping(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleGetMapping(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleUpdateMapping(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleUpdatePortMapping(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleUpdateCredentialMapping(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleUpdateStatusMapping(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleUpdateInfoMapping(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleRemoveMapping(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleGetAssetMappings(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleGetMappings(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleGetAllMappings(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleGetCredentialMappings(const Sender & sender, const std::vector<std::string> & params);
-        static std::string handleCountCredentialMappingsForCredential(const Sender & sender, const std::vector<std::string> & params);
+        std::string handleCreateMapping(const Sender & sender, const std::vector<std::string> & params);
+        std::string handleGetMapping(const Sender & sender, const std::vector<std::string> & params);
+        std::string handleUpdateMapping(const Sender & sender, const std::vector<std::string> & params);
+        std::string handleUpdatePortMapping(const Sender & sender, const std::vector<std::string> & params);
+        std::string handleUpdateCredentialMapping(const Sender & sender, const std::vector<std::string> & params);
+        std::string handleUpdateStatusMapping(const Sender & sender, const std::vector<std::string> & params);
+        std::string handleUpdateInfoMapping(const Sender & sender, const std::vector<std::string> & params);
+        std::string handleRemoveMapping(const Sender & sender, const std::vector<std::string> & params);
+        std::string handleGetAssetMappings(const Sender & sender, const std::vector<std::string> & params);
+        std::string handleGetMappings(const Sender & sender, const std::vector<std::string> & params);
+        std::string handleGetAllMappings(const Sender & sender, const std::vector<std::string> & params);
+        std::string handleGetCredentialMappings(const Sender & sender, const std::vector<std::string> & params);
+        std::string handleCountCredentialMappingsForCredential(const Sender & sender, const std::vector<std::string> & params);
 
-
-        
-        //Helpers
-        static zmsg_t *generateErrorMsg(const std::string & correlationId, const std::string & errPayload);
     
     public:
         //Command list
@@ -102,10 +94,7 @@ namespace cam
     
 } // namespace cam
 
-//  @interface
-//  Create an fty_credential_asset_mapping_server actor
-void fty_credential_asset_mapping_server(zsock_t *pipe, void *endpoint);
-
-void fty_credential_asset_mapping_server_test (bool verbose);
+void
+cam_credential_asset_mapping_server_test (bool verbose);
 
 #endif

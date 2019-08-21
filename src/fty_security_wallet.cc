@@ -110,13 +110,17 @@ int main (int argc, char *argv [])
         
         //start broker agent
         zactor_t *secw_server = zactor_new (fty_security_wallet_mlm_agent, static_cast<void*>(&paramsSecw));
-
-        //start broker agent
-        zactor_t *cam_server = zactor_new (fty_credential_asset_mapping_server, (void *)endpoint.c_str());
         
         //set configuration parameters
-        zstr_sendx (cam_server, "STORAGE_MAPPING_PATH", storage_mapping_path.c_str(), NULL);
-        zstr_sendx (cam_server, "CONNECT",  endpoint.c_str(), mapping_actor_name.c_str(), NULL);
+        Arguments paramsCam;
+        
+        paramsCam["STORAGE_MAPPING_PATH"] = storage_mapping_path;
+        paramsCam["AGENT_NAME"] = mapping_actor_name;
+        paramsCam["ENDPOINT"] = endpoint;
+        
+        //start broker agent
+        zactor_t *cam_server = zactor_new (fty_credential_asset_mapping_mlm_agent,static_cast<void*>(&paramsCam));
+        
 
         while (true)
         {

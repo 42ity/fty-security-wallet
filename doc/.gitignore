@@ -17,8 +17,6 @@ cam_accessor.txt
 cam_accessor.doc
 cam_exception.txt
 cam_exception.doc
-fty_credential_asset_mapping_server.txt
-fty_credential_asset_mapping_server.doc
 secw_document.txt
 secw_document.doc
 secw_exception.txt
@@ -33,6 +31,8 @@ secw_snmpv1.txt
 secw_snmpv1.doc
 secw_user_and_password.txt
 secw_user_and_password.doc
+fty_credential_asset_mapping_mlm_agent.txt
+fty_credential_asset_mapping_mlm_agent.doc
 fty_security_wallet_mlm_agent.txt
 fty_security_wallet_mlm_agent.doc
 fty-security-wallet.txt

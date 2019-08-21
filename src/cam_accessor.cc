@@ -21,24 +21,11 @@
 
 #include "cam_accessor.h"
 
-#include <sys/types.h>
-#include <gnu/libc-version.h>
-#include <unistd.h>
-
-//gettid() is available since glibc 2.30
-#if ((__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 30))
-#include <sys/syscall.h>
-#define gettid() syscall(SYS_gettid)
-#endif
-
-#include <iomanip>
-#include <sstream>
-
 #include "cam_helpers.h"
 
 #include "fty_common_mlm.h"
 
-#include "fty_credential_asset_mapping_server.h"
+#include "cam_credential_asset_mapping_server.h"
 #include "fty_security_wallet.h"
 
 namespace cam
@@ -326,13 +313,9 @@ namespace cam
 //  --------------------------------------------------------------------------
 
 
-#define CAM_SELFTEST_CLIENT_ID "cam-client-test"
-
-std::vector<std::pair<std::string,bool>> cam_accessor_test()
+std::vector<std::pair<std::string,bool>> cam_accessor_test(fty::SyncClient & syncClient)
 {
   std::vector<std::pair<std::string,bool>> testsResults;
-
-  static const char* endpoint = "inproc://fty-credential-asset-mapping-test";
   
   using namespace cam;
 
@@ -350,7 +333,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         
         AssetId assetId("asset-1");
         ServiceId serviceId("test-usage");
@@ -419,7 +402,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
 
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
         throw std::runtime_error("Mapping is returned");
       }
@@ -471,7 +454,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         accessor.createMapping(assetId, serviceId, protocol, port, credId, status, extendedInfo );
 
         printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
@@ -493,7 +476,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         
         const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
 
@@ -553,7 +536,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
 
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         accessor.createMapping(assetId, serviceId, protocol, port, credId, status, extendedInfo );
 
         throw std::runtime_error("Mapping is created");
@@ -599,7 +582,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
 
         accessor.removeMapping(assetId, serviceId, protocol);
 
@@ -623,7 +606,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
 
         throw std::runtime_error("Mapping is returned");
@@ -660,7 +643,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         accessor.removeMapping(assetId, serviceId, protocol);
         
         throw std::runtime_error("Mapping is removed");
@@ -713,7 +696,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         accessor.createMapping(assetId, serviceId, protocol, port, credId, status, extendedInfo );
 
         printf(" *<=  Test #%s > Ok\n", testNumber.c_str());
@@ -735,7 +718,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
 
         credId = "new_cred";
         accessor.updateCredentialId(assetId, serviceId, protocol, credId);
@@ -797,7 +780,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         accessor.updateCredentialId("XXXXXX", "XXXXXX", "XXXXX", credId);
         
         throw std::runtime_error("Mapping is updated");
@@ -823,7 +806,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
 
         status = Status::ERROR;
 
@@ -886,7 +869,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         accessor.updateStatus("XXXXXX", "XXXXXX", "XXXX", status);
         
         throw std::runtime_error("Mapping is updated");
@@ -912,7 +895,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
 
         data = "45";
         std::string extraKey("update-key");
@@ -980,7 +963,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         accessor.updateExtendedInfo("XXXXXX", "XXXXXX", "XXXXXX", extendedInfo);
         
         throw std::runtime_error("Mapping is updated");
@@ -1006,7 +989,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
 
         port = "443";
 
@@ -1069,7 +1052,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         accessor.updatePort("XXXXXX", "XXXXXX", "XXXX", port);
         
         throw std::runtime_error("Mapping is updated");
@@ -1095,7 +1078,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
 
         accessor.removeMapping(assetId, serviceId, protocol);
 
@@ -1123,7 +1106,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         
         AssetId assetId("asset-1");
         ServiceId serviceId("test-usage");
@@ -1154,7 +1137,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
 
         AssetId assetId("asset-XXXXX");
         ServiceId serviceId("usage-XXXXX");
@@ -1190,7 +1173,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         
         AssetId assetId("assetA");
 
@@ -1221,7 +1204,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         
         AssetId assetId("XXXXXX");
 
@@ -1256,7 +1239,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         
         CredentialId credId("credC");
 
@@ -1287,7 +1270,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         
         CredentialId credId("XXXXXX");
 
@@ -1322,7 +1305,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         
         CredentialId credId("credC");
 
@@ -1353,7 +1336,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         
         CredentialId credId("XXXXXX");
 
@@ -1388,7 +1371,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
 
         const std::map<CredentialId, uint32_t> counters = accessor.getAllCredentialCounter();
         
@@ -1424,7 +1407,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor(syncClient);
         
         CredentialId credId("XXXXXX");
         const std::map<CredentialId, uint32_t> counters = accessor.getAllCredentialCounter();
@@ -1458,7 +1441,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor0( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
+        Accessor accessor0(syncClient);
 
         for(uint8_t index = 0; index < 5; index++)
         {
@@ -1488,7 +1471,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       {
         for(uint8_t index = 0; index < 5; index++)
         {
-          Accessor accessor0( CAM_SELFTEST_CLIENT_ID, 20, endpoint);
+          Accessor accessor0(syncClient);
           accessor0.getAllCredentialCounter();
         }
 
@@ -1512,8 +1495,8 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test()
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
       try
       {
-        Accessor accessor0( CAM_SELFTEST_CLIENT_ID, 1000, endpoint);
-        Accessor accessor1( CAM_SELFTEST_CLIENT_ID".1", 1000, endpoint);
+        Accessor accessor0(syncClient);
+        Accessor accessor1(syncClient);
 
         for(uint8_t index = 0; index < 5; index++)
         {

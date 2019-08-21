@@ -13,6 +13,7 @@ lib_LTLIBRARIES += src/libfty_security_wallet.la
 pkgconfig_DATA = src/libfty_security_wallet.pc
 
 src_libfty_security_wallet_la_SOURCES = \
+    src/cam_credential_asset_mapping_server.cc \
     src/cam_credential_asset_mapping_storage.cc \
     src/cam_helpers.cc \
     src/secw_security_wallet_server.cc \
@@ -28,7 +29,6 @@ src_libfty_security_wallet_la_SOURCES += \
     src/cam_credential_asset_mapping.cc \
     src/cam_accessor.cc \
     src/cam_exception.cc \
-    src/fty_credential_asset_mapping_server.cc \
     src/secw_document.cc \
     src/secw_exception.cc \
     src/secw_producer_accessor.cc \
@@ -36,6 +36,7 @@ src_libfty_security_wallet_la_SOURCES += \
     src/secw_snmpv3.cc \
     src/secw_snmpv1.cc \
     src/secw_user_and_password.cc \
+    src/fty_credential_asset_mapping_mlm_agent.cc \
     src/fty_security_wallet_mlm_agent.cc
 
 endif
