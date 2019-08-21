@@ -28,6 +28,8 @@
 #include <chrono>
 #include "fty_security_wallet_classes.h"
 
+#include <thread>
+
 namespace secw
 {
   ProducerAccessor::ProducerAccessor( fty::SyncClient & requestClient)
@@ -244,8 +246,8 @@ std::condition_variable g_condvar;
 
 void callbackCreate(const std::string& portfolio, secw::DocumentPtr newDoc)
 {
-  std::unique_lock<std::mutex> lock(g_lock);
   log_debug ("callback CREATED");
+  std::unique_lock<std::mutex> lock(g_lock);
   g_action = "CREATED";
   g_portfolio = portfolio;
   g_newDoc = newDoc->clone();
@@ -254,8 +256,8 @@ void callbackCreate(const std::string& portfolio, secw::DocumentPtr newDoc)
 
 void callbackUpdated(const std::string& portfolio, secw::DocumentPtr oldDoc, secw::DocumentPtr newDoc)
 {
-  std::unique_lock<std::mutex> lock(g_lock);
   log_debug ("callback UPDATED");
+  std::unique_lock<std::mutex> lock(g_lock);
   g_action = "UPDATED";
   g_portfolio = portfolio;
   g_newDoc = newDoc->clone();
@@ -264,9 +266,9 @@ void callbackUpdated(const std::string& portfolio, secw::DocumentPtr oldDoc, sec
 }
 
 void callbackDeleted(const std::string& portfolio, secw::DocumentPtr oldDoc)
-{
-  std::unique_lock<std::mutex> lock(g_lock);
+{ 
   log_debug ("callback DELETED");
+  std::unique_lock<std::mutex> lock(g_lock);
   g_action = "DELETED";
   g_portfolio = portfolio;
   g_oldDoc = oldDoc->clone();

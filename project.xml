@@ -161,7 +161,7 @@
     <class name = "cam_helpers" private = "1" selftest = "0">List of helper functions use a bit everywhere</class>
 
     <!-- Note: Secw class -->
-    <class name = "secw_security_wallet_server" private = "1" selftest = "0">Security Wallet Server</class>
+    <class name = "secw_security_wallet_server" private = "1" >Security Wallet Server</class>
     
     <class name = "secw_security_wallet" private = "1" selftest = "0">Security wallet to manage the storage and access</class>
     <class name = "secw_portfolio" private = "1" selftest = "0">Portfolio to handle documents in the agent</class>

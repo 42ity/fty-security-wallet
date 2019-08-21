@@ -36,6 +36,8 @@ void usage();
 
 int main (int argc, char *argv [])
 {
+    using Arguments = std::map<std::string, std::string>;
+    
     try
     {
         ftylog_setInstance(SECURITY_WALLET_AGENT,"");
@@ -99,7 +101,7 @@ int main (int argc, char *argv [])
 
         log_info(SECURITY_WALLET_AGENT " starting");
         
-        secw::Arguments paramsSecw;
+        Arguments paramsSecw;
         
         paramsSecw["STORAGE_CONFIGURATION_PATH"] = storage_access_path;
         paramsSecw["STORAGE_DATABASE_PATH"] = storage_database_path;
@@ -111,6 +113,7 @@ int main (int argc, char *argv [])
 
         //start broker agent
         zactor_t *cam_server = zactor_new (fty_credential_asset_mapping_server, (void *)endpoint.c_str());
+        
         //set configuration parameters
         zstr_sendx (cam_server, "STORAGE_MAPPING_PATH", storage_mapping_path.c_str(), NULL);
         zstr_sendx (cam_server, "CONNECT",  endpoint.c_str(), mapping_actor_name.c_str(), NULL);

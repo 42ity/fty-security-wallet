@@ -20,7 +20,7 @@
 */
 
 /*
- * Agents methods
+ * Agents methodsl
  */
 
 #include "fty_security_wallet_classes.h"
