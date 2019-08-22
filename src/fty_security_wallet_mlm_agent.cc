@@ -58,6 +58,8 @@ void fty_security_wallet_mlm_agent(zsock_t *pipe, void *args)
                                        arguments.at("ENDPOINT")
                                     );
     agent.mainloop();
+    
+    std::cerr << "Leave the agent" << std::endl;
 }
 
 
@@ -132,7 +134,7 @@ fty_security_wallet_mlm_agent_test (bool verbose)
         //Tests from the lib
         std::vector<std::pair<std::string,bool>> testLibConsumerResults = secw_consumer_accessor_test(syncClient, streamClient);
         std::vector<std::pair<std::string,bool>> testLibProducerResults = secw_producer_accessor_test(syncClient, streamClient);
-
+        
         printf("\n-----------------------------------------------------------------------\n");
 
         uint32_t testsPassed = 0;

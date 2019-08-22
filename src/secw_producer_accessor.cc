@@ -235,49 +235,48 @@ namespace secw
 
 #define TEST_TIMEOUT 5
 
+using namespace std::placeholders;
+
 //callback for test
 secw::DocumentPtr g_newDoc;
 secw::DocumentPtr g_oldDoc;
 std::string g_portfolio;
 std::string g_action;
 
-std::mutex g_lock;
-std::condition_variable g_condvar;
-
-void callbackCreate(const std::string& portfolio, secw::DocumentPtr newDoc)
+void callbackCreate(const std::string& portfolio, secw::DocumentPtr newDoc, std::mutex * mut, std::condition_variable * condvar)
 {
   log_debug ("callback CREATED");
-  std::unique_lock<std::mutex> lock(g_lock);
+  std::unique_lock<std::mutex> lock(*mut);
   g_action = "CREATED";
   g_portfolio = portfolio;
   g_newDoc = newDoc->clone();
-  g_condvar.notify_all();
+  condvar->notify_all();
 }
 
-void callbackUpdated(const std::string& portfolio, secw::DocumentPtr oldDoc, secw::DocumentPtr newDoc)
+void callbackUpdated(const std::string& portfolio, secw::DocumentPtr oldDoc, secw::DocumentPtr newDoc, std::mutex * mut, std::condition_variable * condvar)
 {
   log_debug ("callback UPDATED");
-  std::unique_lock<std::mutex> lock(g_lock);
+  std::unique_lock<std::mutex> lock(*mut);
   g_action = "UPDATED";
   g_portfolio = portfolio;
   g_newDoc = newDoc->clone();
   g_oldDoc = oldDoc->clone();
-  g_condvar.notify_all();
+  condvar->notify_all();
 }
 
-void callbackDeleted(const std::string& portfolio, secw::DocumentPtr oldDoc)
+void callbackDeleted(const std::string& portfolio, secw::DocumentPtr oldDoc, std::mutex * mut, std::condition_variable * condvar)
 { 
   log_debug ("callback DELETED");
-  std::unique_lock<std::mutex> lock(g_lock);
+  std::unique_lock<std::mutex> lock(*mut);
   g_action = "DELETED";
   g_portfolio = portfolio;
   g_oldDoc = oldDoc->clone();
-  g_condvar.notify_all();
+  condvar->notify_all();
 }
 
 /*void callbackStarted() Cannot be tested here
 {
-  std::unique_lock<std::mutex> lock(g_lock);
+  std::unique_lock<std::mutex> lock(mut);
   g_action = "STARTED";
   g_condvar.notify_all();
 }*/
@@ -286,6 +285,9 @@ void callbackDeleted(const std::string& portfolio, secw::DocumentPtr oldDoc)
 std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::SyncClient & syncClient, fty::StreamSubscriber & streamClient)
 {
   std::vector<std::pair<std::string,bool>> testsResults;
+  
+  std::mutex g_lock;
+  std::condition_variable g_condvar;
   
   using namespace secw;
 
@@ -596,7 +598,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::SyncCl
     ProducerAccessor producerAccessor(syncClient, streamClient);
 
     //register the callback on create
-    producerAccessor.setCallbackOnCreate(callbackCreate);
+    producerAccessor.setCallbackOnCreate(std::bind(callbackCreate, _1, _2, &g_lock, &g_condvar));
 
     try
     {
@@ -690,7 +692,8 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::SyncCl
     ProducerAccessor producerAccessor(syncClient, streamClient);
 
     //register the callback on update
-    producerAccessor.setCallbackOnUpdate(callbackUpdated);
+    producerAccessor.setCallbackOnUpdate(std::bind(callbackUpdated, _1, _2, _3, &g_lock, &g_condvar));
+
 
     try
     {
@@ -788,7 +791,8 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::SyncCl
     ProducerAccessor producerAccessor(syncClient, streamClient);
 
     //register the callback on update
-    producerAccessor.setCallbackOnUpdate(callbackUpdated);
+    producerAccessor.setCallbackOnUpdate(std::bind(callbackUpdated, _1, _2, _3, &g_lock, &g_condvar));
+
 
     try
     {
@@ -836,7 +840,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::SyncCl
     ProducerAccessor producerAccessor(syncClient, streamClient);
 
     //register the callback on create
-    producerAccessor.setCallbackOnDelete(callbackDeleted);
+    producerAccessor.setCallbackOnDelete(std::bind(callbackDeleted, _1, _2, &g_lock, &g_condvar));
 
     try
     {
