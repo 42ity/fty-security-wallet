@@ -29,19 +29,17 @@
 #include "fty_security_wallet_classes.h"
 
 #include "fty_common_mlm_zconfig.h"
+#include "fty_common_mlm_stream_client.h"
 
-void usage(){
-    puts (SECURITY_WALLET_AGENT " [options] ...");
-    puts ("  -v|--verbose        verbose test output");
-    puts ("  -h|--help           this information");
-    puts ("  -c|--config         path to config file");
-}
+//functions
+void usage();
 
 int main (int argc, char *argv [])
 {
+    using Arguments = std::map<std::string, std::string>;
+    
     try
     {
-    
         ftylog_setInstance(SECURITY_WALLET_AGENT,"");
         int argn;
         char *config_file = NULL;
@@ -102,19 +100,27 @@ int main (int argc, char *argv [])
         }
 
         log_info(SECURITY_WALLET_AGENT " starting");
-
+        
+        Arguments paramsSecw;
+        
+        paramsSecw["STORAGE_CONFIGURATION_PATH"] = storage_access_path;
+        paramsSecw["STORAGE_DATABASE_PATH"] = storage_database_path;
+        paramsSecw["AGENT_NAME"] = secw_actor_name;
+        paramsSecw["ENDPOINT"] = endpoint;
+        
         //start broker agent
-        zactor_t *secw_server = zactor_new (fty_security_wallet_mlm_agent, (void *)endpoint.c_str());
+        zactor_t *secw_server = zactor_new (fty_security_wallet_mlm_agent, static_cast<void*>(&paramsSecw));
+        
         //set configuration parameters
-        zstr_sendx (secw_server, "STORAGE_CONFIGURATION_PATH", storage_access_path.c_str(), NULL);
-        zstr_sendx (secw_server, "STORAGE_DATABASE_PATH", storage_database_path.c_str(), NULL);
-        zstr_sendx (secw_server, "CONNECT", endpoint.c_str(), secw_actor_name.c_str(), NULL);
-
+        Arguments paramsCam;
+        
+        paramsCam["STORAGE_MAPPING_PATH"] = storage_mapping_path;
+        paramsCam["AGENT_NAME"] = mapping_actor_name;
+        paramsCam["ENDPOINT"] = endpoint;
+        
         //start broker agent
-        zactor_t *cam_server = zactor_new (fty_credential_asset_mapping_server, (void *)endpoint.c_str());
-        //set configuration parameters
-        zstr_sendx (cam_server, "STORAGE_MAPPING_PATH", storage_mapping_path.c_str(), NULL);
-        zstr_sendx (cam_server, "CONNECT",  endpoint.c_str(), mapping_actor_name.c_str(), NULL);
+        zactor_t *cam_server = zactor_new (fty_credential_asset_mapping_mlm_agent,static_cast<void*>(&paramsCam));
+        
 
         while (true)
         {
@@ -164,3 +170,12 @@ int main (int argc, char *argv [])
     }
 
 }
+
+void usage()
+{
+    puts (SECURITY_WALLET_AGENT " [options] ...");
+    puts ("  -v|--verbose        verbose test output");
+    puts ("  -h|--help           this information");
+    puts ("  -c|--config         path to config file");
+}
+

@@ -33,6 +33,10 @@
 #include "../include/fty_security_wallet.h"
 
 //  Opaque class structures to allow forward references
+#ifndef CAM_CREDENTIAL_ASSET_MAPPING_SERVER_T_DEFINED
+typedef struct _cam_credential_asset_mapping_server_t cam_credential_asset_mapping_server_t;
+#define CAM_CREDENTIAL_ASSET_MAPPING_SERVER_T_DEFINED
+#endif
 #ifndef CAM_CREDENTIAL_ASSET_MAPPING_STORAGE_T_DEFINED
 typedef struct _cam_credential_asset_mapping_storage_t cam_credential_asset_mapping_storage_t;
 #define CAM_CREDENTIAL_ASSET_MAPPING_STORAGE_T_DEFINED
@@ -70,6 +74,7 @@ typedef struct _secw_configuration_t secw_configuration_t;
 
 //  Internal API
 
+#include "cam_credential_asset_mapping_server.h"
 #include "cam_credential_asset_mapping_storage.h"
 #include "cam_helpers.h"
 #include "secw_security_wallet_server.h"
@@ -81,6 +86,16 @@ typedef struct _secw_configuration_t secw_configuration_t;
 
 //  *** To avoid double-definitions, only define if building without draft ***
 #ifndef FTY_SECURITY_WALLET_BUILD_DRAFT_API
+
+//  *** Draft method, defined for internal use only ***
+//  Self test of this class.
+FTY_SECURITY_WALLET_PRIVATE void
+    cam_credential_asset_mapping_server_test (bool verbose);
+
+//  *** Draft method, defined for internal use only ***
+//  Self test of this class.
+FTY_SECURITY_WALLET_PRIVATE void
+    secw_security_wallet_server_test (bool verbose);
 
 //  Self test for private classes
 FTY_SECURITY_WALLET_PRIVATE void

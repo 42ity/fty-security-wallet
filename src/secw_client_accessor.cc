@@ -44,117 +44,34 @@
 
 #include "secw_helpers.h"
 
+
+using namespace std::placeholders;
+
 namespace secw
 {
-  ClientAccessor::ClientAccessor(const ClientId & clientId,
-                  uint32_t timeout,
-                  const std::string & endPoint):
-    m_clientId(clientId),
-    m_timeout(timeout),
-    m_endPoint(endPoint)
+  ClientAccessor::ClientAccessor( fty::SyncClient & requestClient)
+   : m_requestClient(requestClient), m_ptrStreamClient(nullptr)
+  {}
+    
+  ClientAccessor::ClientAccessor( fty::SyncClient & requestClient, fty::StreamSubscriber & subscriberClient)
+   : m_requestClient(requestClient), m_ptrStreamClient(&subscriberClient)
   {}
 
   ClientAccessor:: ~ClientAccessor()
   {
-    //1. Set the handlers to null
+    //unsubscribe if needed
+    if(m_isRegistered && m_ptrStreamClient)
     {
-      //lock the mutex to set the handler
-      std::unique_lock<std::mutex> lock(m_handlerFunctionLock);
-
-      m_updatedCallback = nullptr;
-      m_createdCallback = nullptr;
-      m_deletedCallback = nullptr;
-      m_startedCallback = nullptr;
+      m_ptrStreamClient->unsubscribe(m_registrationId);
     }
-
-    //2. Update thread
-    updateNotificationThread();
   }
 
   std::vector<std::string> ClientAccessor::sendCommand(const std::string & command, const std::vector<std::string> & frames) const
   {
-    mlm_client_t * client = mlm_client_new();
-
-    if(client == NULL)
-    {
-      mlm_client_destroy(&client);
-      throw SecwMalamuteClientIsNullException();
-    }
-
-    //create a unique sender id: <clientId>.[thread id in hexa]
-    pid_t threadId = gettid();
-
-    std::stringstream ss;
-    ss << m_clientId << "." << std::setfill('0') << std::setw(sizeof(pid_t)*2) << std::hex << threadId;
-
-    std::string uniqueId = ss.str();
-
-    int rc = mlm_client_connect (client, m_endPoint.c_str(), m_timeout, uniqueId.c_str());
-
-    if (rc != 0)
-    {
-      mlm_client_destroy(&client);
-      throw SecwMalamuteConnectionFailedException();
-    }
-
-    //Prepare the request:
-    zmsg_t *request = zmsg_new();
-    ZuuidGuard  zuuid(zuuid_new ());
-    zmsg_addstr (request, zuuid_str_canonical (zuuid));
-
-    //add the command
-    zmsg_addstr (request, command.c_str());
-
-    //add all the extra frames
-    for(const std::string & frame : frames )
-    {
-      zmsg_addstr (request, frame.c_str());
-    }
-
-    if(zsys_interrupted)
-    {
-      zmsg_destroy(&request);
-      mlm_client_destroy(&client);
-      throw SecwMalamuteInterruptedException();
-    }
-
-    //send the message
-    mlm_client_sendto (client, SECURITY_WALLET_AGENT, "REQUEST", NULL, m_timeout, &request);
-
-    if(zsys_interrupted)
-    {
-      zmsg_destroy(&request);
-      mlm_client_destroy(&client);
-      throw SecwMalamuteInterruptedException();
-    }
-
-    //Get the reply
-    ZmsgGuard recv(mlm_client_recv (client));
-    mlm_client_destroy(&client);
-
-    //Get number of frame all the frame
-    size_t numberOfFrame = zmsg_size(recv);
-
-    if(numberOfFrame < 2)
-    {
-      throw SecwProtocolErrorException("Wrong number of frame");
-    }
-
-    //Check the message
-    ZstrGuard str(zmsg_popstr (recv));
-    if(!streq (str, zuuid_str_canonical (zuuid)))
-    {
-      throw SecwProtocolErrorException("Mismatch correlation id");
-    }
-
-    std::vector<std::string> receivedFrames;
-
-    //we unstack all the other frame starting by the 2rd one.
-    for(size_t index = 1; index < numberOfFrame; index++)
-    {
-      ZstrGuard frame( zmsg_popstr(recv) );
-      receivedFrames.push_back( std::string(frame.get()) );
-    }
+    std::vector<std::string> payload = {command};
+    std::copy(frames.begin(), frames.end(), back_inserter(payload));
+    
+    std::vector<std::string> receivedFrames = m_requestClient.syncRequestWithReply(payload);
 
     //check if the first frame we get is an error
     if(receivedFrames[0] == "ERROR")
@@ -170,74 +87,106 @@ namespace secw
       }
 
     }
-
     return receivedFrames;
   }
 
-  void ClientAccessor::notificationHandler()
+  void ClientAccessor::updateNotificationThread()
   {
-    mlm_client_t *client = mlm_client_new ();
+    bool shouldBeRunning = false;
 
-    if(client == NULL)
+    //1. Get to know if we should run or not
     {
-        mlm_client_destroy(&client);
-        m_handlerFunctionThreadStarted.notify_all();
-        throw SecwMalamuteClientIsNullException();
+      std::unique_lock<std::mutex> lock(m_handlerFunctionLock);
+      shouldBeRunning = ((m_createdCallback) || (m_updatedCallback) || (m_deletedCallback) || (m_startedCallback));
+    }
+    
+    //check if we need to subscribe
+    if(shouldBeRunning && !m_isRegistered)
+    {
+      m_registrationId = m_ptrStreamClient->subscribe(std::bind(&ClientAccessor::callbackHandler, this, _1));
+      m_isRegistered = true;
+    }
+    
+    //check if we need to unsubscribe
+    if(shouldBeRunning && !m_isRegistered)
+    {
+      m_ptrStreamClient->unsubscribe(m_registrationId);
+      m_isRegistered = false;
+    }
+    
+  }
+
+  void ClientAccessor::setCallbackOnUpdate(UpdatedCallback updatedCallback)
+  {
+    if(!m_ptrStreamClient) return; // no stream listener
+
+    std::cerr << "Set callback UPDATED" << std::endl;
+    //1. Set the handler
+    {
+      //lock the mutex to set the handler
+      std::unique_lock<std::mutex> lock(m_handlerFunctionLock);
+      m_updatedCallback = updatedCallback;
     }
 
-    //create a unique id: <m_clientId>-SECW_NOTIFICATIONS.[thread id in hexa]
-    pid_t threadId = gettid();
+    //2. Update thread if needed
+    updateNotificationThread();
 
-    std::stringstream ss;
-    ss << m_clientId  << "-" << SECW_NOTIFICATIONS << "." << std::setfill('0') << std::setw(sizeof(pid_t)*2) << std::hex << threadId;
+  }
 
-    std::string uniqueId = ss.str();
-
-    int rc = mlm_client_connect (client, m_endPoint.c_str(), 1000, uniqueId.c_str());
-
-    if (rc != 0)
+  void ClientAccessor::setCallbackOnCreate(CreatedCallback createdCallback)
+  {
+    if(!m_ptrStreamClient) return; // no stream listener
+    
+    //1. Set the handler
     {
-        mlm_client_destroy(&client);
-        m_handlerFunctionThreadStarted.notify_all();
-        throw SecwMalamuteConnectionFailedException();
+      //lock the mutex to set the handler
+      std::unique_lock<std::mutex> lock(m_handlerFunctionLock);
+      m_createdCallback = createdCallback;
+    }
+    
+    //2. Update thread if needed
+    updateNotificationThread();
+
+  }
+
+  void ClientAccessor::setCallbackOnDelete(DeletedCallback deletedCallback)
+  {
+    if(!m_ptrStreamClient) return; // no stream listener
+    
+    //1. Set the handler
+    {
+      //lock the mutex to set the handler
+      std::unique_lock<std::mutex> lock(m_handlerFunctionLock);
+      m_deletedCallback = deletedCallback;
     }
 
-    rc = mlm_client_set_consumer (client, SECW_NOTIFICATIONS, ".*");
-    if (rc != 0)
+    //2. Update thread if needed
+    updateNotificationThread();
+  }
+
+  void ClientAccessor::setCallbackOnStart(StartedCallback startedCallback)
+  {
+    if(!m_ptrStreamClient) return; // no stream listener
+    
+    //1. Set the handler
     {
-        mlm_client_destroy (&client);
-        m_handlerFunctionThreadStarted.notify_all();
-        throw SecwMalamuteInterruptedException();
+      //lock the mutex to set the handler
+      std::unique_lock<std::mutex> lock(m_handlerFunctionLock);
+      m_startedCallback = startedCallback;
     }
 
-    zpoller_t *poller = zpoller_new (mlm_client_msgpipe (client), NULL);
-
-    m_handlerFunctionThreadStarted.notify_all();
-
-    while (!zsys_interrupted)
-    {
-      void *which = zpoller_wait (poller, -1);
-      if (which == mlm_client_msgpipe (client))
-      {
-        ZmsgGuard msg (mlm_client_recv (client));
-
-        //check if we need to leave the loop
-        if(m_stopRequested)
+    //2. Update thread if needed
+    updateNotificationThread();
+  }
+  
+  void ClientAccessor::callbackHandler( const std::vector<std::string> & payload)
+  {
+       try
         {
-          break;
-        }
-
-        //Get number of frame all the frame
-        size_t numberOfFrame = zmsg_size(msg);
-
-        try
-        {
-          //treat only the notification
-          if (numberOfFrame == 1)
+          //treat only the payload with good format (1 frame)
+          if (payload.size() == 1)
           {
-            ZstrGuard notification (zmsg_popstr (msg));
-
-            cxxtools::SerializationInfo si = deserialize(std::string(notification.get()));
+            cxxtools::SerializationInfo si = deserialize(payload[0]);
 
             std::string action = "";
             si.getMember ("action") >>= action;
@@ -306,163 +255,20 @@ namespace secw
 
             //end of handlers
           }
+          else
+          {
+            log_warning("Unknown payload received");
+          }
 
         }
         catch(const std::exception& e)
         {
-          log_error("Error during notification processing: %s", e.what());
+          log_error("Error during security wallet notification processing: %s", e.what());
         }
         catch (...) //Show Must Go On => Log errors and continue
         {
-          log_error("Error during notification processing: unknown error");
+          log_error("Error during security wallet notification processing: unknown error");
         }
-
-      }
-    }
-
-    zpoller_destroy(&poller);
-    mlm_client_destroy(&client);
-
-  }
-
-  //function which start or stop the thread if needed
-  void ClientAccessor::updateNotificationThread()
-  {
-    bool shouldBeRunning = false;
-
-    //1. Get to know if we should run or not
-    {
-      std::unique_lock<std::mutex> lock(m_handlerFunctionLock);
-      shouldBeRunning = ((m_createdCallback) || (m_updatedCallback) || (m_deletedCallback) || (m_startedCallback));
-    }
-
-    //2. update the thread
-    if(shouldBeRunning && (!m_notificationThread.joinable()))
-    {
-      std::unique_lock<std::mutex> lock(m_handlerFunctionStarting);
-
-      //start
-      m_stopRequested = false;
-
-      m_notificationThread = std::thread(std::bind(&ClientAccessor::notificationHandler, this));
-
-      m_handlerFunctionThreadStarted.wait(lock);
-    }
-    else if((!shouldBeRunning) && m_notificationThread.joinable())
-    {
-      //stop
-      m_stopRequested = true;
-
-      //send a signal to the bus
-      try
-      {
-        mlm_client_t * client = mlm_client_new();
-
-        if(client == NULL)
-        {
-          mlm_client_destroy(&client);
-          throw SecwMalamuteClientIsNullException();
-        }
-
-        //create a unique id: <m_clientId>+SECW_NOTIFICATIONS.[thread id in hexa]
-        pid_t threadId = gettid();
-
-        std::stringstream ss;
-        ss << m_clientId  << "+" << SECW_NOTIFICATIONS << "." << std::setfill('0') << std::setw(sizeof(pid_t)*2) << std::hex << threadId;
-
-        std::string uniqueId = ss.str();
-
-        int rc = mlm_client_connect (client, m_endPoint.c_str(), 1000, uniqueId.c_str());
-
-        if (rc != 0)
-        {
-          mlm_client_destroy(&client);
-          throw SecwMalamuteConnectionFailedException();
-        }
-
-        rc = mlm_client_set_producer (client, SECW_NOTIFICATIONS);
-        if (rc != 0)
-        {
-            mlm_client_destroy (&client);
-            throw SecwMalamuteInterruptedException();
-        }
-
-        zmsg_t *notification = zmsg_new ();
-        zmsg_addstr (notification, "");
-        rc = mlm_client_send (client, "SYNC", &notification);
-
-        if (rc != 0)
-        {
-          zmsg_destroy(&notification);
-          mlm_client_destroy(&client);
-          throw SecwMalamuteInterruptedException();
-        }
-
-        mlm_client_destroy (&client);
-      }
-      catch(const std::exception& e)
-      {
-        throw std::runtime_error("Impossible to stop the notification handler: "+std::string(e.what()));
-      }
-
-      //wait until the thread finish
-      m_notificationThread.join();
-    }
-
-  }
-
-  void ClientAccessor::setCallbackOnUpdate(UpdatedCallback updatedCallback)
-  {
-    std::cerr << "Set callback UPDATED" << std::endl;
-    //1. Set the handler
-    {
-      //lock the mutex to set the handler
-      std::unique_lock<std::mutex> lock(m_handlerFunctionLock);
-      m_updatedCallback = updatedCallback;
-    }
-
-    //2. Update thread if needed
-    updateNotificationThread();
-
-  }
-
-  void ClientAccessor::setCallbackOnCreate(CreatedCallback createdCallback)
-  {
-    //1. Set the handler
-    {
-      //lock the mutex to set the handler
-      std::unique_lock<std::mutex> lock(m_handlerFunctionLock);
-      m_createdCallback = createdCallback;
-    }
-
-    //2. Update thread if needed
-    updateNotificationThread();
-  }
-
-  void ClientAccessor::setCallbackOnDelete(DeletedCallback deletedCallback)
-  {
-    //1. Set the handler
-    {
-      //lock the mutex to set the handler
-      std::unique_lock<std::mutex> lock(m_handlerFunctionLock);
-      m_deletedCallback = deletedCallback;
-    }
-
-    //2. Update thread if needed
-    updateNotificationThread();
-  }
-
-  void ClientAccessor::setCallbackOnStart(StartedCallback startedCallback)
-  {
-    //1. Set the handler
-    {
-      //lock the mutex to set the handler
-      std::unique_lock<std::mutex> lock(m_handlerFunctionLock);
-      m_startedCallback = startedCallback;
-    }
-
-    //2. Update thread if needed
-    updateNotificationThread();
   }
 
 } //namespace secw

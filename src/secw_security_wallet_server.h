@@ -25,6 +25,9 @@
 #include <functional>
 #include "secw_security_wallet.h"
 
+#include "fty_common_client.h"
+#include "fty_common_sync_server.h"
+
 #include <cxxtools/serializationinfo.h>
 /**
  * \brief Agent SecurityWalletServer main server actor
@@ -33,27 +36,25 @@ namespace secw
 {
     using Command   = std::string;
     using Sender    = std::string;
-    using Subject   = std::string;
     
     using FctCommandHandler = std::function<std::string (const Sender &, const std::vector<std::string> &)>;
-    using FctNotifier = std::function<void (const std::string &)>;
 
-    class SecurityWalletServer final
+    class SecurityWalletServer final : public fty::SyncServer
     {
 
     public:
         explicit SecurityWalletServer(  const std::string & configurationPath,
                                         const std::string & databasePath,
-                                        FctNotifier notifier = nullptr);
+                                        fty::StreamPublisher & streamPublisher);
         
-        std::vector<std::string> handleRequest(const Sender & sender, const std::vector<std::string> & payload);
+        std::vector<std::string> handleRequest(const Sender & sender, const std::vector<std::string> & payload) override;
 
     private:
         // List of supported commands with a reference to the handler for this command.
         std::map<Command, FctCommandHandler> m_supportedCommands;
 
         SecurityWallet m_activeWallet;
-        FctNotifier m_notifier;
+        fty::StreamPublisher & m_streamPublisher;
         
         //Handler for all supported commands
         std::string handleGetListDocumentsWithSecret(const Sender & sender, const std::vector<std::string> & params);
@@ -107,5 +108,8 @@ namespace secw
     };
 
 } // namespace secw
+
+void
+    secw_security_wallet_server_test (bool verbose);
 
 #endif

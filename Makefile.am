@@ -63,6 +63,7 @@ EXTRA_DIST += \
 endif
 
 EXTRA_DIST += \
+    src/cam_credential_asset_mapping_server.h \
     src/cam_credential_asset_mapping_storage.h \
     src/cam_helpers.h \
     src/secw_security_wallet_server.h \

@@ -24,8 +24,9 @@
 
 #include "cam_credential_asset_mapping.h"
 
-#include <czmq.h>
-#include <malamute.h>
+#include "fty_common_client.h"
+#include "fty_common_mlm_sync_client.h"
+#include <memory>
 
 namespace cam
 {
@@ -36,8 +37,12 @@ namespace cam
   class Accessor
   {
   public:
+    
+    explicit Accessor( fty::SyncClient & requestClient);
+    
     /**
-     * @brief Construct a new Accessor object
+     * @deprecated
+     * @brief Construct a new Accessor object using malamute
      *
      * @param clientId
      * @param timeout
@@ -84,16 +89,17 @@ namespace cam
 
   
   private:
-    ClientId m_clientId;
-    uint32_t m_timeout;
-    std::string m_endPoint;
+    //for backward compatibility
+    std::shared_ptr<mlm::MlmSyncClient> m_mlmClient;
 
+    fty::SyncClient & m_requestClient;
+    
     std::vector<std::string> sendCommand(const std::string & command, const std::vector<std::string> & frames) const;
   };
   
 } //namespace cam
 
-std::vector<std::pair<std::string,bool>> cam_accessor_test();
+std::vector<std::pair<std::string,bool>> cam_accessor_test(fty::SyncClient & syncClient);
 
 #endif
 

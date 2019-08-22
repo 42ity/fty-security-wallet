@@ -40,8 +40,15 @@ typedef struct {
 static test_item_t
 all_tests [] = {
 #ifdef FTY_SECURITY_WALLET_BUILD_DRAFT_API
+// Tests for stable/draft private classes:
+// Now built only with --enable-drafts, so even stable builds are hidden behind the flag
+    { "cam_credential_asset_mapping_server", NULL, true, false, "cam_credential_asset_mapping_server_test" },
+    { "secw_security_wallet_server", NULL, true, false, "secw_security_wallet_server_test" },
+    { "private_classes", NULL, false, false, "$ALL" }, // compat option for older projects
+#endif // FTY_SECURITY_WALLET_BUILD_DRAFT_API
+#ifdef FTY_SECURITY_WALLET_BUILD_DRAFT_API
 // Tests for draft public classes:
-    { "fty_credential_asset_mapping_server", fty_credential_asset_mapping_server_test, false, true, NULL },
+    { "fty_credential_asset_mapping_mlm_agent", fty_credential_asset_mapping_mlm_agent_test, false, true, NULL },
     { "fty_security_wallet_mlm_agent", fty_security_wallet_mlm_agent_test, false, true, NULL },
 #endif // FTY_SECURITY_WALLET_BUILD_DRAFT_API
     {NULL, NULL, 0, 0, NULL}          //  Sentinel

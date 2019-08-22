@@ -1,5 +1,5 @@
 /*  =========================================================================
-    fty_security_wallet_mlm_agent - Security Wallet malamute agent
+    fty_credential_asset_mapping_mlm_agent - Credential Asset Mapping malamute agent
 
     Copyright (C) 2019 Eaton
 
@@ -19,21 +19,18 @@
     =========================================================================
 */
 
-#ifndef FTY_SECURITY_WALLET_MLM_AGENT_H_INCLUDED
-#define FTY_SECURITY_WALLET_MLM_AGENT_H_INCLUDED
-
-#include "fty_common_mlm_agent.h"
+#ifndef FTY_CREDENTIAL_ASSET_MAPPING_MLM_AGENT_H_INCLUDED
+#define FTY_CREDENTIAL_ASSET_MAPPING_MLM_AGENT_H_INCLUDED
 
 //  @interface
-//  Create an security wallet actor
-void 
-    fty_security_wallet_mlm_agent(zsock_t *pipe, void *args);
-
-//  Self test
+//  Create an fty_credential_asset_mapping_server actor
 void
-    fty_security_wallet_mlm_agent_test (bool verbose);
+    fty_credential_asset_mapping_mlm_agent (zsock_t *pipe, void *args);
+
+//  Self test of this class
+void
+    fty_credential_asset_mapping_mlm_agent_test (bool verbose);
+//  @end
+
 
 #endif
-
-
-

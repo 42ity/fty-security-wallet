@@ -1,5 +1,5 @@
 /*  =========================================================================
-    fty_security_wallet_mlm_agent - Security Wallet malamute agent
+    fty_credential_asset_mapping_mlm_agent - Credential Asset Mapping malamute agent
 
     Copyright (C) 2019 Eaton
 
@@ -20,36 +20,22 @@
 */
 
 /*
- * Agents methods
- */
+@header
+    fty_credential_asset_mapping_mlm_agent - Credential Asset Mapping malamute agent
+@discuss
+@end
+*/
 
 #include "fty_security_wallet_classes.h"
 
-#include "secw_exception.h"
-#include "secw_security_wallet_server.h"
-#include "secw_security_wallet.h"
-#include "secw_helpers.h"
-
-#include "fty_common_mlm_stream_client.h"
-#include "fty_common_mlm_basic_mailbox_server.h"
-
-
-#include <sstream>
-#include <cxxtools/jsonserializer.h>
-
-void fty_security_wallet_mlm_agent(zsock_t *pipe, void *args)
+void fty_credential_asset_mapping_mlm_agent (zsock_t *pipe, void *args)
 {
     using Arguments = std::map<std::string, std::string>;
     
     const Arguments & arguments = *static_cast<Arguments*>(args);
     
-    //create a stream publisher for notification
-    mlm::MlmStreamClient notificationStream(SECURITY_WALLET_AGENT, SECW_NOTIFICATIONS, 1000, arguments.at("ENDPOINT"));
-    
     //create the server
-    secw::SecurityWalletServer server(  arguments.at("STORAGE_CONFIGURATION_PATH"),
-                                        arguments.at("STORAGE_DATABASE_PATH"),
-                                        notificationStream);
+    cam::CredentialAssetMappingServer server(arguments.at("STORAGE_MAPPING_PATH"));
     
     //launch the agent
     mlm::MlmBasicMailboxServer agent(  pipe, 
@@ -58,14 +44,11 @@ void fty_security_wallet_mlm_agent(zsock_t *pipe, void *args)
                                        arguments.at("ENDPOINT")
                                     );
     agent.mainloop();
-    
-    std::cerr << "Leave the agent" << std::endl;
 }
 
 
 //  --------------------------------------------------------------------------
-//  Self test
-
+//  Self test of this class
 
 #define SELFTEST_DIR_RO "src/selftest-ro"
 #define SELFTEST_DIR_RW "src/selftest-rw"
@@ -81,84 +64,57 @@ void fty_security_wallet_mlm_agent(zsock_t *pipe, void *args)
 #include <fstream>
 
 void
-fty_security_wallet_mlm_agent_test (bool verbose)
+fty_credential_asset_mapping_mlm_agent_test (bool verbose)
 {
-    printf ("\n\n ** fty_security_wallet_mlm_agent: \n\n");
+    using Arguments = std::map<std::string, std::string>;
+    
+    printf ("\n ** fty_credential_asset_mapping_mlm_agent: \n");
     assert (SELFTEST_DIR_RO);
     assert (SELFTEST_DIR_RW);
 
-    static const char* endpoint = "inproc://fty-security-walletg-test";
+    static const char* endpoint = "inproc://fty-credential-asset-mapping-test";
 
-    //Copy the database file
+    //Copy the mapping file
     {
-        std::ifstream source(SELFTEST_DIR_RO"/data.json", std::ios::binary);
-        std::ofstream dest(SELFTEST_DIR_RW"/data.json", std::ios::binary | std::ofstream::trunc );
+        std::ifstream source(SELFTEST_DIR_RO"/mapping.json", std::ios::binary);
+        std::ofstream dest(SELFTEST_DIR_RW"/mapping.json", std::ios::binary | std::ofstream::trunc );
         dest << source.rdbuf();
 
         dest.close();
         source.close();
     }
 
-    //Copy the configuration file
-    {
-        std::ifstream source(SELFTEST_DIR_RO"/configuration.json", std::ios::binary);
-        std::ofstream dest(SELFTEST_DIR_RW"/configuration.json", std::ios::binary | std::ofstream::trunc );
-        dest << source.rdbuf();
-
-        dest.close();
-        source.close();
-    }
-
-    //create the broker 
     zactor_t *broker = zactor_new (mlm_server, (void*) "Malamute");
     zstr_sendx (broker, "BIND", endpoint, NULL);
     if (verbose)
         zstr_send (broker, "VERBOSE");
     
-    //New section => we need to destroy clients before broker
+    //set configuration parameters
+    Arguments paramsCam;
+
+    paramsCam["STORAGE_MAPPING_PATH"] =  SELFTEST_DIR_RW"/mapping.json";
+    paramsCam["AGENT_NAME"] = MAPPING_AGENT;
+    paramsCam["ENDPOINT"] = endpoint;
+
+    //start broker agent
+    zactor_t *server = zactor_new (fty_credential_asset_mapping_mlm_agent,static_cast<void*>(&paramsCam));
+
     {
-        //setup parameters for the agent
-        std::map<std::string, std::string> paramsSecw;
-
-        paramsSecw["STORAGE_CONFIGURATION_PATH"] = SELFTEST_DIR_RW"/configuration.json";
-        paramsSecw["STORAGE_DATABASE_PATH"] = SELFTEST_DIR_RW"/data.json";
-        paramsSecw["AGENT_NAME"] = SECURITY_WALLET_AGENT;
-        paramsSecw["ENDPOINT"] = endpoint;
-
-        zactor_t *server = zactor_new (fty_security_wallet_mlm_agent, static_cast<void*>(&paramsSecw));
-  
-        //create the 2 Clients
-        mlm::MlmSyncClient syncClient("secw-server-test", SECURITY_WALLET_AGENT, 1000, endpoint);
-        mlm::MlmStreamClient streamClient("secw-server-test", SECW_NOTIFICATIONS, 1000, endpoint);
+        //create the 1 Client
+        mlm::MlmSyncClient syncClient("cam-server-test", MAPPING_AGENT, 1000, endpoint);
 
         //Tests from the lib
-        std::vector<std::pair<std::string,bool>> testLibConsumerResults = secw_consumer_accessor_test(syncClient, streamClient);
-        std::vector<std::pair<std::string,bool>> testLibProducerResults = secw_producer_accessor_test(syncClient, streamClient);
-        
+        std::vector<std::pair<std::string,bool>> testLibResults = cam_accessor_test(syncClient);
+
         printf("\n-----------------------------------------------------------------------\n");
 
         uint32_t testsPassed = 0;
         uint32_t testsFailed = 0;
 
-        printf ("\n\n ** fty_security_wallet_mlm_agent: \n\n");
+        printf ("\n ** fty_credential_asset_mapping_mlm_agent: \n");
 
-        printf("\tTests from the lib: Consumer part\n");
-        for(const auto & result : testLibConsumerResults)
-        {
-            if(result.second)
-            {
-                printf(ANSI_COLOR_GREEN"\tOK " ANSI_COLOR_RESET "\t%s\n",result.first.c_str());
-                testsPassed++;
-            }
-            else
-            {
-                printf(ANSI_COLOR_RED"\tNOK" ANSI_COLOR_RESET "\t%s\n",result.first.c_str());
-                testsFailed++;
-            }
-        }
-
-        printf("\n\tTests from the lib: Producer part\n");
-        for(const auto & result : testLibProducerResults)
+        printf("\tTests from the lib: \n");
+        for(const auto & result : testLibResults)
         {
             if(result.second)
             {
@@ -177,15 +133,20 @@ fty_security_wallet_mlm_agent_test (bool verbose)
         if(testsFailed == 0)
         {
             printf(ANSI_COLOR_GREEN"\n %i tests passed, everything is ok\n" ANSI_COLOR_RESET "\n",testsPassed);
+
+            /*std::ifstream database(SELFTEST_DIR_RW"/mapping.json", std::ios::binary);
+            std::cerr << database.rdbuf() << std::endl;
+
+            database.close();*/
         }
         else
         {
             printf(ANSI_COLOR_RED"\n!!!!!!!! %i/%i tests did not pass !!!!!!!! \n" ANSI_COLOR_RESET "\n",testsFailed,(testsPassed+testsFailed));
 
-            printf("Content of the database at the end of tests: \n");
+            printf("Content of the mapping at the end of tests: \n");
             printf("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-            std::ifstream database(SELFTEST_DIR_RW"/data.json", std::ios::binary);
+            std::ifstream database(SELFTEST_DIR_RW"/mapping.json", std::ios::binary);
             std::cerr << database.rdbuf() << std::endl;
 
             database.close();
@@ -197,9 +158,10 @@ fty_security_wallet_mlm_agent_test (bool verbose)
 
         zstr_sendm (server, "$TERM");
         sleep(1);
-        
-        zactor_destroy (&server);
+
     }
 
+    zactor_destroy (&server);
     zactor_destroy (&broker);
 }
+

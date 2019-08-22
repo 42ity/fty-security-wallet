@@ -33,10 +33,22 @@
 
 namespace secw
 {
+  ConsumerAccessor::ConsumerAccessor( fty::SyncClient & requestClient)
+  {
+      m_clientAccessor = std::make_shared<ClientAccessor>(requestClient);
+  }
+  
+  ConsumerAccessor::ConsumerAccessor( fty::SyncClient & requestClient, fty::StreamSubscriber & subscriberClient)
+  {
+      m_clientAccessor = std::make_shared<ClientAccessor>(requestClient, subscriberClient);
+  }
+  
   ConsumerAccessor::ConsumerAccessor(	const ClientId & clientId,
                                       uint32_t timeout,
                                       const std::string & endPoint):
-    m_clientAccessor(std::make_shared<ClientAccessor>(clientId, timeout, endPoint))
+    m_mlmSyncClient(std::make_shared<mlm::MlmSyncClient>(clientId, SECURITY_WALLET_AGENT, timeout, endPoint)),
+    m_mlmStreamClient(std::make_shared<mlm::MlmStreamClient>(clientId, SECW_NOTIFICATIONS, timeout, endPoint)),
+    m_clientAccessor(std::make_shared<ClientAccessor>(*m_mlmSyncClient, *m_mlmStreamClient))
   {}
 
   std::vector<std::string> ConsumerAccessor::getPortfolioList() const
@@ -190,13 +202,10 @@ namespace secw
 //  --------------------------------------------------------------------------
 
 
-#define SELFTEST_CLIENT_ID "secw-client-test"
 
-std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test()
+std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::SyncClient & syncClient, fty::StreamSubscriber & streamClient)
 {
   std::vector<std::pair<std::string,bool>> testsResults;
-
-  static const char* endpoint = "inproc://fty-security-walletg-test";
   
   using namespace secw;
 
@@ -206,7 +215,7 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #1.1 getPortfolioList\n");
-    ConsumerAccessor consumerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ConsumerAccessor consumerAccessor(syncClient, streamClient);
     try
     {
       std::vector<std::string> portfolio = consumerAccessor.getPortfolioList();
@@ -236,7 +245,7 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test()
     printf(" *=>  Test #1.2 SecwUnknownPortfolioException\n");
     std::string portfolioName("XXXXX");
 
-    ConsumerAccessor consumerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ConsumerAccessor consumerAccessor(syncClient, streamClient);
     
     try
     {
@@ -271,7 +280,7 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #2.1 getConsumerUsages\n");
-    ConsumerAccessor consumerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ConsumerAccessor consumerAccessor(syncClient, streamClient);
     try
     {
       std::set<std::string> usages = consumerAccessor.getConsumerUsages();
@@ -304,7 +313,7 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #3.1 getListDocumentsWithPrivateData\n");
-    ConsumerAccessor consumerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ConsumerAccessor consumerAccessor(syncClient, streamClient);
     try
     {
       std::vector<DocumentPtr> doc = consumerAccessor.getListDocumentsWithPrivateData("default");
@@ -335,7 +344,7 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #3.2 getListDocumentsWithPrivateData usage=discovery_monitoring");
-    ConsumerAccessor consumerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ConsumerAccessor consumerAccessor(syncClient, streamClient);
     try
     {
       std::vector<DocumentPtr> doc = consumerAccessor.getListDocumentsWithPrivateData("default", "discovery_monitoring");
@@ -366,7 +375,7 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #3.3 getListDocumentsWithPrivateData => SecwIllegalAccess");
-    ConsumerAccessor consumerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ConsumerAccessor consumerAccessor(syncClient, streamClient);
     try
     {
       consumerAccessor.getListDocumentsWithPrivateData("default", "mass_device_management");
@@ -390,7 +399,7 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #4.1 getDocumentWithPrivateData\n");
-    ConsumerAccessor consumerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ConsumerAccessor consumerAccessor(syncClient, streamClient);
     try
     {
       DocumentPtr doc = consumerAccessor.getDocumentWithPrivateData("default", "id_readable");
@@ -416,7 +425,7 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #4.2 getDocumentWithPrivateData => SecwDocumentDoNotExistException\n");
-    ConsumerAccessor consumerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ConsumerAccessor consumerAccessor(syncClient, streamClient);
     try
     {
       consumerAccessor.getDocumentWithPrivateData("default", "XXXXX-XXXXXXXXX");
@@ -440,7 +449,7 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #4.3 getDocumentWithPrivateDataByName\n");
-    ConsumerAccessor consumerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ConsumerAccessor consumerAccessor(syncClient, streamClient);
     try
     {
       DocumentPtr doc = consumerAccessor.getDocumentWithPrivateDataByName("default", "myFirstDoc");
@@ -466,7 +475,7 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test()
   printf("\n-----------------------------------------------------------------------\n");
   {
     printf(" *=>  Test #4.4 getDocumentWithPrivateDataByName => SecwNameDoesNotExistException\n");
-    ConsumerAccessor consumerAccessor(SELFTEST_CLIENT_ID, 1000, endpoint);
+    ConsumerAccessor consumerAccessor(syncClient, streamClient);
     try
     {
       consumerAccessor.getDocumentWithPrivateDataByName("default", "XXXXX-XXXXXXXXX");
