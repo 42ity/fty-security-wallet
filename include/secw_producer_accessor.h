@@ -24,6 +24,9 @@
 
 #include "secw_document.h"
 
+#include "fty_common_client.h"
+#include "fty_common_mlm_sync_client.h"
+
 namespace secw
 {
   using ClientId = std::string;
