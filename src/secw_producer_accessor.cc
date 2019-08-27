@@ -30,6 +30,10 @@
 
 #include <thread>
 
+
+#include "fty_common_mlm_sync_client.h"
+#include "fty_common_mlm_stream_client.h"
+
 namespace secw
 {
   ProducerAccessor::ProducerAccessor( fty::SyncClient & requestClient)
