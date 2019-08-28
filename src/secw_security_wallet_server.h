@@ -109,7 +109,4 @@ namespace secw
 
 } // namespace secw
 
-void
-    secw_security_wallet_server_test (bool verbose);
-
 #endif

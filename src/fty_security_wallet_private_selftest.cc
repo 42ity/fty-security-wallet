@@ -37,11 +37,6 @@
 void
 fty_security_wallet_private_selftest (bool verbose, const char *subtest)
 {
-// Tests for stable private classes:
-    if (streq (subtest, "$ALL") || streq (subtest, "cam_credential_asset_mapping_server_test"))
-        cam_credential_asset_mapping_server_test (verbose);
-    if (streq (subtest, "$ALL") || streq (subtest, "secw_security_wallet_server_test"))
-        secw_security_wallet_server_test (verbose);
 }
 /*
 ################################################################################

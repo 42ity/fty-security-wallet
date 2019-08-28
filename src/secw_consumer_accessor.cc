@@ -37,12 +37,12 @@
 
 namespace secw
 {
-  ConsumerAccessor::ConsumerAccessor( fty::SyncClient & requestClient)
+  ConsumerAccessor::ConsumerAccessor( mlm::MlmSyncClient & requestClient)
   {
       m_clientAccessor = std::make_shared<ClientAccessor>(requestClient);
   }
   
-  ConsumerAccessor::ConsumerAccessor( fty::SyncClient & requestClient, fty::StreamSubscriber & subscriberClient)
+  ConsumerAccessor::ConsumerAccessor( mlm::MlmSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient)
   {
       m_clientAccessor = std::make_shared<ClientAccessor>(requestClient, subscriberClient);
   }
@@ -207,7 +207,7 @@ namespace secw
 
 
 
-std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::SyncClient & syncClient, fty::StreamSubscriber & streamClient)
+std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(mlm::MlmSyncClient & syncClient, mlm::MlmStreamClient & streamClient)
 {
   std::vector<std::pair<std::string,bool>> testsResults;
   
