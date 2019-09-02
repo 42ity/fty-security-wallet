@@ -87,16 +87,6 @@ typedef struct _secw_configuration_t secw_configuration_t;
 //  *** To avoid double-definitions, only define if building without draft ***
 #ifndef FTY_SECURITY_WALLET_BUILD_DRAFT_API
 
-//  *** Draft method, defined for internal use only ***
-//  Self test of this class.
-FTY_SECURITY_WALLET_PRIVATE void
-    cam_credential_asset_mapping_server_test (bool verbose);
-
-//  *** Draft method, defined for internal use only ***
-//  Self test of this class.
-FTY_SECURITY_WALLET_PRIVATE void
-    secw_security_wallet_server_test (bool verbose);
-
 //  Self test for private classes
 FTY_SECURITY_WALLET_PRIVATE void
     fty_security_wallet_private_selftest (bool verbose, const char *subtest);

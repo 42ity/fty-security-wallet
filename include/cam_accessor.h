@@ -38,7 +38,7 @@ namespace cam
   {
   public:
     
-    explicit Accessor( fty::SyncClient & requestClient);
+    explicit Accessor( mlm::MlmSyncClient & requestClient);
     
     /**
      * @deprecated
@@ -99,7 +99,7 @@ namespace cam
   
 } //namespace cam
 
-std::vector<std::pair<std::string,bool>> cam_accessor_test(fty::SyncClient & syncClient);
+std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & syncClient);
 
 #endif
 

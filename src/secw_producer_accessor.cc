@@ -36,12 +36,12 @@
 
 namespace secw
 {
-  ProducerAccessor::ProducerAccessor( fty::SyncClient & requestClient)
+  ProducerAccessor::ProducerAccessor( mlm::MlmSyncClient & requestClient)
   {
       m_clientAccessor = std::make_shared<ClientAccessor>(requestClient);
   }
   
-  ProducerAccessor::ProducerAccessor( fty::SyncClient & requestClient, fty::StreamSubscriber & subscriberClient)
+  ProducerAccessor::ProducerAccessor( mlm::MlmSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient)
   {
       m_clientAccessor = std::make_shared<ClientAccessor>(requestClient, subscriberClient);
   }
@@ -286,7 +286,7 @@ void callbackDeleted(const std::string& portfolio, secw::DocumentPtr oldDoc, std
 }*/
 
 
-std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::SyncClient & syncClient, fty::StreamSubscriber & streamClient)
+std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(mlm::MlmSyncClient & syncClient, mlm::MlmStreamClient & streamClient)
 {
   std::vector<std::pair<std::string,bool>> testsResults;
   

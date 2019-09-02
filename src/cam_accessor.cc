@@ -30,7 +30,7 @@
 
 namespace cam
 {
-  Accessor::Accessor( fty::SyncClient & requestClient)
+  Accessor::Accessor( mlm::MlmSyncClient & requestClient)
     : m_mlmClient(), m_requestClient(requestClient)
   {
   }
@@ -313,7 +313,7 @@ namespace cam
 //  --------------------------------------------------------------------------
 
 
-std::vector<std::pair<std::string,bool>> cam_accessor_test(fty::SyncClient & syncClient)
+std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & syncClient)
 {
   std::vector<std::pair<std::string,bool>> testsResults;
   

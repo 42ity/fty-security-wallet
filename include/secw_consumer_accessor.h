@@ -81,8 +81,8 @@ namespace secw
   {
   public:
       
-    explicit ConsumerAccessor( fty::SyncClient & requestClient);
-    explicit ConsumerAccessor( fty::SyncClient & requestClient, fty::StreamSubscriber & subscriberClient);
+    explicit ConsumerAccessor( mlm::MlmSyncClient & requestClient);
+    explicit ConsumerAccessor( mlm::MlmSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient);
     
     /**
      * @deprecated
@@ -196,6 +196,6 @@ namespace secw
 } //namespace secw
 
 //  @interface
-std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::SyncClient & syncClient, fty::StreamSubscriber & streamClient);
+std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(mlm::MlmSyncClient & syncClient, mlm::MlmStreamClient & streamClient);
 
 #endif

@@ -94,7 +94,4 @@ namespace cam
     
 } // namespace cam
 
-void
-cam_credential_asset_mapping_server_test (bool verbose);
-
 #endif

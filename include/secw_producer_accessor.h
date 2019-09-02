@@ -82,8 +82,8 @@ namespace secw
   {
   public:
       
-    explicit ProducerAccessor( fty::SyncClient & requestClient);
-    explicit ProducerAccessor( fty::SyncClient & requestClient, fty::StreamSubscriber & subscriberClient);
+    explicit ProducerAccessor( mlm::MlmSyncClient & requestClient);
+    explicit ProducerAccessor( mlm::MlmSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient);
     
   /**
    * @depricated
@@ -224,6 +224,6 @@ namespace secw
 } //namespace secw
 
 //  @interface for unit tests
-std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::SyncClient & syncClient, fty::StreamSubscriber & streamClient);
+std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(mlm::MlmSyncClient & syncClient, mlm::MlmStreamClient & streamClient);
 
 #endif
