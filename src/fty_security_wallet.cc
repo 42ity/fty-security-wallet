@@ -31,6 +31,8 @@
 #include "fty_common_mlm_zconfig.h"
 #include "fty_common_mlm_stream_client.h"
 
+#include "fty_common_socket_basic_mailbox_server.h"
+
 //functions
 void usage();
 
@@ -66,6 +68,7 @@ int main (int argc, char *argv [])
         // Parse config file
         std::string secw_actor_name(SECURITY_WALLET_AGENT);
         std::string endpoint(DEFAULT_ENDPOINT);
+        std::string socketPath(DEFAULT_SOCKET);
         std::string storage_database_path(DEFAULT_STORAGE_DATABASE_PATH);
         std::string storage_access_path(DEFAULT_STORAGE_CONFIGURATION_PATH);
 
@@ -81,6 +84,7 @@ int main (int argc, char *argv [])
             verbose |= (config.getEntry("secw_server/verbose", "false") == "true");
 
             endpoint = config.getEntry("secw-malamute/endpoint", DEFAULT_ENDPOINT);
+            socketPath = config.getEntry("secw-socket/socket", DEFAULT_SOCKET);
             secw_actor_name = config.getEntry( "secw-malamute/address", SECURITY_WALLET_AGENT);
             storage_database_path = config.getEntry( "secw-storage/database", DEFAULT_STORAGE_DATABASE_PATH);
             storage_access_path = config.getEntry( "secw-storage/configuration", DEFAULT_STORAGE_CONFIGURATION_PATH);
@@ -101,6 +105,7 @@ int main (int argc, char *argv [])
 
         log_info(SECURITY_WALLET_AGENT " starting");
         
+        //create params for SECW
         Arguments paramsSecw;
         
         paramsSecw["STORAGE_CONFIGURATION_PATH"] = storage_access_path;
@@ -108,10 +113,23 @@ int main (int argc, char *argv [])
         paramsSecw["AGENT_NAME"] = secw_actor_name;
         paramsSecw["ENDPOINT"] = endpoint;
         
-        //start broker agent
-        zactor_t *secw_server = zactor_new (fty_security_wallet_mlm_agent, static_cast<void*>(&paramsSecw));
+        //start secw agent
         
-        //set configuration parameters
+        //create a stream publisher for notification
+        mlm::MlmStreamClient notificationStream(SECURITY_WALLET_AGENT, SECW_NOTIFICATIONS, 1000, paramsSecw.at("ENDPOINT"));
+    
+        //create the server
+        secw::SecurityWalletServer serverSecw(  paramsSecw.at("STORAGE_CONFIGURATION_PATH"),
+                                        paramsSecw.at("STORAGE_DATABASE_PATH"),
+                                        notificationStream);
+        
+        fty::SocketBasicServer agentSecw( serverSecw, socketPath);
+
+
+        std::thread agentSecwThread(&fty::SocketBasicServer::run, &agentSecw);
+
+        
+        //set configuration parameters for CAM
         Arguments paramsCam;
         
         paramsCam["STORAGE_MAPPING_PATH"] = storage_mapping_path;
@@ -124,18 +142,6 @@ int main (int argc, char *argv [])
 
         while (true)
         {
-            char *str = zstr_recv (secw_server);
-            if (str)
-            {
-                puts (str);
-                zstr_free (&str);
-            }
-            else
-            {
-                //stop everything
-                break;
-            }
-
             char *camStr = zstr_recv (cam_server);
             if (camStr)
             {
@@ -151,7 +157,9 @@ int main (int argc, char *argv [])
         }
 
         log_info ("Secw Interrupted ...");
-        zactor_destroy(&secw_server);
+        agentSecw.requestStop();
+        agentSecwThread.join();
+        
 
         log_info ("Cam Interrupted ...");
         zactor_destroy(&cam_server);

@@ -28,8 +28,12 @@
 
 namespace mlm
 {
-    class MlmSyncClient;
     class MlmStreamClient;
+}
+
+namespace fty
+{
+    class SocketSyncClient;
 }
 
 namespace secw
@@ -82,20 +86,8 @@ namespace secw
   {
   public:
       
-    explicit ProducerAccessor( mlm::MlmSyncClient & requestClient);
-    explicit ProducerAccessor( mlm::MlmSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient);
-    
-  /**
-   * @depricated
-   * @brief Construct a new Producer Accessor
-   * 
-   * @param clientId 
-   * @param timeout 
-   * @param endPoint 
-   */
-    explicit ProducerAccessor(const ClientId & clientId,
-                uint32_t timeout,
-                const std::string & endPoint);
+    explicit ProducerAccessor( fty::SocketSyncClient & requestClient);
+    explicit ProducerAccessor( fty::SocketSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient);
     
     /**
      * @brief Get the List of Portfolio name
@@ -214,16 +206,13 @@ namespace secw
     void setCallbackOnStart(StartedCallback startedCallback= nullptr);
   
   private:
-    //for backward compatibility
-    std::shared_ptr<mlm::MlmSyncClient> m_mlmSyncClient;
-    std::shared_ptr<mlm::MlmStreamClient> m_mlmStreamClient;  
-    
+   
     std::shared_ptr<ClientAccessor> m_clientAccessor;
   };
   
 } //namespace secw
 
 //  @interface for unit tests
-std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(mlm::MlmSyncClient & syncClient, mlm::MlmStreamClient & streamClient);
+std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::SocketSyncClient & syncClient, mlm::MlmStreamClient & streamClient);
 
 #endif

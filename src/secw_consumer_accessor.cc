@@ -32,28 +32,20 @@
 #include "secw_helpers.h"
 
 
-#include "fty_common_mlm_sync_client.h"
+#include "fty_common_socket_sync_client.h"
 #include "fty_common_mlm_stream_client.h"
 
 namespace secw
 {
-  ConsumerAccessor::ConsumerAccessor( mlm::MlmSyncClient & requestClient)
+  ConsumerAccessor::ConsumerAccessor( fty::SocketSyncClient & requestClient)
   {
       m_clientAccessor = std::make_shared<ClientAccessor>(requestClient);
   }
   
-  ConsumerAccessor::ConsumerAccessor( mlm::MlmSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient)
+  ConsumerAccessor::ConsumerAccessor( fty::SocketSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient)
   {
       m_clientAccessor = std::make_shared<ClientAccessor>(requestClient, subscriberClient);
   }
-  
-  ConsumerAccessor::ConsumerAccessor(	const ClientId & clientId,
-                                      uint32_t timeout,
-                                      const std::string & endPoint):
-    m_mlmSyncClient(std::make_shared<mlm::MlmSyncClient>(clientId, SECURITY_WALLET_AGENT, timeout, endPoint)),
-    m_mlmStreamClient(std::make_shared<mlm::MlmStreamClient>(clientId, SECW_NOTIFICATIONS, timeout, endPoint)),
-    m_clientAccessor(std::make_shared<ClientAccessor>(*m_mlmSyncClient, *m_mlmStreamClient))
-  {}
 
   std::vector<std::string> ConsumerAccessor::getPortfolioList() const
   {
@@ -207,7 +199,7 @@ namespace secw
 
 
 
-std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(mlm::MlmSyncClient & syncClient, mlm::MlmStreamClient & streamClient)
+std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::SocketSyncClient & syncClient, mlm::MlmStreamClient & streamClient)
 {
   std::vector<std::pair<std::string,bool>> testsResults;
   

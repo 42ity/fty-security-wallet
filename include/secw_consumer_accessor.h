@@ -28,8 +28,12 @@
 
 namespace mlm
 {
-    class MlmSyncClient;
     class MlmStreamClient;
+}
+
+namespace fty
+{
+    class SocketSyncClient;
 }
 
 namespace secw
@@ -81,20 +85,8 @@ namespace secw
   {
   public:
       
-    explicit ConsumerAccessor( mlm::MlmSyncClient & requestClient);
-    explicit ConsumerAccessor( mlm::MlmSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient);
-    
-    /**
-     * @deprecated
-     * @brief Construct a new Consumer Accessor object
-     * 
-     * @param clientId 
-     * @param timeout 
-     * @param endPoint 
-     */
-    explicit ConsumerAccessor(const ClientId & clientId,
-                uint32_t timeout,
-                const std::string & endPoint);
+    explicit ConsumerAccessor( fty::SocketSyncClient & requestClient);
+    explicit ConsumerAccessor( fty::SocketSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient);
     
     /**
      * @brief Get the List of portfolio name
@@ -185,17 +177,13 @@ namespace secw
 
   
   private:
-    //for backward compatibility
-    std::shared_ptr<mlm::MlmSyncClient> m_mlmSyncClient;
-    std::shared_ptr<mlm::MlmStreamClient> m_mlmStreamClient;
-    
-    
     std::shared_ptr<ClientAccessor> m_clientAccessor;
+    
   };
   
 } //namespace secw
 
 //  @interface
-std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(mlm::MlmSyncClient & syncClient, mlm::MlmStreamClient & streamClient);
+std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::SocketSyncClient & syncClient, mlm::MlmStreamClient & streamClient);
 
 #endif

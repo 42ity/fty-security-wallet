@@ -31,28 +31,20 @@
 #include <thread>
 
 
-#include "fty_common_mlm_sync_client.h"
+#include "fty_common_socket_sync_client.h"
 #include "fty_common_mlm_stream_client.h"
 
 namespace secw
 {
-  ProducerAccessor::ProducerAccessor( mlm::MlmSyncClient & requestClient)
+  ProducerAccessor::ProducerAccessor( fty::SocketSyncClient & requestClient)
   {
       m_clientAccessor = std::make_shared<ClientAccessor>(requestClient);
   }
   
-  ProducerAccessor::ProducerAccessor( mlm::MlmSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient)
+  ProducerAccessor::ProducerAccessor( fty::SocketSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient)
   {
       m_clientAccessor = std::make_shared<ClientAccessor>(requestClient, subscriberClient);
   }
-  
-  ProducerAccessor::ProducerAccessor(	const ClientId & clientId,
-                                      uint32_t timeout,
-                                      const std::string & endPoint):
-    m_mlmSyncClient(std::make_shared<mlm::MlmSyncClient>(clientId, SECURITY_WALLET_AGENT, timeout, endPoint)),
-    m_mlmStreamClient(std::make_shared<mlm::MlmStreamClient>(clientId, SECW_NOTIFICATIONS, timeout, endPoint)),
-    m_clientAccessor(std::make_shared<ClientAccessor>(*m_mlmSyncClient, *m_mlmStreamClient))
-  {}
 
   std::vector<std::string> ProducerAccessor::getPortfolioList() const
   {
@@ -286,7 +278,7 @@ void callbackDeleted(const std::string& portfolio, secw::DocumentPtr oldDoc, std
 }*/
 
 
-std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(mlm::MlmSyncClient & syncClient, mlm::MlmStreamClient & streamClient)
+std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::SocketSyncClient & syncClient, mlm::MlmStreamClient & streamClient)
 {
   std::vector<std::pair<std::string,bool>> testsResults;
   
