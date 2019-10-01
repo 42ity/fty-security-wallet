@@ -22,10 +22,11 @@ AM_CPPFLAGS = \
     ${openssl_CFLAGS} \
     ${fty_common_CFLAGS} \
     ${fty_common_mlm_CFLAGS} \
+    ${fty_common_socket_CFLAGS} \
     -D__STDC_FORMAT_MACROS \
     -I$(srcdir)/include
 
-project_libs = ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cxxtools_LIBS} ${log4cplus_LIBS} ${fty_common_logging_LIBS} ${openssl_LIBS} ${fty_common_LIBS} ${fty_common_mlm_LIBS}
+project_libs = ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cxxtools_LIBS} ${log4cplus_LIBS} ${fty_common_logging_LIBS} ${openssl_LIBS} ${fty_common_LIBS} ${fty_common_mlm_LIBS} ${fty_common_socket_LIBS}
 
 SUBDIRS = doc
 SUBDIRS += include
@@ -56,6 +57,7 @@ EXTRA_DIST += \
     Findopenssl.cmake \
     Findfty_common.cmake \
     Findfty_common_mlm.cmake \
+    Findfty_common_socket.cmake \
     builds/cmake/Modules/ClangFormat.cmake \
     builds/cmake/clang-format-check.sh.in \
     builds/cmake/Config.cmake.in \

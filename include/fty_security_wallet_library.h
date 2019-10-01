@@ -35,6 +35,7 @@
 #include <cxxtools/allocator.h>
 #include <fty_log.h>
 #include <fty_common_mlm.h>
+#include <fty_common_socket.h>
 
 //  FTY_SECURITY_WALLET version macros for compile-time API detection
 #define FTY_SECURITY_WALLET_VERSION_MAJOR 1
@@ -104,8 +105,8 @@ typedef struct _secw_user_and_password_t secw_user_and_password_t;
 #define SECW_USER_AND_PASSWORD_T_DEFINED
 typedef struct _fty_credential_asset_mapping_mlm_agent_t fty_credential_asset_mapping_mlm_agent_t;
 #define FTY_CREDENTIAL_ASSET_MAPPING_MLM_AGENT_T_DEFINED
-typedef struct _fty_security_wallet_mlm_agent_t fty_security_wallet_mlm_agent_t;
-#define FTY_SECURITY_WALLET_MLM_AGENT_T_DEFINED
+typedef struct _fty_security_wallet_socket_agent_t fty_security_wallet_socket_agent_t;
+#define FTY_SECURITY_WALLET_SOCKET_AGENT_T_DEFINED
 #endif // FTY_SECURITY_WALLET_BUILD_DRAFT_API
 
 
@@ -122,7 +123,7 @@ typedef struct _fty_security_wallet_mlm_agent_t fty_security_wallet_mlm_agent_t;
 #include "secw_snmpv1.h"
 #include "secw_user_and_password.h"
 #include "fty_credential_asset_mapping_mlm_agent.h"
-#include "fty_security_wallet_mlm_agent.h"
+#include "fty_security_wallet_socket_agent.h"
 #endif // FTY_SECURITY_WALLET_BUILD_DRAFT_API
 
 #ifdef FTY_SECURITY_WALLET_BUILD_DRAFT_API

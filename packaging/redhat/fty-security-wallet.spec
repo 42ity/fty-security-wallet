@@ -65,6 +65,7 @@ BuildRequires:  fty-common-logging-devel
 BuildRequires:  openssl-devel
 BuildRequires:  fty-common-devel
 BuildRequires:  fty-common-mlm-devel
+BuildRequires:  fty-common-socket-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -98,6 +99,7 @@ Requires:       fty-common-logging-devel
 Requires:       openssl-devel
 Requires:       fty-common-devel
 Requires:       fty-common-mlm-devel
+Requires:       fty-common-socket-devel
 
 %description devel
 security wallet to manage json documents including a public and secret part development tools

@@ -10,6 +10,9 @@ secw-malamute
     endpoint = ipc://@/malamute #   Malamute endpoint
     address = security-wallet     #   Agent address
 
+secw-socket
+    socket = /tmp/secw.socket #   Malamute endpoint
+
 secw-storage
     database = /var/lib/fty/fty-security-wallet/database.json
     configuration = /etc/fty/fty-security-wallet/configuration.json

@@ -19,7 +19,7 @@ include_HEADERS += \
     secw_snmpv1.h \
     secw_user_and_password.h \
     fty_credential_asset_mapping_mlm_agent.h \
-    fty_security_wallet_mlm_agent.h
+    fty_security_wallet_socket_agent.h
 
 endif
 
