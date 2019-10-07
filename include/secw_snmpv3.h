@@ -89,7 +89,7 @@ namespace secw
 
         void validate() const override;
 
-        //Public elements
+        //Public secw elements
         Snmpv3SecurityLevel getSecurityLevel() const { return m_securityLevel; }
         Snmpv3AuthProtocol getAuthProtocol() const { return m_authProtocol; }
         Snmpv3PrivProtocol getPrivProtocol() const { return m_privProtocol; }
@@ -100,7 +100,7 @@ namespace secw
         void setPrivProtocol(Snmpv3PrivProtocol privProtocol)  {  m_privProtocol = privProtocol; }
         void setSecurityName(const std::string & securityName)  {  m_securityName = securityName; }
 
-        //Private elements
+        //Private secw elements
         const std::string & getAuthPassword() const { return m_authPassword; }
         const std::string & getPrivPassword() const { return m_privPassword; }
 
@@ -115,12 +115,12 @@ namespace secw
         static Snmpv3Ptr tryToCast(DocumentPtr doc);
 
     private:
-        //Public elements
+        //Public secw elements
         Snmpv3SecurityLevel m_securityLevel = NO_AUTH_NO_PRIV;
         Snmpv3AuthProtocol m_authProtocol = MD5;
         Snmpv3PrivProtocol m_privProtocol = DES;
 
-        //Private elements
+        //Private secw elements
         std::string m_securityName = "";
         std::string m_authPassword = "";
         std::string m_privPassword = "";

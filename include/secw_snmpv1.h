@@ -52,11 +52,11 @@ namespace secw
 
         void validate() const override;
 
-        //Public elements
+        //Public secw elements
         const std::string & getCommunityName() const { return m_communityName; }
         void setCommunityName(const std::string & community) { m_communityName = community; }
 
-        //Private elements
+        //Private secw elements
         //no private
 
         /**
@@ -67,10 +67,10 @@ namespace secw
         static Snmpv1Ptr tryToCast(DocumentPtr doc);
 
     private:
-        //Public elements
+        //Public secw elements
         std::string m_communityName = "";
 
-        //Private elements
+        //Private secw elements
         //no private
 
         void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;

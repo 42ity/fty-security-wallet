@@ -50,7 +50,7 @@ namespace secw
 
         void validate() const override;
 
-        //Public elements
+        //Public secw elements
         const std::string & getPem() const { return m_pem; }
         void setPem(const std::string & pem) { m_pem = pem; }
 
@@ -62,7 +62,7 @@ namespace secw
         static ExternalCertificatePtr tryToCast(DocumentPtr doc);
 
     private:
-        //Private elements
+        //Private secw elements
         std::string m_pem;
 
         void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;
