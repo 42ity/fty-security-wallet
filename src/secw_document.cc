@@ -223,11 +223,11 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
             //log_debug("Create document '%s' matching with '%s'", doc->getType().c_str(), type.c_str());
 
             doc->UpdateHeaderFromSerializationInfo(si);
-            doc->UpdatePublicDocFromSerializationInfo(publicEntry);
+            doc->updatePublicDocFromSerializationInfo(publicEntry);
             
             if(privateEntry != nullptr)
             {
-                doc->UpdatePrivateDocFromSerializationInfo(*privateEntry);
+                doc->updatePrivateDocFromSerializationInfo(*privateEntry);
                 
                 if(!documentExist)
                 {

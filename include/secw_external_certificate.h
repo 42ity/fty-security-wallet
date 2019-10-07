@@ -1,5 +1,5 @@
 /*  =========================================================================
-    secw_external_certificate - Document parsers for xternal certificate document
+    secw_external_certificate - Document parsers for external certificate document
 
     Copyright (C) 2019 Eaton
 
@@ -68,8 +68,8 @@ namespace secw
         void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;
         void fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const override;
 
-        void UpdatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
-        void UpdatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
+        void updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
+        void updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
     };
 
 } // namepsace secw

@@ -73,7 +73,7 @@ namespace secw
         si.addMember(DOC_USER_AND_PASSWORD_USERNAME) <<= m_username;
     }
 
-    void UserAndPassword::UpdatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
+    void UserAndPassword::updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
     {
         try
         {
@@ -89,7 +89,7 @@ namespace secw
         }
     }
 
-    void UserAndPassword::UpdatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
+    void UserAndPassword::updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
     {
         try
         {

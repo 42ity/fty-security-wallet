@@ -166,8 +166,8 @@ namespace secw
     virtual void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const = 0;
     virtual void fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const = 0;
 
-    virtual void UpdatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) = 0;
-    virtual void UpdatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) = 0;
+    virtual void updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) = 0;
+    virtual void updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) = 0;
     
   private:
     void fillSerializationInfoHeaderDoc(cxxtools::SerializationInfo& si) const;

@@ -1,5 +1,5 @@
 /*  =========================================================================
-    secw_external_certificate - Document parsers for xternal certificate document
+    secw_external_certificate - Document parsers for external certificate document
 
     Copyright (C) 2019 Eaton
 
@@ -21,7 +21,7 @@
 
 /*
 @header
-    secw_external_certificate - Document parsers for xternal certificate document
+    secw_external_certificate - Document parsers for external certificate document
 @discuss
 @end
 */
@@ -68,11 +68,11 @@ namespace secw
         si.addMember(DOC_EXTERNAL_CERTIFICATE_PEM) <<= m_pem;
     }
 
-    void ExternalCertificate::UpdatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& /*si*/)
+    void ExternalCertificate::updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& /*si*/)
     {
     }
 
-    void ExternalCertificate::UpdatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
+    void ExternalCertificate::updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
     {
         try
         {

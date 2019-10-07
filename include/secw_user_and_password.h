@@ -77,8 +77,8 @@ namespace secw
         void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;
         void fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const override;
 
-        void UpdatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
-        void UpdatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
+        void updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
+        void updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
     };
 
 } // namepsace secw

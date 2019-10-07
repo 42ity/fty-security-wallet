@@ -62,7 +62,7 @@ namespace secw
         si.addMember(DOC_SNMPV1_COMMUNITY_NAME) <<= m_communityName;
     }
 
-    void Snmpv1::UpdatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
+    void Snmpv1::updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
     {
         try
         {
@@ -74,7 +74,7 @@ namespace secw
         }
     }
 
-    void Snmpv1::UpdatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
+    void Snmpv1::updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
     {
     }
 
