@@ -1814,6 +1814,348 @@ std::string document;
     }
   }
 
+//test 10.1 => insertNewDocument Internal Certificate
+  testNumber = "10.1";
+  testName = "insertNewDocument Internal Certificate";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+    printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(syncClient, streamClient);
+    try
+    {
+      InternalCertificatePtr doc = std::make_shared<InternalCertificate>("Test insert Internal Certificate","<PEM>", "<PK>");
+
+      doc->addUsage("discovery_monitoring");
+
+      id = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<Document>(doc));
+
+      //check that the doc is inserted
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 10.2 => insertNewDocument -> retrieve data
+  testNumber = "10.2";
+  testName = "insertNewDocument Internal Certificate -> retrieve data";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+    printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(syncClient, streamClient);
+    try
+    {
+      DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+      InternalCertificatePtr doc = InternalCertificate::tryToCast(insertedDoc);
+
+      if(doc == nullptr) throw std::runtime_error("No document retrieved");
+
+      if(doc->getUsageIds().count("discovery_monitoring") == 0) throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
+      if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
+
+      if(doc->getName() != "Test insert Internal Certificate") throw std::runtime_error("Bad document retrieved: name do not match");
+      
+      if(doc->getPem() != "<PEM>") throw std::runtime_error("Bad document retrieved: pem do not match");
+
+      //doc is valid
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 10.3 => insertNewDocument Certificate
+  testNumber = "10.3";
+  testName = "insertNewDocument Internal Certificate -> name already exist";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+    printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(syncClient, streamClient);
+    try
+    {
+      InternalCertificatePtr doc = std::make_shared<InternalCertificate>("Test insert Internal Certificate","<PEM>", "<PK>");
+
+      doc->addUsage("discovery_monitoring");
+
+      id = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<Document>(doc));
+
+      throw std::runtime_error("Document has been added");
+    }
+    catch(const SecwNameAlreadyExistsException & e)
+    {
+      if(e.getName() == "Test insert Internal Certificate")
+      {
+        printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+      }
+      else
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: expected name in exception 'Test insert Internal Certificate' received '%s'\n",e.getName().c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 10.4 => updateDocument Internal Certificate
+  testNumber = "10.4";
+  testName = "updateDocument Internal Certificate";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(syncClient, streamClient);
+    try
+    {
+      DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+      InternalCertificatePtr doc = InternalCertificate::tryToCast(insertedDoc);
+
+      if(doc == nullptr) throw std::runtime_error("No document retrieved");
+
+      //update security name and priv password
+      doc->setName("Test update Internal Certificate");
+      doc->setPem("new_pem");
+      doc->setPrivateKeyPem("new_pk");
+
+      //update
+      producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(doc));
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 10.6 => updateDocument Internal Certificate -> retrieve data
+  testNumber = "10.6";
+  testName = "updateDocument Internal Certificate -> retrieve data";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(syncClient, streamClient);
+    try
+    {
+      DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+      InternalCertificatePtr doc = InternalCertificate::tryToCast(insertedDoc);
+
+      if(doc == nullptr) throw std::runtime_error("No document retrieved");
+
+      if(doc->getUsageIds().count("discovery_monitoring") == 0) throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
+      if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
+
+      
+      if(doc->getName() != "Test update Internal Certificate") throw std::runtime_error("Bad document retrieved: name do not match");
+      if(doc->getPem() != "new_pem") throw std::runtime_error("Bad document retrieved: pem do not match");
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 10.7 => updateDocument Internal Certificate -> retrieve data getDocumentWithoutPrivateDataByName
+  testNumber = "10.7";
+  testName = "updateDocument Internal Certificate -> retrieve data getDocumentWithoutPrivateDataByName";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(syncClient, streamClient);
+    try
+    {
+      DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateDataByName("default", "Test update Internal Certificate");
+
+      InternalCertificatePtr doc = InternalCertificate::tryToCast(insertedDoc);
+
+      if(doc == nullptr) throw std::runtime_error("No document retrieved");
+
+      if(doc->getUsageIds().count("discovery_monitoring") == 0) throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
+      if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
+
+      
+      if(doc->getId() != id ) throw std::runtime_error("Bad document retrieved: id do not match");
+      if(doc->getPem() != "new_pem") throw std::runtime_error("Bad document retrieved: pem do not match");
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 10.8 => updateDocument Internal Certificate -> getDocumentWithoutPrivateDataByName => SecwNameDoesNotExistException
+  testNumber = "10.8";
+  testName = "updateDocument Internal Certificate -> getDocumentWithoutPrivateDataByName => SecwNameDoesNotExistException";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+    printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(syncClient, streamClient);
+    try
+    {
+      producerAccessor.getDocumentWithoutPrivateDataByName("default", "Test insert Internal Certificate");
+
+      throw std::runtime_error("Document is return");
+    }
+    catch(const SecwNameDoesNotExistException &)
+    {
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 10.9 => updateDocument Internal Certificate
+  testNumber = "10.9";
+  testName = "updateDocument Internal Certificate -> name already exist";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(syncClient, streamClient);
+    try
+    {
+      DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+      InternalCertificatePtr doc = InternalCertificate::tryToCast(insertedDoc);
+
+      if(doc == nullptr) throw std::runtime_error("No document retrieved");
+
+      //update name
+      doc->setName("myFirstDoc");
+
+      //update
+      producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(doc));
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+
+      throw std::runtime_error("Document has been updated");
+    }
+    catch(const SecwNameAlreadyExistsException & e)
+    {
+      if(e.getName() == "myFirstDoc")
+      {
+        printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+      }
+      else
+      {
+        printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+        printf("Error: expected name in exception 'myFirstDoc' received '%s'\n",e.getName().c_str());
+        testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+      }
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 10.10 => updateDocument Internal Certificate -> bad format
+  testNumber = "10.10";
+  testName = "updateDocument Internal Certificate -> bad format";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(syncClient, streamClient);
+    try
+    {
+      DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+      InternalCertificatePtr doc = InternalCertificate::tryToCast(insertedDoc);
+
+      if(doc == nullptr) throw std::runtime_error("No document retrieved");
+
+      //update with wrong data
+      doc->setPem("");
+      doc->setPrivateKeyPem("");
+
+      //update
+      producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(doc));
+
+      throw std::runtime_error("Document has been updated");
+    }
+    catch(const SecwInvalidDocumentFormatException &)
+    {
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
+//test 10.11 => deleteDocument Internal Certificate
+  testNumber = "10.11";
+  testName = "deleteDocument Internal Certificate";
+  printf("\n-----------------------------------------------------------------------\n");
+  {
+     printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
+    ProducerAccessor producerAccessor(syncClient, streamClient);
+    try
+    {
+      producerAccessor.deleteDocument("default", id);
+
+      //check that the document is removed
+      std::vector<Id> ids = {id};
+      if(producerAccessor.getListDocumentsWithoutPrivateData("default", ids).size() != 0)
+      {
+        throw std::runtime_error("Document is not removed");
+      }
+
+      printf(" *<=  Test #%s > OK\n", testNumber.c_str());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
+    }
+    catch(const std::exception& e)
+    {
+      printf(" *<=  Test #%s > Failed\n", testNumber.c_str());
+      printf("Error: %s\n",e.what());
+      testsResults.emplace_back (" Test #"+testNumber+" "+testName,false);
+    }
+  }
+
 //end of tests
   return testsResults;
   
