@@ -34,6 +34,7 @@ src_libfty_security_wallet_la_SOURCES += \
     src/secw_producer_accessor.cc \
     src/secw_consumer_accessor.cc \
     src/secw_external_certificate.cc \
+    src/secw_internal_certificate.cc \
     src/secw_snmpv3.cc \
     src/secw_snmpv1.cc \
     src/secw_user_and_password.cc \
