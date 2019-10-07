@@ -51,7 +51,7 @@ namespace secw
 
     void ExternalCertificate::validate() const
     {
-        if(m_containPrivateData) throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
+        //if(m_containPrivateData) throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
         if(m_pem.empty()) throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
 
         //#TODO check the certificate
