@@ -172,7 +172,7 @@ namespace secw
   private:
     void fillSerializationInfoHeaderDoc(cxxtools::SerializationInfo& si) const;
 
-    void UpdateHeaderFromSerializationInfo(const cxxtools::SerializationInfo& si);
+    void updateHeaderFromSerializationInfo(const cxxtools::SerializationInfo& si);
 
   };
 

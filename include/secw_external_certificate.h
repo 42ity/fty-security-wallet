@@ -62,7 +62,7 @@ namespace secw
         static ExternalCertificatePtr tryToCast(DocumentPtr doc);
 
     private:
-        //Private secw elements
+        //Public secw elements
         std::string m_pem;
 
         void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;

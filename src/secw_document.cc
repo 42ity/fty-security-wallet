@@ -145,7 +145,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
         si.addMember(DOC_USAGES_ENTRY) <<= getUsageIds();
     }
 
-    void Document::UpdateHeaderFromSerializationInfo(const cxxtools::SerializationInfo& si)
+    void Document::updateHeaderFromSerializationInfo(const cxxtools::SerializationInfo& si)
     {
         try
         {
@@ -224,7 +224,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
             
             //log_debug("Create document '%s' matching with '%s'", doc->getType().c_str(), type.c_str());
 
-            doc->UpdateHeaderFromSerializationInfo(si);
+            doc->updateHeaderFromSerializationInfo(si);
             doc->updatePublicDocFromSerializationInfo(publicEntry);
             
             if(privateEntry != nullptr)
