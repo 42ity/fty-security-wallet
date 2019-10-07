@@ -22,24 +22,65 @@
 #ifndef SECW_INTERNAL_CERTIFICATE_H_INCLUDED
 #define SECW_INTERNAL_CERTIFICATE_H_INCLUDED
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define INTERNAL_CERTIFICATE_TYPE "InternalCertificate"
 
-//  @interface
-//  Create a new secw_internal_certificate
-FTY_SECURITY_WALLET_EXPORT secw_internal_certificate_t *
-    secw_internal_certificate_new (void);
+namespace secw
+{
+    class InternalCertificate;
 
-//  Destroy the secw_internal_certificate
-FTY_SECURITY_WALLET_EXPORT void
-    secw_internal_certificate_destroy (secw_internal_certificate_t **self_p);
+    using InternalCertificatePtr   = std::shared_ptr<InternalCertificate>;
+    
+    /**
+     * Some key definition for serialization
+     * 
+     */
+    static constexpr const char* DOC_INTERNAL_CERTIFICATE_PEM = "secw_internal_certificate_pem";
+    static constexpr const char* DOC_INTERNAL_CERTIFICATE_PRIVATE_KEY_PEM = "secw_internal_certificate_private_key_pem";
 
 
-//  @end
+    class InternalCertificate  final : public Document
+    {
+    public:
 
-#ifdef __cplusplus
-}
-#endif
+        InternalCertificate();
+
+        InternalCertificate( const std::string & name,
+                const std::string & pem = "",
+                const std::string & privateKeyPem = "");
+
+        DocumentPtr clone() const override;
+
+        void validate() const override;
+
+        //Public elements
+        const std::string & getPem() const { return m_pem; }
+        void setPem(const std::string & pem) { m_pem = pem; }
+
+        //Private elements
+        const std::string & getPrivateKeyPem() const { return m_privateKeyPem; }
+        void setPrivateKeyPem(const std::string & privateKeyPem) { m_privateKeyPem = privateKeyPem; }
+
+        /**
+         * \brief try to cast a document to a UserAndPassword shared ptr
+         * 
+         * \return shared ptr on UserAndPassword or null shared ptr in case of error
+         */
+        static InternalCertificatePtr tryToCast(DocumentPtr doc);
+
+    private:
+        //Public elements
+        std::string m_pem;
+
+        //Private elements
+        std::string m_privateKeyPem;
+
+        void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;
+        void fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const override;
+
+        void updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
+        void updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
+    };
+
+} // namepsace secw
 
 #endif

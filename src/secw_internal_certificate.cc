@@ -27,40 +27,93 @@
 */
 
 #include "fty_security_wallet_classes.h"
-
-//  Structure of our class
-
-struct _secw_internal_certificate_t {
-    int filler;     //  Declare class properties here
-};
-
-
-//  --------------------------------------------------------------------------
-//  Create a new secw_internal_certificate
-
-secw_internal_certificate_t *
-secw_internal_certificate_new (void)
+namespace secw
 {
-    secw_internal_certificate_t *self = (secw_internal_certificate_t *) zmalloc (sizeof (secw_internal_certificate_t));
-    assert (self);
-    //  Initialize class properties here
-    return self;
-}
+/*-----------------------------------------------------------------------------*/
+/*   InternalCertificate Document                                                           */
+/*-----------------------------------------------------------------------------*/
+//Public
+    InternalCertificate::InternalCertificate() :
+        Document(INTERNAL_CERTIFICATE_TYPE)
+    {}
 
-
-//  --------------------------------------------------------------------------
-//  Destroy the secw_internal_certificate
-
-void
-secw_internal_certificate_destroy (secw_internal_certificate_t **self_p)
-{
-    assert (self_p);
-    if (*self_p) {
-        secw_internal_certificate_t *self = *self_p;
-        //  Free class properties here
-        //  Free object itself
-        free (self);
-        *self_p = NULL;
+    InternalCertificate::InternalCertificate( const std::string & name,
+                const std::string & pem,
+                const std::string & privateKeyPem) :
+        Document(INTERNAL_CERTIFICATE_TYPE),
+        m_pem(pem),
+        m_privateKeyPem(privateKeyPem)
+    {
+        m_name=name;
     }
-}
 
+    DocumentPtr InternalCertificate::clone() const
+    {
+        return std::dynamic_pointer_cast<Document>(std::make_shared<InternalCertificate>(*this));
+    }
+
+    void InternalCertificate::validate() const
+    {
+        if(!m_containPrivateData) throw SecwInvalidDocumentFormatException(DOC_INTERNAL_CERTIFICATE_PRIVATE_KEY_PEM);
+        if(m_pem.empty()) throw SecwInvalidDocumentFormatException(DOC_INTERNAL_CERTIFICATE_PEM);
+        if(m_privateKeyPem.empty()) throw SecwInvalidDocumentFormatException(DOC_INTERNAL_CERTIFICATE_PRIVATE_KEY_PEM);
+
+        //#TODO check the certificate
+
+    }
+
+//Private
+    void InternalCertificate::fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const
+    {
+        if(!m_privateKeyPem.empty())
+        {
+            si.addMember(DOC_INTERNAL_CERTIFICATE_PRIVATE_KEY_PEM) <<= m_privateKeyPem;
+        }
+    }
+
+    void InternalCertificate::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const
+    {
+        si.addMember(DOC_INTERNAL_CERTIFICATE_PEM) <<= m_pem;
+    }
+
+    void InternalCertificate::updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
+    {
+        try
+        {
+            const cxxtools::SerializationInfo * privateKey = si.findMember(DOC_INTERNAL_CERTIFICATE_PRIVATE_KEY_PEM);
+            if(privateKey != nullptr)
+            {
+                *privateKey >>= m_privateKeyPem;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwInvalidDocumentFormatException(DOC_INTERNAL_CERTIFICATE_PRIVATE_KEY_PEM);
+        }
+    }
+
+    void InternalCertificate::updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
+    {
+        try
+        {
+            si.getMember(DOC_INTERNAL_CERTIFICATE_PEM) >>= m_pem;
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwInvalidDocumentFormatException(DOC_INTERNAL_CERTIFICATE_PEM);
+        }
+    }
+
+    InternalCertificatePtr InternalCertificate::tryToCast(DocumentPtr doc)
+    {
+        InternalCertificatePtr ptr(nullptr);
+
+        if((doc != nullptr) && (doc->getType() == INTERNAL_CERTIFICATE_TYPE))
+        {
+            ptr = std::dynamic_pointer_cast<InternalCertificate>(doc);
+        }
+
+        return ptr;
+    }
+
+} // namespace secw
