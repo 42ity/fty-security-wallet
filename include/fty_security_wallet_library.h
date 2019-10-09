@@ -97,6 +97,10 @@ typedef struct _secw_producer_accessor_t secw_producer_accessor_t;
 #define SECW_PRODUCER_ACCESSOR_T_DEFINED
 typedef struct _secw_consumer_accessor_t secw_consumer_accessor_t;
 #define SECW_CONSUMER_ACCESSOR_T_DEFINED
+typedef struct _secw_external_certificate_t secw_external_certificate_t;
+#define SECW_EXTERNAL_CERTIFICATE_T_DEFINED
+typedef struct _secw_internal_certificate_t secw_internal_certificate_t;
+#define SECW_INTERNAL_CERTIFICATE_T_DEFINED
 typedef struct _secw_snmpv3_t secw_snmpv3_t;
 #define SECW_SNMPV3_T_DEFINED
 typedef struct _secw_snmpv1_t secw_snmpv1_t;
@@ -119,6 +123,8 @@ typedef struct _fty_security_wallet_socket_agent_t fty_security_wallet_socket_ag
 #include "secw_exception.h"
 #include "secw_producer_accessor.h"
 #include "secw_consumer_accessor.h"
+#include "secw_external_certificate.h"
+#include "secw_internal_certificate.h"
 #include "secw_snmpv3.h"
 #include "secw_snmpv1.h"
 #include "secw_user_and_password.h"

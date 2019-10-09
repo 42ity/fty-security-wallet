@@ -25,6 +25,10 @@ secw_producer_accessor.txt
 secw_producer_accessor.doc
 secw_consumer_accessor.txt
 secw_consumer_accessor.doc
+secw_external_certificate.txt
+secw_external_certificate.doc
+secw_internal_certificate.txt
+secw_internal_certificate.doc
 secw_snmpv3.txt
 secw_snmpv3.doc
 secw_snmpv1.txt

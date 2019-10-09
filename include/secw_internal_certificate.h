@@ -1,5 +1,5 @@
 /*  =========================================================================
-    secw_snmpv1 - Document parsers for snmpv1 document
+    secw_internal_certificate - Document parsers for internal certificate document
 
     Copyright (C) 2019 Eaton
 
@@ -19,59 +19,60 @@
     =========================================================================
 */
 
-#ifndef SECW_SNMPV1_H_INCLUDED
-#define SECW_SNMPV1_H_INCLUDED
+#ifndef SECW_INTERNAL_CERTIFICATE_H_INCLUDED
+#define SECW_INTERNAL_CERTIFICATE_H_INCLUDED
 
-#define SNMPV1_TYPE "Snmpv1"
+#define INTERNAL_CERTIFICATE_TYPE "InternalCertificate"
 
 namespace secw
 {
-    /**
-     * \brief snmpv1 implementation
-     */
-    class Snmpv1;
+    class InternalCertificate;
 
-    using Snmpv1Ptr   = std::shared_ptr<Snmpv1>;
-
+    using InternalCertificatePtr   = std::shared_ptr<InternalCertificate>;
+    
     /**
      * Some key definition for serialization
      * 
      */
-    static constexpr const char* DOC_SNMPV1_COMMUNITY_NAME = "secw_snmpv1_community_name";
+    static constexpr const char* DOC_INTERNAL_CERTIFICATE_PEM = "secw_internal_certificate_pem";
+    static constexpr const char* DOC_INTERNAL_CERTIFICATE_PRIVATE_KEY_PEM = "secw_internal_certificate_private_key_pem";
 
-    class Snmpv1  final : public Document
+
+    class InternalCertificate  final : public Document
     {
     public:
 
-        Snmpv1();
+        InternalCertificate();
 
-        Snmpv1( const std::string & name,
-                const std::string & communityName = "");
+        InternalCertificate( const std::string & name,
+                const std::string & pem = "",
+                const std::string & privateKeyPem = "");
 
         DocumentPtr clone() const override;
 
         void validate() const override;
 
         //Public secw elements
-        const std::string & getCommunityName() const { return m_communityName; }
-        void setCommunityName(const std::string & community) { m_communityName = community; }
+        const std::string & getPem() const { return m_pem; }
+        void setPem(const std::string & pem) { m_pem = pem; }
 
         //Private secw elements
-        //no private
+        const std::string & getPrivateKeyPem() const { return m_privateKeyPem; }
+        void setPrivateKeyPem(const std::string & privateKeyPem) { m_privateKeyPem = privateKeyPem; }
 
         /**
-         * \brief try to cast a document to a Snmpv1 shared ptr
+         * \brief try to cast a document to a UserAndPassword shared ptr
          * 
-         * \return shared ptr on snmpv1 or null shared ptr in case of error
+         * \return shared ptr on UserAndPassword or null shared ptr in case of error
          */
-        static Snmpv1Ptr tryToCast(DocumentPtr doc);
+        static InternalCertificatePtr tryToCast(DocumentPtr doc);
 
     private:
         //Public secw elements
-        std::string m_communityName = "";
+        std::string m_pem;
 
         //Private secw elements
-        //no private
+        std::string m_privateKeyPem;
 
         void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;
         void fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const override;

@@ -220,6 +220,8 @@
     <class name = "secw_consumer_accessor" selftest = "0">Accessor to return documents from the agent</class>
     
     <!-- Note: Add new supported types here and modify secw_document.cc to handle then in the Document factory -->
+    <class name = "secw_external_certificate" selftest = "0">Document parsers for external certificate document</class>
+    <class name = "secw_internal_certificate" selftest = "0">Document parsers for internal certificate document</class>
     <class name = "secw_snmpv3" selftest = "0">Document parsers for snmpv3 document</class>
     <class name = "secw_snmpv1" selftest = "0">Document parsers for snmpv1 document</class>
     <class name = "secw_user_and_password" selftest = "0">Document parsers for user and password document</class>

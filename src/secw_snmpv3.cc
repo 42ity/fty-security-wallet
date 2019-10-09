@@ -117,7 +117,7 @@ namespace secw
         si.addMember(DOC_SNMPV3_PRIV_PROTOCOL) <<= m_privProtocol;
     }
 
-    void Snmpv3::UpdatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
+    void Snmpv3::updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
     {
         try
         {
@@ -147,7 +147,7 @@ namespace secw
         }
     }
 
-    void Snmpv3::UpdatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
+    void Snmpv3::updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
     {
         try
         {

@@ -7,7 +7,8 @@
 				"supported_types": [
 					"Snmpv3",
 					"Snmpv1",
-					"UserAndPassword"
+					"UserAndPassword",
+					"ExternalCertificate"
 				]
 			},
 			{
@@ -36,14 +37,23 @@
 				"usages": [
 					"user_script"
 				]
+			},
+			{
+				"client_regex": "root",
+				"usages": [
+					"user_script",
+					"discovery_monitoring",
+					"mass_device_management"
+				]
 			}
 		],
 		"producers": [
 			{
-				"client_regex": ".*",
+				"client_regex": "(www-data)|(root)",
 				"usages": [
 					"discovery_monitoring",
-					"mass_device_management"
+					"mass_device_management",
+					"user_script"
 				]
 			}
 		]

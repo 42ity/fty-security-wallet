@@ -1,5 +1,5 @@
 /*  =========================================================================
-    secw_snmpv1 - Document parsers for snmpv1 document
+    secw_external_certificate - Document parsers for external certificate document
 
     Copyright (C) 2019 Eaton
 
@@ -19,59 +19,51 @@
     =========================================================================
 */
 
-#ifndef SECW_SNMPV1_H_INCLUDED
-#define SECW_SNMPV1_H_INCLUDED
+#ifndef SECW_EXTERNAL_CERTIFICATE_H_INCLUDED
+#define SECW_EXTERNAL_CERTIFICATE_H_INCLUDED
 
-#define SNMPV1_TYPE "Snmpv1"
+#define EXTERNAL_CERTIFICATE_TYPE "ExternalCertificate"
 
 namespace secw
 {
-    /**
-     * \brief snmpv1 implementation
-     */
-    class Snmpv1;
+    class ExternalCertificate;
 
-    using Snmpv1Ptr   = std::shared_ptr<Snmpv1>;
-
+    using ExternalCertificatePtr   = std::shared_ptr<ExternalCertificate>;
+    
     /**
      * Some key definition for serialization
      * 
      */
-    static constexpr const char* DOC_SNMPV1_COMMUNITY_NAME = "secw_snmpv1_community_name";
+    static constexpr const char* DOC_EXTERNAL_CERTIFICATE_PEM = "secw_external_certificate_pem";
 
-    class Snmpv1  final : public Document
+
+    class ExternalCertificate  final : public Document
     {
     public:
 
-        Snmpv1();
+        ExternalCertificate();
 
-        Snmpv1( const std::string & name,
-                const std::string & communityName = "");
+        ExternalCertificate( const std::string & name,
+                const std::string & pem = "");
 
         DocumentPtr clone() const override;
 
         void validate() const override;
 
         //Public secw elements
-        const std::string & getCommunityName() const { return m_communityName; }
-        void setCommunityName(const std::string & community) { m_communityName = community; }
-
-        //Private secw elements
-        //no private
+        const std::string & getPem() const { return m_pem; }
+        void setPem(const std::string & pem) { m_pem = pem; }
 
         /**
-         * \brief try to cast a document to a Snmpv1 shared ptr
+         * \brief try to cast a document to a UserAndPassword shared ptr
          * 
-         * \return shared ptr on snmpv1 or null shared ptr in case of error
+         * \return shared ptr on UserAndPassword or null shared ptr in case of error
          */
-        static Snmpv1Ptr tryToCast(DocumentPtr doc);
+        static ExternalCertificatePtr tryToCast(DocumentPtr doc);
 
     private:
         //Public secw elements
-        std::string m_communityName = "";
-
-        //Private secw elements
-        //no private
+        std::string m_pem;
 
         void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;
         void fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const override;
@@ -83,3 +75,4 @@ namespace secw
 } // namepsace secw
 
 #endif
+

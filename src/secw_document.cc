@@ -31,6 +31,8 @@
 #include "secw_snmpv3.h"
 #include "secw_snmpv1.h"
 #include "secw_user_and_password.h"
+#include "secw_external_certificate.h"
+#include "secw_internal_certificate.h"
 
 #include <cxxtools/jsonserializer.h>
 #include <cxxtools/jsondeserializer.h>
@@ -45,7 +47,9 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
 {
     { SNMPV3_TYPE, []() { return DocumentPtr(new Snmpv3()); }},
     { SNMPV1_TYPE, []() { return DocumentPtr(new Snmpv1()); }},
-    { USER_AND_PASSWORD_TYPE, []() { return DocumentPtr(new UserAndPassword()); }}
+    { USER_AND_PASSWORD_TYPE, []() { return DocumentPtr(new UserAndPassword()); }},
+    { EXTERNAL_CERTIFICATE_TYPE, []() { return DocumentPtr(new ExternalCertificate()); }},
+    { INTERNAL_CERTIFICATE_TYPE, []() { return DocumentPtr(new InternalCertificate()); }}
 };
 
 //Public
@@ -141,7 +145,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
         si.addMember(DOC_USAGES_ENTRY) <<= getUsageIds();
     }
 
-    void Document::UpdateHeaderFromSerializationInfo(const cxxtools::SerializationInfo& si)
+    void Document::updateHeaderFromSerializationInfo(const cxxtools::SerializationInfo& si)
     {
         try
         {
@@ -220,12 +224,12 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
             
             //log_debug("Create document '%s' matching with '%s'", doc->getType().c_str(), type.c_str());
 
-            doc->UpdateHeaderFromSerializationInfo(si);
-            doc->UpdatePublicDocFromSerializationInfo(publicEntry);
+            doc->updateHeaderFromSerializationInfo(si);
+            doc->updatePublicDocFromSerializationInfo(publicEntry);
             
             if(privateEntry != nullptr)
             {
-                doc->UpdatePrivateDocFromSerializationInfo(*privateEntry);
+                doc->updatePrivateDocFromSerializationInfo(*privateEntry);
                 
                 if(!documentExist)
                 {

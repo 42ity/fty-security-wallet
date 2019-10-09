@@ -51,11 +51,11 @@ namespace secw
 
         void validate() const override;
 
-        //Public elements
+        //Public secw elements
         const std::string & getUsername() const { return m_username; }
         void setUsername(const std::string & username) { m_username = username; }
 
-        //Private elements
+        //Private secw elements
         const std::string & getPassword() const { return m_password; }
         void setPassword(const std::string & password) { m_password = password; m_containPrivateData = true; }
 
@@ -67,18 +67,18 @@ namespace secw
         static UserAndPasswordPtr tryToCast(DocumentPtr doc);
 
     private:
-        //Public elements
+        //Public secw elements
         std::string m_username = "";
 
 
-        //Private elements
+        //Private secw elements
         std::string m_password = "";
 
         void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;
         void fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const override;
 
-        void UpdatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
-        void UpdatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
+        void updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
+        void updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
     };
 
 } // namepsace secw
