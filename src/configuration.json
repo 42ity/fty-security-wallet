@@ -38,6 +38,12 @@
 					"user_script"
 				]
 			},
+            {
+                "client_regex": "mass-management-daemon",
+				"usages": [
+					"mass_device_management"
+				]
+            },
 			{
 				"client_regex": "root",
 				"usages": [
