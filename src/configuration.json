@@ -45,6 +45,12 @@
 				]
             },
 			{
+				"client_regex": "discovery-monitoring-daemon",
+				"usages": [
+					"discovery_monitoring"
+				]
+			},
+			{
 				"client_regex": "root",
 				"usages": [
 					"user_script",
