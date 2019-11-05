@@ -35,6 +35,8 @@ Build-Depends: debhelper (>= 9),
     libfty-common-dev,
     libfty-common-mlm-dev,
     libfty-common-socket-dev,
+    libfty-common-messagebus-dev,
+    libfty-common-dto-dev,
     gcc (>= 4.9.0), g++ (>= 4.9.0),
     systemd,
     dh-systemd,
@@ -64,6 +66,8 @@ Depends:
     libfty-common-dev,
     libfty-common-mlm-dev,
     libfty-common-socket-dev,
+    libfty-common-messagebus-dev,
+    libfty-common-dto-dev,
     libfty-security-wallet1 (= ${binary:Version})
 Description: fty-security-wallet development tools
  This package contains development files for fty-security-wallet:

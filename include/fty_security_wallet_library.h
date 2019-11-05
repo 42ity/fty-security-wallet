@@ -36,6 +36,8 @@
 #include <fty_log.h>
 #include <fty_common_mlm.h>
 #include <fty_common_socket.h>
+#include <fty_common_messagebus.h>
+#include <fty_common_dto.h>
 
 //  FTY_SECURITY_WALLET version macros for compile-time API detection
 #define FTY_SECURITY_WALLET_VERSION_MAJOR 1
