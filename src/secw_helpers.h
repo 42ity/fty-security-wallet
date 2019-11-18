@@ -30,6 +30,9 @@ namespace secw
 
   bool hasCommonUsageIds( const std::set<std::string> &  usages1, const std::set<std::string> &  usages2);
 
+  std::string encrypt(const std::string & plainData, const std::string & key);
+  std::string decrypt(const std::string & encryptedData, const std::string & key);
+
 } //namespace secw
 
 #endif

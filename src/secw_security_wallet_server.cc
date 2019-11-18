@@ -36,6 +36,8 @@
 #include "secw_document.h"
 
 #include "secw_helpers.h"
+#include "fty_srr_dto.h"
+
 using namespace std::placeholders;
 
 namespace secw
@@ -43,7 +45,9 @@ namespace secw
 
     SecurityWalletServer::SecurityWalletServer( const std::string & configurationPath,
                                                 const std::string & databasePath,
-                                                fty::StreamPublisher & streamPublisher)
+                                                fty::StreamPublisher & streamPublisher,
+                                                const std::string & srrEndpoint,
+                                                const std::string & srrAgentName)
         :   m_activeWallet(configurationPath, databasePath),
             m_streamPublisher(streamPublisher)
     {
@@ -65,10 +69,31 @@ namespace secw
         m_supportedCommands[CREATE] = std::bind(&SecurityWalletServer::handleCreate, this, _1, _2);
         m_supportedCommands[DELETE] = std::bind(&SecurityWalletServer::handleDelete, this, _1, _2);
         m_supportedCommands[UPDATE] = std::bind(&SecurityWalletServer::handleUpdate, this, _1, _2);
+
+
+        //add support for SRR here (need to rework after)
+        if((!srrEndpoint.empty()) && (!srrAgentName.empty()))
+        {
+            m_msgBus.reset(messagebus::MlmMessageBus(srrEndpoint, srrAgentName));
+            m_msgBus->connect();
+
+            // Listen all incoming request
+            m_msgBus->receive("ETN.Q.IPMCORE.SECUWALLET", std::bind(&SecurityWalletServer::handleSRRRequest, this, _1));
+        }  
+
+    }
+
+    SecurityWalletServer::~SecurityWalletServer()
+    {
+        //ensure nothing else is on going
+        std::unique_lock<std::mutex>(m_lock);
     }
 
     std::vector<std::string> SecurityWalletServer::handleRequest(const Sender & sender, const std::vector<std::string> & payload)
     {
+        //ensure nothing else is on going
+        std::unique_lock<std::mutex>(m_lock);
+
         try
         {
             if(payload.size() == 0)
@@ -113,6 +138,99 @@ namespace secw
         {
             log_error("Unexpected error: unknown");
             return {"ERROR",""};
+        }
+    }
+
+    void SecurityWalletServer::handleSRRRequest(messagebus::Message msg)
+    {
+        log_debug("Configuration handle request");
+        try
+        {
+            dto::UserData userData;
+            // Get request
+            dto::UserData data = msg.userData();
+            dto::srr::ConfigQueryDto configQuery;
+            data >> configQuery;
+
+            //log_debug("Config query-> action: %s", configQuery.action.c_str());
+            
+            if(configQuery.action == dto::srr::Action::SAVE)
+            {
+                //ensure nothing else is on going
+                std::unique_lock<std::mutex>(m_lock);
+                //get the srr files
+                
+                //dto::config::ConfigResponseDto respDto(""/*configQuery.featureName*/, STATUS_FAILED);
+                /*std::map<std::string, cxxtools::SerializationInfo> configSiList;
+                for(auto const& feature: configQuery.features)
+                {
+                    // Get the configuration file path name from class variable m_parameters
+                    std::string configurationFileName = AUGEAS_FILES + m_parameters.at(feature) + ANY_NODES;
+                    log_debug("Configuration file name: %s", configurationFileName.c_str());
+                    
+                    cxxtools::SerializationInfo si;
+                    getConfigurationToJson(si, configurationFileName);
+                    configSiList[feature] = si;
+                }
+                // Set response
+                setSaveResponse(configSiList, respDto);
+                userData << respDto;*/
+            } 
+            else if ((configQuery.action == dto::srr::Action::RESTORE) && (!configQuery.data.empty()))
+            {
+                //ensure nothing else is on going
+                std::unique_lock<std::mutex>(m_lock);
+                // To store response
+                /*dto::srr::SrrRestoreDtoList srrRestoreDtoList(STATUS_SUCCESS); 
+                // Get request and serialize it
+                cxxtools::SerializationInfo restoreSi;
+                readFromString(configQuery.data, restoreSi);
+                // Get data member
+                cxxtools::SerializationInfo siData = restoreSi.getMember(DATA_MEMBER);
+                cxxtools::SerializationInfo::Iterator it;
+                for (it = siData.begin(); it != siData.end(); ++it)
+                {
+                    dto::srr::SrrRestoreDto respDto(it->begin()->name(), STATUS_FAILED);
+                    // Build the augeas configuration file name.
+                    std::string configurationFileName = AUGEAS_FILES + m_parameters.at(respDto.name);
+                    log_debug("Restore configuration for: %s, with configuration file: %s", respDto.name.c_str(), configurationFileName.c_str());
+                    
+                    cxxtools::SerializationInfo siData = it->getMember(respDto.name).getMember(DATA_MEMBER);
+                    int returnValue = setConfiguration(&siData, configurationFileName);
+                    if (returnValue == 0)
+                    {
+                        log_debug("Restore configuration for: %s succeed!", respDto.name.c_str());
+                        respDto.status = STATUS_SUCCESS;
+                    } 
+                    else
+                    {
+                        std::string errorMsg = "Restore configuration for: " + respDto.name + " failed!";
+                        log_error(errorMsg.c_str());
+                        respDto.error = errorMsg;
+                        srrRestoreDtoList.status = STATUS_FAILED;
+                    }
+                    srrRestoreDtoList.responseList.push_back(respDto);
+               }
+               userData << srrRestoreDtoList;*/
+            } 
+            else
+            {
+                throw std::runtime_error("Request not valid");
+            }
+            // Send response
+            //sendResponse(msg, userData, configQuery.action);
+        }
+        catch (const std::out_of_range& oor)
+        {
+            log_error("Feature name not found");
+        }
+        catch (std::exception &e)
+        {
+            log_error("Unexpected error: %s", e.what());
+        }
+        catch (...)
+        {
+            log_error("Unexpected error: unknown");
         }
     }
 

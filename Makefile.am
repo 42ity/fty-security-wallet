@@ -77,6 +77,7 @@ EXTRA_DIST += \
     src/secw_portfolio.h \
     src/secw_client_accessor.h \
     src/secw_helpers.h \
+    src/secw_openssl_wrapper.h \
     src/secw_configuration.h \
     README.md \
     src/fty_security_wallet_classes.h

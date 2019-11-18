@@ -76,6 +76,21 @@ namespace secw
     return returnData;
   }
 
+  std::string encrypt(const std::string & plainData, const std::string & key)
+  {
+    return key + "=" + plainData;
+  }
+
+  std::string decrypt(const std::string & encryptedData, const std::string & key)
+  {
+    if( encryptedData.substr(key.length(), 1) != "=" )
+    {
+      throw std::runtime_error("Bad encryption format");
+    }
+
+    return encryptedData.substr(key.length() + 1);
+  }
+
   bool hasCommonUsageIds( const std::set<std::string> &  usages1, const std::set<std::string> &  usages2)
   {
     bool matching = false;

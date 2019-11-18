@@ -45,9 +45,18 @@ namespace secw
     public:
         explicit SecurityWalletServer(  const std::string & configurationPath,
                                         const std::string & databasePath,
-                                        fty::StreamPublisher & streamPublisher);
+                                        fty::StreamPublisher & streamPublisher,
+                                        const std::string & srrEndpoint = "",
+                                        const std::string & srrAgentName = "");
+
+        ~SecurityWalletServer();
         
         std::vector<std::string> handleRequest(const Sender & sender, const std::vector<std::string> & payload) override;
+
+        std::string getSrrSaveData(const std::string & passphrase);
+        void restoreSRRData(const std::string & data, const std::string & passphrase);
+        
+
 
     private:
         // List of supported commands with a reference to the handler for this command.
@@ -83,6 +92,9 @@ namespace secw
         
         std::string serializeListDocumentsPrivate(const std::string & portfolioName, const std::set<UsageId> & usages);
         std::string serializeListDocumentsPublic(const std::string & portfolioName, const std::set<UsageId> & usages);
+
+        //srr
+        void handleSRRRequest(messagebus::Message msg);
     
     public:
         //Command list
@@ -103,7 +115,12 @@ namespace secw
 
         static constexpr const char* CREATE = "CREATE";
         static constexpr const char* DELETE = "DELETE";
-        static constexpr const char* UPDATE = "UPDATE";        
+        static constexpr const char* UPDATE = "UPDATE";
+
+        //SRR
+        std::unique_ptr<messagebus::MessageBus> m_msgBus;
+
+        std::mutex m_lock;        
  
     };
 

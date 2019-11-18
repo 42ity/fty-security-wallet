@@ -282,6 +282,7 @@
 
     <class name = "secw_client_accessor" private = "1" selftest = "0">Accessor to return documents from the agent</class>
     <class name = "secw_helpers" private = "1" selftest = "0">List of helper functions use a bit everywhere</class>
+    <class name = "secw_openssl_wrapper" private = "1" selftest = "0">Openssl wrapper for crypto</class>
 
     <class name = "secw-configuration" private = "1" selftest = "0">Handle the configuration of a security wallet</class>
     

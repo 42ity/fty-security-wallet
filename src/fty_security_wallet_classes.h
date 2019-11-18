@@ -65,6 +65,10 @@ typedef struct _secw_client_accessor_t secw_client_accessor_t;
 typedef struct _secw_helpers_t secw_helpers_t;
 #define SECW_HELPERS_T_DEFINED
 #endif
+#ifndef SECW_OPENSSL_WRAPPER_T_DEFINED
+typedef struct _secw_openssl_wrapper_t secw_openssl_wrapper_t;
+#define SECW_OPENSSL_WRAPPER_T_DEFINED
+#endif
 #ifndef SECW_CONFIGURATION_T_DEFINED
 typedef struct _secw_configuration_t secw_configuration_t;
 #define SECW_CONFIGURATION_T_DEFINED
@@ -82,6 +86,7 @@ typedef struct _secw_configuration_t secw_configuration_t;
 #include "secw_portfolio.h"
 #include "secw_client_accessor.h"
 #include "secw_helpers.h"
+#include "secw_openssl_wrapper.h"
 #include "secw_configuration.h"
 
 //  *** To avoid double-definitions, only define if building without draft ***
