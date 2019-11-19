@@ -43,8 +43,8 @@ namespace secw
 
         const PortfolioConfiguration & getConfiguration(const std::string & portfolioName = "default") const;
 
-        std::string getSrrSaveData(const std::string & passphrase);
-        void restoreSRRData(const std::string & data, const std::string & passphrase);
+        cxxtools::SerializationInfo getSrrSaveData(const std::string & passphrase);
+        void restoreSRRData(const cxxtools::SerializationInfo & si, const std::string & passphrase);
 
         static constexpr const uint8_t SECW_VERSION = 1;
 

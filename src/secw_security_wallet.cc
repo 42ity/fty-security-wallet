@@ -179,7 +179,7 @@ namespace secw
 
     }
 
-    std::string SecurityWallet::getSrrSaveData(const std::string & passphrase)
+    cxxtools::SerializationInfo SecurityWallet::getSrrSaveData(const std::string & passphrase)
     {
         cxxtools::SerializationInfo si;
 
@@ -198,13 +198,11 @@ namespace secw
             portfolios.setCategory(cxxtools::SerializationInfo::Array);
         }
         
-        return serialize(si);
+        return si;
     }
 
-    void SecurityWallet::restoreSRRData(const std::string & data, const std::string & passphrase)
+    void SecurityWallet::restoreSRRData(const cxxtools::SerializationInfo & si, const std::string & passphrase)
     {
-        cxxtools::SerializationInfo si = deserialize(data);
-        
         //check the phasephase
         std::string receivedPassphrase;
         si.getMember("checksum") >>= receivedPassphrase;

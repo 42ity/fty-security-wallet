@@ -76,19 +76,50 @@ namespace secw
     return returnData;
   }
 
-  std::string encrypt(const std::string & plainData, const std::string & key)
+  std::string encrypt(const std::string & plainData, const std::string & passphrase)
   {
-    return key + "=" + plainData;
+    // Convert data to binary
+    ByteField plainBinary = strToBytes(plainData);
+    // Generate key and initial vector
+    ByteField key = generateSHA256Digest(strToBytes(passphrase));
+    ByteField iv = randomVector(IV_BYTE_SIZE);
+    std::string cyphered = base64Encode(iv);
+    cyphered += ":";
+    cyphered += base64Encode(Aes256cbcEncrypt(plainBinary, key, iv));
+    // CAUTION: need to clean memory to avoid key and init vector stay in the
+    // heap after deallocation
+    clean(iv);
+    clean(key);
+    // Return cyphered string
+    return cyphered;
   }
 
-  std::string decrypt(const std::string & encryptedData, const std::string & key)
+  std::string decrypt(const std::string & encryptedData, const std::string & passphrase)
   {
-    if( encryptedData.substr(key.length(), 1) != "=" )
+    // If input is empty string do not try to decypher and return an empty string
+    if( encryptedData.empty() )
     {
-      throw std::runtime_error("Bad encryption format");
+      return "";
     }
 
-    return encryptedData.substr(key.length() + 1);
+    // Ensure there is a ':' after initial vector
+    if ((encryptedData.length() <= IV_BASE64_SIZE) || (encryptedData[IV_BASE64_SIZE] != ':'))
+    {
+      throw std::invalid_argument("Invalid cyphered format");
+    }
+    // Compute key from passphrase
+    ByteField key = generateSHA256Digest(strToBytes(passphrase));
+    // Extract init vector
+    ByteField iv = base64Decode(encryptedData, 0, IV_BASE64_SIZE);
+    // Decrypt
+    ByteField plainBinary = Aes256cbcDecrypt(base64Decode(encryptedData, IV_BASE64_SIZE + 1), key, iv);
+    // CAUTION: need to clean memory to avoid key and init vector stay in the
+    // heap after deallocation
+    clean(iv);
+    clean(key);
+    // Convert binary to string
+    return bytesToStr(plainBinary);
+
   }
 
   bool hasCommonUsageIds( const std::set<std::string> &  usages1, const std::set<std::string> &  usages2)

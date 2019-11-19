@@ -52,12 +52,7 @@ namespace secw
         ~SecurityWalletServer();
         
         std::vector<std::string> handleRequest(const Sender & sender, const std::vector<std::string> & payload) override;
-
-        std::string getSrrSaveData(const std::string & passphrase);
-        void restoreSRRData(const std::string & data, const std::string & passphrase);
         
-
-
     private:
         // List of supported commands with a reference to the handler for this command.
         std::map<Command, FctCommandHandler> m_supportedCommands;

@@ -90,17 +90,13 @@ namespace secw
       BIO_push(b64, mem);
 
       BIO_write(b64, &data[0], data.size());
-      BIO_flush(b64);
+      (void)BIO_flush(b64);
 
       // get a pointer to mem's data
       BUF_MEM *bptr;
       BIO_get_mem_ptr(b64, &bptr);
 
       // Convert to string
-      //std::shared_ptr<char> buff = std::shared_ptr<char>(new char[bptr->length + 1]);
-      //std::memcpy(buff.get(), bptr->data, bptr->length);
-      //buff.get()[bptr->length] = 0;
-      //std::string returnVal(buff.get());
       std::string returnVal(bptr->data, bptr->length);
 
       BIO_free_all(b64);
@@ -130,17 +126,16 @@ namespace secw
     ByteField generateDigest(const ByteField & data, const EVP_MD * pEvpMd)
     {
       // Build the returned vector
-      //std::shared_ptr<Byte> digest = std::shared_ptr<Byte>(new Byte[EVP_MAX_MD_SIZE]);
       ByteField digest(EVP_MAX_MD_SIZE);
       unsigned int digestSize = 0;
+      
       // Compute the digest
       EVP_MD_CTX * md5ctx = EVP_MD_CTX_create();
       EVP_DigestInit_ex(md5ctx, pEvpMd, NULL);
       EVP_DigestUpdate(md5ctx, &data[0], data.size());
       EVP_DigestFinal_ex(md5ctx, &digest[0], &digestSize);
       EVP_MD_CTX_destroy(md5ctx);
-      //ByteField returnDigest(digest.get(), digest.get() + digestSize);
-      //return returnDigest;
+
       // Adjust the returned vector size with the digest size
       digest.resize(digestSize);
       return digest;
@@ -171,7 +166,7 @@ namespace secw
       EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
       int len;
       size_t cipherDataLen;
-      //std::shared_ptr<Byte> cipherData = std::shared_ptr<Byte>(new Byte[data.size() + 64]);
+
       ByteField cipherData(data.size() + 64);
       /* Initialise the encryption operation. IMPORTANT - ensure you use a key
       * and IV size appropriate for your cipher
@@ -179,11 +174,13 @@ namespace secw
       * IV size for *most* modes is the same as the block size. For AES this
       * is 128 bits */
       EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, &key[0], &iv[0]);
+      
       /* Provide the message to be encrypted, and obtain the encrypted output.
       * EVP_EncryptUpdate can be called multiple times if necessary
       */
       EVP_EncryptUpdate(ctx, &cipherData[0], &len, &data[0], data.size());
       cipherDataLen = len;
+      
       /* Finalise the encryption. Further cipherData bytes may be written at
       * this stage.
       */
@@ -193,7 +190,7 @@ namespace secw
       /* Clean up */
       EVP_CIPHER_CTX_free(ctx);
 
-      //return ByteField(cipherData.get(), cipherData.get() + cipherDataLen);
+
       cipherData.resize(cipherDataLen);
       return cipherData;
     }
@@ -220,6 +217,7 @@ namespace secw
 
       int len;
       size_t plainDataLen;
+      
       /* Initialise the decryption operation. IMPORTANT - ensure you use a key
       * and IV size appropriate for your cipher
       * In this example we are using 256 bit AES (i.e. a 256 bit key). The
