@@ -69,5 +69,32 @@
 				]
 			}
 		]
+	},
+    {
+		"portfolio_name": "internal",
+		"usages": [
+			{
+				"usage_id": "webserver",
+				"supported_types": [
+					"InternalCertificate"
+				]
+			}
+		],
+		"consumers": [
+						{
+				"client_regex": "(www-data)|(root)",
+				"usages": [
+					"webserver"
+				]
+			}
+		],
+		"producers": [
+			{
+				"client_regex": "(certificate-generator-daemon)|(root)",
+				"usages": [
+					"webserver"
+				]
+			}
+		]
 	}
 ]
