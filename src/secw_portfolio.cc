@@ -206,7 +206,7 @@ namespace secw
     {
         si.addMember("version") <<= PORTFOLIO_VERSION;
         si.addMember("name") <<= m_name;
-        cxxtools::SerializationInfo siDocuments = si.addMember("documents");
+        cxxtools::SerializationInfo & siDocuments = si.addMember("documents");
 
         for (const auto pDoc : getListDocuments() )
         {

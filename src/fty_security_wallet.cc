@@ -112,6 +112,8 @@ int main (int argc, char *argv [])
         paramsSecw["STORAGE_DATABASE_PATH"] = storage_database_path;
         paramsSecw["AGENT_NAME"] = secw_actor_name;
         paramsSecw["ENDPOINT"] = endpoint;
+        paramsSecw["AGENT_NAME_SRR"] = secw_actor_name;
+        paramsSecw["ENDPOINT_SRR"] = endpoint;
         
         //start secw agent
         
@@ -121,7 +123,9 @@ int main (int argc, char *argv [])
         //create the server
         secw::SecurityWalletServer serverSecw(  paramsSecw.at("STORAGE_CONFIGURATION_PATH"),
                                         paramsSecw.at("STORAGE_DATABASE_PATH"),
-                                        notificationStream);
+                                        notificationStream,
+                                        paramsSecw.at("ENDPOINT_SRR"),
+                                        paramsSecw.at("AGENT_NAME_SRR"));
         
         fty::SocketBasicServer agentSecw( serverSecw, socketPath);
 

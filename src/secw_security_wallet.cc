@@ -187,16 +187,16 @@ namespace secw
         si.addMember("checksum") <<= encrypt(passphrase, passphrase);
 
         //get the documents
-        cxxtools::SerializationInfo portfolios = si.addMember("portfolios");
+        cxxtools::SerializationInfo & portfolios = si.addMember("portfolios");
        
+        for(const Portfolio & portfolio : m_portfolios)
         {
-            for(const Portfolio & portfolio : m_portfolios)
-            {
-                portfolio.serializePortfolioSRR(portfolios.addMember(""), passphrase);
-            }
-
-            portfolios.setCategory(cxxtools::SerializationInfo::Array);
+            log_debug("Save portfolio <%s>", portfolio.getName().c_str());
+            portfolio.serializePortfolioSRR(portfolios.addMember(""), passphrase);
         }
+
+        
+        portfolios.setCategory(cxxtools::SerializationInfo::Array);
         
         return si;
     }

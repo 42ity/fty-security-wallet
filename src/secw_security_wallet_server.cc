@@ -71,10 +71,11 @@ namespace secw
         m_supportedCommands[DELETE] = std::bind(&SecurityWalletServer::handleDelete, this, _1, _2);
         m_supportedCommands[UPDATE] = std::bind(&SecurityWalletServer::handleUpdate, this, _1, _2);
 
-
+        log_debug("check SRR <%s> <%s>", srrEndpoint.c_str(), srrAgentName.c_str());
         //add support for SRR here (need to rework after)
         if((!srrEndpoint.empty()) && (!srrAgentName.empty()))
         {
+            log_debug("Connect SRR %s %s", srrEndpoint.c_str(), srrAgentName.c_str());
             m_msgBus.reset(messagebus::MlmMessageBus(srrEndpoint, srrAgentName));
             m_msgBus->connect();
 
@@ -92,6 +93,7 @@ namespace secw
 
     std::vector<std::string> SecurityWalletServer::handleRequest(const Sender & sender, const std::vector<std::string> & payload)
     {
+        log_debug("process SRR");
         //ensure nothing else is on going
         std::unique_lock<std::mutex>(m_lock);
 
