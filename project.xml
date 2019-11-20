@@ -12,6 +12,8 @@
     <target name = "redhat" />
 
     <target name = "travis" >
+        <option name = "recursive_dependencies" value = "true"/>
+        <!-- <option name = "global_release" value = "release/IPM-2.0.0"> -->
         <!-- option name = "clangformat_implem" value = "autotools" / -->
         <option name = "use_cmake" value = "0" />
         <option name = "dist" value = "trusty" />
