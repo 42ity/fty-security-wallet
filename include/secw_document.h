@@ -116,7 +116,25 @@ namespace secw
      */
     void fillSerializationInfoWithoutSecret(cxxtools::SerializationInfo& si) const;
 
+    /**
+     * \brief Append the serialization of the document for SRR.
+     * 
+     * \param[in|out] cxxtools::SerializationInfo
+     * \param[in] enctyption key use to encrypt private part
+     */
+    void fillSerializationInfoSRR(cxxtools::SerializationInfo& si, const std::string & encryptionKey) const;
+
+ 
+
   //Classe methods
+   /**
+     * \brief return a document Ptr from a serilization from SRR
+     * 
+     * \return DocumentPtr
+     */
+
+    static DocumentPtr createFromSRR(const cxxtools::SerializationInfo& si, const std::string & encryptionKey);
+
     /**
      * \brief return the list of all supported types od documents
      * 

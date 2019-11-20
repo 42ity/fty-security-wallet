@@ -56,6 +56,9 @@ namespace secw
         void loadPortfolio(const cxxtools::SerializationInfo& si);
         void serializePortfolio(cxxtools::SerializationInfo& si) const;
 
+        void loadPortfolioFromSRR(const cxxtools::SerializationInfo& si, const std::string & encryptiondKey, bool isSameInstance = false);
+        void serializePortfolioSRR(cxxtools::SerializationInfo& si, const std::string & encryptiondKey) const;
+
         static constexpr const uint8_t PORTFOLIO_VERSION = 1;
 
     private:
@@ -66,6 +69,7 @@ namespace secw
         std::map<std::string, DocumentPtr > m_mapNameDocuments;
 
         void loadPortfolioVersion1(const cxxtools::SerializationInfo& si);
+        void loadPortfolioSRRVersion1(const cxxtools::SerializationInfo& si, const std::string & encryptiondKey, bool isSameInstance);
     };
 
     void operator<<= (cxxtools::SerializationInfo& si, const Portfolio & portfolio);

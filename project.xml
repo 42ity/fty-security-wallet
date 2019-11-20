@@ -190,6 +190,78 @@
                 />
         </use>
     </use>
+
+    <!-- use fty-common-messagebus -->
+    <use project = "fty-common-messagebus" libname = "libfty_common_messagebus" header = "fty_common_messagebus.h"
+        repository = "https://github.com/42ity/fty-common-messagebus.git"
+        release = "master"
+        test = "fty_common_messagebus_selftest">
+
+        <use project = "czmq"
+            repository = "https://github.com/42ity/czmq.git"
+            release = "v3.0.2-FTY-master"
+            min_major = "3" min_minor = "0" min_patch = "2" >
+
+            <use project = "libzmq"
+                repository = "https://github.com/42ity/libzmq.git"
+                release = "4.2.0-FTY-master" >
+
+                <use project = "libsodium" prefix = "sodium"
+                    repository = "https://github.com/42ity/libsodium.git"
+                    release = "1.0.5-FTY-master"
+                    test = "sodium_init"
+                    />
+            </use>
+        </use>
+        <use project = "malamute" min_major = "1" test = "mlm_server_test"
+            repository = "https://github.com/42ity/malamute.git"
+            release = "1.0-FTY-master"
+            />
+
+        <use project = "fty-common-dto" min_major = "1" libname = "libfty_common_dto" test = "fty_common_dto_private_selftest"  header = "fty_common_dto.h"
+            repository = "https://github.com/42ity/fty-common-dto.git"
+            release = "master"
+            >
+            <use project = "cxxtools" test = "cxxtools::Utf8Codec::Utf8Codec" header = "cxxtools/allocator.h"
+                        repository = "https://github.com/42ity/cxxtools.git"
+                        release = "2.2-FTY-master"
+                        />
+        </use>
+
+        <use project = "fty-common-logging" libname = "libfty_common_logging" header = "fty_log.h"
+            repository = "https://github.com/42ity/fty-common-logging.git"
+            release = "master"
+            test = "fty_common_logging_selftest" >
+
+            <use project = "log4cplus" header = "log4cplus/logger.h" test = "appender_test"
+                repository = "https://github.com/42ity/log4cplus.git"
+                release = "1.1.2-FTY-master"
+                />
+        </use>
+    </use>
+    
+    <!-- use fty-common-dto -->
+    <use project = "fty-common-dto" libname = "libfty_common_dto" header = "fty_common_dto.h"
+        repository = "https://github.com/42ity/fty-common-dto.git"
+        release = "master"
+        test = "fty_common_dto_selftest">
+
+        <use project = "cxxtools" test = "cxxtools::Utf8Codec::Utf8Codec" header = "cxxtools/allocator.h"
+                repository = "https://github.com/42ity/cxxtools.git"
+                release = "2.2-FTY-master"
+                />
+
+        <use project = "fty-common-logging" libname = "libfty_common_logging" header = "fty_log.h"
+            repository = "https://github.com/42ity/fty-common-logging.git"
+            release = "master"
+            test = "fty_common_logging_selftest" >
+
+            <use project = "log4cplus" header = "log4cplus/logger.h" test = "appender_test"
+                repository = "https://github.com/42ity/log4cplus.git"
+                release = "1.1.2-FTY-master"
+                />
+        </use>
+    </use>
     
     <!-- Note: Credential asset mapping -->
     <class name = "cam_credential_asset_mapping_server" private = "1" selftest = "0">Credential Asset Mapping Server</class>
@@ -210,6 +282,7 @@
 
     <class name = "secw_client_accessor" private = "1" selftest = "0">Accessor to return documents from the agent</class>
     <class name = "secw_helpers" private = "1" selftest = "0">List of helper functions use a bit everywhere</class>
+    <class name = "secw_openssl_wrapper" private = "1" selftest = "0">Openssl wrapper for crypto</class>
 
     <class name = "secw-configuration" private = "1" selftest = "0">Handle the configuration of a security wallet</class>
     

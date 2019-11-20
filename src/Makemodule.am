@@ -21,6 +21,7 @@ src_libfty_security_wallet_la_SOURCES = \
     src/secw_portfolio.cc \
     src/secw_client_accessor.cc \
     src/secw_helpers.cc \
+    src/secw_openssl_wrapper.cc \
     src/secw_configuration.cc \
     src/platform.h
 

@@ -19,6 +19,8 @@ git clone --quiet --depth 1 -b master https://github.com/42ity/fty-common-loggin
 git clone --quiet --depth 1 -b master https://github.com/42ity/fty-common.git fty-common
 git clone --quiet --depth 1 -b master https://github.com/42ity/fty-common-mlm.git fty-common-mlm
 git clone --quiet --depth 1 -b master https://github.com/42ity/fty-common-socket.git fty-common-socket
+git clone --quiet --depth 1 -b master https://github.com/42ity/fty-common-messagebus.git fty-common-messagebus
+git clone --quiet --depth 1 -b master https://github.com/42ity/fty-common-dto.git fty-common-dto
 cd -
 
 if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list zproject >/dev/null 2>&1) || \

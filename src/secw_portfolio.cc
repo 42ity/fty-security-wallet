@@ -177,6 +177,47 @@ namespace secw
         si.addMember("documents") <<= getListDocuments();
     }
 
+    void Portfolio::loadPortfolioFromSRR(const cxxtools::SerializationInfo& si, const std::string & encryptiondKey,  bool isSameInstance)
+    {
+        uint8_t version = 0;
+
+        try
+        {
+            si.getMember("version") >>= version;
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data");
+        }
+
+        //remove former content
+        m_documents.clear();
+        m_mapNameDocuments.clear();
+
+        switch(version)
+        {
+            case 1: loadPortfolioSRRVersion1(si, encryptiondKey, isSameInstance);
+                    break;
+            default: throw SecwImpossibleToLoadPortfolioException("Version "+std::to_string(version)+" not supported");
+        }
+    }
+    
+    void Portfolio::serializePortfolioSRR(cxxtools::SerializationInfo& si, const std::string & encryptiondKey) const
+    {
+        si.addMember("version") <<= PORTFOLIO_VERSION;
+        si.addMember("name") <<= m_name;
+        cxxtools::SerializationInfo & siDocuments = si.addMember("documents");
+
+        for (const auto pDoc : getListDocuments() )
+        {
+
+            pDoc->fillSerializationInfoSRR(siDocuments.addMember(""), encryptiondKey); 
+        }
+
+        siDocuments.setCategory(cxxtools::SerializationInfo::Array);
+
+    }
+
     void Portfolio::loadPortfolioVersion1(const cxxtools::SerializationInfo& si)
     {
         try
@@ -204,6 +245,55 @@ namespace secw
                 {
                     log_error("Impossible to load a document from portfolio %s: %s", m_name.c_str(), e.what());
                 }
+                
+                
+            }
+            
+            log_debug("Portfolio %s loaded with %i documents",m_name.c_str(), count );
+
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data in portfolio " + m_name);
+        }
+    }
+
+    void Portfolio::loadPortfolioSRRVersion1(const cxxtools::SerializationInfo& si, const std::string & encryptiondKey, bool isSameInstance)
+    {
+        try
+        {
+            si.getMember("name") >>= m_name;
+            const cxxtools::SerializationInfo& documents = si.getMember("documents");
+            
+            size_t count = 0;
+            
+            for( size_t index = 0; index < documents.memberCount(); index++ )
+            {
+                try
+                {
+                    DocumentPtr doc = Document::createFromSRR(documents.getMember(index), encryptiondKey);              
+                    
+                    if((!isSameInstance) && (doc->getType() == "InternalCertificate") )
+                    {
+                        log_info("Skip InternalCertificate because the instance is not the same.");
+                    }
+                    else
+                    {
+                        doc->validate();
+
+                        m_documents[doc->getId()] = doc;
+                        m_mapNameDocuments[doc->getName()] = doc;
+
+                        count++;
+                    }
+
+                }
+                catch(const std::exception& e)
+                {
+                    log_error("Impossible to load a document from portfolio %s: %s", m_name.c_str(), e.what());
+                }
+                
+                
             }
             
             log_debug("Portfolio %s loaded with %i documents",m_name.c_str(), count );

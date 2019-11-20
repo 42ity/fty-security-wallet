@@ -48,7 +48,9 @@ void fty_security_wallet_mlm_agent(zsock_t *pipe, void *args)
     //create the server
     secw::SecurityWalletServer server(  arguments.at("STORAGE_CONFIGURATION_PATH"),
                                         arguments.at("STORAGE_DATABASE_PATH"),
-                                        notificationStream);
+                                        notificationStream,
+                                        arguments.at("ENDPOINT_SRR"),
+                                        arguments.at("AGENT_NAME_SRR"));
     
     //launch the agent
     mlm::MlmBasicMailboxServer agent(  pipe, 

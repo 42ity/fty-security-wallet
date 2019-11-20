@@ -34,6 +34,8 @@
 #include "secw_external_certificate.h"
 #include "secw_internal_certificate.h"
 
+#include "secw_helpers.h"
+
 #include <cxxtools/jsonserializer.h>
 #include <cxxtools/jsondeserializer.h>
 
@@ -133,6 +135,81 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
         fillSerializationInfoHeaderDoc(si);
         fillSerializationInfoPublicDoc(si.addMember(DOC_PUBLIC_ENTRY));
         fillSerializationInfoPrivateDoc(si.addMember(DOC_PRIVATE_ENTRY));
+    }
+
+    void Document::fillSerializationInfoSRR(cxxtools::SerializationInfo& si, const std::string & encryptionKey) const
+    {
+        fillSerializationInfoHeaderDoc(si);
+        fillSerializationInfoPublicDoc(si.addMember(DOC_PUBLIC_ENTRY));
+        cxxtools::SerializationInfo & privateSi = si.addMember(DOC_PRIVATE_ENTRY);
+
+        privateSi.addMember("format") <<= "ENC";
+        cxxtools::SerializationInfo subSi;
+
+        fillSerializationInfoPrivateDoc(subSi);
+
+        std::string dataToEncrypt = serialize(subSi);
+
+        privateSi.addMember("data") <<= encrypt(dataToEncrypt, encryptionKey);
+    }
+
+    DocumentPtr Document::createFromSRR(const cxxtools::SerializationInfo& si, const std::string & encryptionKey)
+    {
+        DocumentPtr doc;
+        try
+        {
+            Id id;
+            DocumentType type;
+
+            si.getMember(DOC_TYPE_ENTRY) >>= type;
+            si.getMember(DOC_ID_ENTRY) >>= id;
+
+            const cxxtools::SerializationInfo & publicEntry = si.getMember(DOC_PUBLIC_ENTRY);
+            const cxxtools::SerializationInfo & privateSection = si.getMember(DOC_PRIVATE_ENTRY);
+
+            doc = Document::m_documentFactoryFuntions.at(type)();
+            doc->m_id = id;
+            
+            //log_debug("Create document '%s' matching with '%s'", doc->getType().c_str(), type.c_str());
+
+            doc->updateHeaderFromSerializationInfo(si);
+            doc->updatePublicDocFromSerializationInfo(publicEntry);
+
+            std::string format;
+            privateSection.getMember("format") >>= format;
+
+            if(format == "plaintext")
+            {
+                const cxxtools::SerializationInfo & privateEntry = privateSection.getMember("data");
+                doc->updatePrivateDocFromSerializationInfo(privateEntry);
+            }
+            else if (format == "ENC")
+            {
+                std::string encryptedData;
+                privateSection.getMember("data") >>= encryptedData;
+
+                cxxtools::SerializationInfo privateEntry = deserialize(decrypt(encryptedData, encryptionKey));
+
+                doc->updatePrivateDocFromSerializationInfo(privateEntry);
+            }
+            else
+            {
+                throw SecwException("Bad data format");
+            }  
+
+            doc->m_containPrivateData = true;
+
+        }
+        catch(const SecwException & e)
+        {
+            throw;
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwException(e.what());
+        }
+
+        return doc;
     }
 
 //Private 

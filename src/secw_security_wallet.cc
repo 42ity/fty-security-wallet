@@ -43,15 +43,43 @@ namespace secw
 /*-----------------------------------------------------------------------------*/
 //Public
     SecurityWallet::SecurityWallet(const std::string & configurationPath, const std::string & databasePath):
-        m_pathDatabase(databasePath)
+        m_pathConfiguration(configurationPath), m_pathDatabase(databasePath)
     { 
+        try
+        {
+            reload();
+        }
+        catch(const std::exception& e)
+        {
+            exit(EXIT_FAILURE);
+        }
+        
+
+        //attempt to save the database and ensure that we can write
+        try
+        {
+            save();
+        }
+        catch(const std::exception& e)
+        {
+            log_error("Error while saving into database file %s\n %s",m_pathDatabase.c_str(), e.what());
+            exit(EXIT_FAILURE);
+        }
+        
+    }
+
+    void SecurityWallet::reload()
+    {
+        m_configurations.clear();
+        m_portfolios.clear();
+
         //Load Config and then Database
         
         //Load Config
         try
         {
             struct stat buffer;   
-            bool fileExist =  (stat (configurationPath.c_str(), &buffer) == 0);
+            bool fileExist =  (stat (m_pathConfiguration.c_str(), &buffer) == 0);
         
             if(!fileExist)
             {
@@ -59,8 +87,8 @@ namespace secw
             }
             
             std::ifstream input;
-
-            input.open(configurationPath);
+            
+            input.open(m_pathConfiguration);
 
             cxxtools::SerializationInfo rootSi;
             cxxtools::JsonDeserializer deserializer(input);
@@ -88,8 +116,8 @@ namespace secw
         }
         catch(const std::exception& e)
         {
-            log_error("Error while loading configuration file %s\n %s",configurationPath.c_str(), e.what());
-            exit(EXIT_FAILURE);
+            log_error("Error while loading configuration file %s\n %s",m_pathConfiguration.c_str(), e.what());
+            throw;
         }
         
         
@@ -146,20 +174,60 @@ namespace secw
         catch(const std::exception& e)
         {
             log_error("Error while loading database file %s\n %s",m_pathDatabase.c_str(), e.what());
-            exit(EXIT_FAILURE);
+            throw;
         }
 
-        //attempt to save the database and ensure that we can write
-        try
+    }
+
+    cxxtools::SerializationInfo SecurityWallet::getSrrSaveData(const std::string & passphrase)
+    {
+        cxxtools::SerializationInfo si;
+
+        //add the phasephase
+        si.addMember("checksum") <<= encrypt(passphrase, passphrase);
+
+        //get the documents
+        cxxtools::SerializationInfo & portfolios = si.addMember("portfolios");
+       
+        for(const Portfolio & portfolio : m_portfolios)
         {
-            save();
+            log_debug("Save portfolio <%s>", portfolio.getName().c_str());
+            portfolio.serializePortfolioSRR(portfolios.addMember(""), passphrase);
         }
-        catch(const std::exception& e)
-        {
-            log_error("Error while saving into database file %s\n %s",m_pathDatabase.c_str(), e.what());
-            exit(EXIT_FAILURE);
-        }
+
         
+        portfolios.setCategory(cxxtools::SerializationInfo::Array);
+        
+        return si;
+    }
+
+    void SecurityWallet::restoreSRRData(const cxxtools::SerializationInfo & si, const std::string & passphrase)
+    {
+        //check the phasephase
+        std::string receivedPassphrase;
+        si.getMember("checksum") >>= receivedPassphrase;
+
+        if(passphrase != decrypt(receivedPassphrase, passphrase))
+        {
+            throw std::runtime_error("bad passphrase");
+        }
+
+        const cxxtools::SerializationInfo& portfolios = si.getMember("portfolios");
+
+        std::vector<Portfolio> listPortfolio;
+            
+        for(size_t index = 0; index < portfolios.memberCount(); index++ )
+        {
+            Portfolio portfolio;
+            portfolio.loadPortfolioFromSRR(portfolios.getMember(index), passphrase);
+
+            listPortfolio.push_back(portfolio);
+        }
+
+        m_portfolios = listPortfolio;
+
+        save();
+        reload();
     }
 
     void SecurityWallet::save() const

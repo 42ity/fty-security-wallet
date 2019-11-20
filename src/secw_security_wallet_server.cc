@@ -36,6 +36,9 @@
 #include "secw_document.h"
 
 #include "secw_helpers.h"
+#include "fty_srr_dto.h"
+
+
 using namespace std::placeholders;
 
 namespace secw
@@ -43,7 +46,9 @@ namespace secw
 
     SecurityWalletServer::SecurityWalletServer( const std::string & configurationPath,
                                                 const std::string & databasePath,
-                                                fty::StreamPublisher & streamPublisher)
+                                                fty::StreamPublisher & streamPublisher,
+                                                const std::string & srrEndpoint,
+                                                const std::string & srrAgentName)
         :   m_activeWallet(configurationPath, databasePath),
             m_streamPublisher(streamPublisher)
     {
@@ -65,10 +70,33 @@ namespace secw
         m_supportedCommands[CREATE] = std::bind(&SecurityWalletServer::handleCreate, this, _1, _2);
         m_supportedCommands[DELETE] = std::bind(&SecurityWalletServer::handleDelete, this, _1, _2);
         m_supportedCommands[UPDATE] = std::bind(&SecurityWalletServer::handleUpdate, this, _1, _2);
+
+        log_debug("check SRR <%s> <%s>", srrEndpoint.c_str(), srrAgentName.c_str());
+        //add support for SRR here (need to rework after)
+        if((!srrEndpoint.empty()) && (!srrAgentName.empty()))
+        {
+            log_debug("Connect SRR %s %s", srrEndpoint.c_str(), srrAgentName.c_str());
+            m_msgBus.reset(messagebus::MlmMessageBus(srrEndpoint, srrAgentName));
+            m_msgBus->connect();
+
+            // Listen all incoming request
+            m_msgBus->receive("ETN.Q.IPMCORE.SECUWALLET", std::bind(&SecurityWalletServer::handleSRRRequest, this, _1));
+        }  
+
+    }
+
+    SecurityWalletServer::~SecurityWalletServer()
+    {
+        //ensure nothing else is on going
+        std::unique_lock<std::mutex>(m_lock);
     }
 
     std::vector<std::string> SecurityWalletServer::handleRequest(const Sender & sender, const std::vector<std::string> & payload)
     {
+        log_debug("process SRR");
+        //ensure nothing else is on going
+        std::unique_lock<std::mutex>(m_lock);
+
         try
         {
             if(payload.size() == 0)
@@ -116,6 +144,183 @@ namespace secw
         }
     }
 
+    static void setSaveResponse (const std::map<std::string, cxxtools::SerializationInfo>& configSiList, dto::srr::ConfigResponseDto& respDto);
+    static void sendResponse(std::unique_ptr<messagebus::MessageBus> & msgBus, const messagebus::Message& msg, const dto::UserData& userData, const dto::srr::Action action);
+
+    void SecurityWalletServer::handleSRRRequest(messagebus::Message msg)
+    {
+        const std::string securityWalletFeature = "security-wallet";
+        
+        using namespace dto;
+        using namespace dto::srr;
+        
+        log_debug("Configuration handle request");
+        try
+        {
+            UserData response;
+            
+            // Get request
+            UserData data = msg.userData();
+            ConfigQueryDto configQuery;
+            data >> configQuery;
+
+            switch(configQuery.action)
+            {
+                case Action::SAVE:
+                {
+                    // Response
+                    ConfigResponseDto respDto("", dto::srr::Status::FAILED);
+                    std::map<std::string, cxxtools::SerializationInfo> configSiList;
+                    
+                    for(auto const& feature: configQuery.features)
+                    {
+                        if(feature == securityWalletFeature)
+                        {
+                            std::unique_lock<std::mutex>(m_lock);
+
+                            configSiList[feature] = m_activeWallet.getSrrSaveData(configQuery.passPhrase);
+                        }
+                    }
+                    // Set response
+                    setSaveResponse(configSiList, respDto);
+                    response << respDto;
+                }
+                break;
+                
+                case Action::RESTORE:
+                {      
+                    // To store response
+                    SrrRestoreDtoList srrRestoreDtoList(Status::SUCCESS);
+                    
+                    // Get request and serialize it
+                    cxxtools::SerializationInfo restoreSi = deserialize(configQuery.data);
+                    // Get data member
+                    cxxtools::SerializationInfo siData = restoreSi.getMember("data");
+                    cxxtools::SerializationInfo::Iterator it;
+
+                    for (it = siData.begin(); it != siData.end(); ++it)
+                    {
+                        dto::srr::SrrRestoreDto respDto(it->begin()->name(), Status::FAILED);
+
+                        if(respDto.name == securityWalletFeature)
+                        {
+
+                            try
+                            {
+                                cxxtools::SerializationInfo siData = it->getMember(respDto.name).getMember("data");
+                                //ensure nothing else is on going
+                                std::unique_lock<std::mutex>(m_lock);
+
+                                m_activeWallet.restoreSRRData(siData, configQuery.passPhrase);
+
+                                log_debug("Restore configuration for: %s succeed!", respDto.name.c_str());
+                                respDto.status = Status::SUCCESS;
+                            }
+                            catch(const std::exception& e)
+                            {
+                                respDto.error = std::string(e.what());
+                                srrRestoreDtoList.status = Status::FAILED;
+                            } 
+                           
+                        } 
+                        else
+                        {
+                            std::string errorMsg = "Restore configuration for: " + respDto.name + " failed!";
+                            log_error(errorMsg.c_str());
+                            respDto.error = errorMsg;
+                            srrRestoreDtoList.status = Status::FAILED;
+                        }
+
+                        srrRestoreDtoList.responseList.push_back(respDto);
+                   }
+                   response << srrRestoreDtoList;
+                }
+                break;
+                
+                /*case Action::GET_FEATURE_LIST:
+                {
+                    
+                }
+                break;*/
+                
+                default: throw std::runtime_error("Request not valid");
+                
+            }
+            
+            // Send response
+            sendResponse(m_msgBus, msg, response, configQuery.action);
+        }
+        catch (const std::out_of_range & )
+        {
+            log_error("Feature name not found");
+        }
+        catch (std::exception &e)
+        {
+            log_error("Unexpected error: %s", e.what());
+        }
+        catch (...)
+        {
+            log_error("Unexpected error: unknown");
+        }
+    }
+
+    static void setSaveResponse (const std::map<std::string, cxxtools::SerializationInfo>& configSiList, dto::srr::ConfigResponseDto& respDto)
+    {
+        // Array si
+        cxxtools::SerializationInfo jsonResp;
+        jsonResp.setCategory(cxxtools::SerializationInfo::Category::Array);
+
+        for(auto const& configSi: configSiList)
+        {
+            cxxtools::SerializationInfo si;
+            si.setCategory(cxxtools::SerializationInfo::Category::Object);
+            // Feature si
+            cxxtools::SerializationInfo siFeature;
+            // Content si
+            cxxtools::SerializationInfo siTemp;
+            siTemp.addMember("version") <<= 1;
+            cxxtools::SerializationInfo& siData = siTemp.addMember("data");
+            siData <<= configSi.second;
+            siData.setName("data");
+            // Add si version + data in si feature
+            siFeature <<= siTemp;
+            siFeature.setName(configSi.first);
+            // Add the feature in the main si
+            si.addMember(configSi.first) <<= siFeature;
+            // Put in the array
+            jsonResp.addMember(configSi.first) <<= si;
+        }
+        // Serialize the response
+        respDto.data = serialize(jsonResp);
+        respDto.status = dto::srr::Status::SUCCESS;
+    }
+    
+    /**
+     * Send response on message bus.
+     * @param msg
+     * @param responseDto
+     * @param configQuery
+     */
+    static void sendResponse(std::unique_ptr<messagebus::MessageBus> & msgBus, const messagebus::Message& msg, const dto::UserData& userData, const dto::srr::Action action)
+    {
+        try
+        {
+            messagebus::Message resp;
+            resp.userData() = userData;
+            resp.metaData().emplace(messagebus::Message::SUBJECT, actionToString(action));
+            resp.metaData().emplace(messagebus::Message::FROM, "security-wallet");
+            resp.metaData().emplace(messagebus::Message::TO, msg.metaData().find(messagebus::Message::FROM)->second);
+            resp.metaData().emplace(messagebus::Message::COORELATION_ID, msg.metaData().find(messagebus::Message::COORELATION_ID)->second);
+            msgBus->sendReply(msg.metaData().find(messagebus::Message::REPLY_TO)->second, resp);
+        }
+        catch (messagebus::MessageBusException& ex)
+        {
+            log_error("Message bus error: %s", ex.what());
+        } catch (...)
+        {
+            log_error("Unexpected error: unknown");
+        }
+    }
 
     std::string SecurityWalletServer::handleGetListPortfolio(const Sender & /*sender*/, const std::vector<std::string> & /*params*/)
     {
