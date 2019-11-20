@@ -177,8 +177,10 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     export DEPENDENCIES_DIR="`pwd`/tmp-deps"
     GLOBAL_RELEASE="`head -n 1 .ci_global_release 2> /dev/null`"
     if [ "x$GLOBAL_RELEASE" = "x" ]; then
+      [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any) using ./ci_dependencies.sh $TRAVIS_BRANCH..."
       (source ./ci_dependencies.sh $TRAVIS_BRANCH)
     else
+    [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any) using ./ci_dependencies.sh $GLOBAL_RELEASE..."
       (source ./ci_dependencies.sh $GLOBAL_RELEASE)
     fi
 
