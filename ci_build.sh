@@ -177,11 +177,18 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     export DEPENDENCIES_DIR="`pwd`/tmp-deps"
     GLOBAL_RELEASE="`head -n 1 .ci_global_release 2> /dev/null`"
     if [ "x$GLOBAL_RELEASE" = "x" ]; then
-      [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any) using ./ci_dependencies.sh $TRAVIS_BRANCH..."
-      (source ./ci_dependencies.sh $TRAVIS_BRANCH)
+      PROPAGATED_BRANCH="$TRAVIS_BRANCH"
     else
-    [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any) using ./ci_dependencies.sh $GLOBAL_RELEASE..."
-      (source ./ci_dependencies.sh $GLOBAL_RELEASE)
+      PROPAGATED_BRANCH="$GLOBAL_RELEASE"
+    fi
+
+    DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
+    if [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
+        [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any) using ./ci_dependencies.sh..."
+        (source ./ci_dependencies.sh)
+    else
+        [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any) using ./ci_dependencies.sh $PROPAGATED_BRANCH branch..."
+        (source ./ci_dependencies.sh $PROPAGATED_BRANCH)
     fi
 
     # Build and check this project; note that zprojects always have an autogen.sh
