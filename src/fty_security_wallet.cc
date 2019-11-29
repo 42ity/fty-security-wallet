@@ -33,11 +33,14 @@
 
 #include "fty_common_socket_basic_mailbox_server.h"
 
+#include <thread>
+
 //functions
 void usage();
 
 int main (int argc, char *argv [])
 {
+    
     using Arguments = std::map<std::string, std::string>;
     
     try

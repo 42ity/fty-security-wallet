@@ -13,7 +13,6 @@
 
     <target name = "travis" >
         <option name = "recursive_dependencies" value = "true"/>
-        <!-- <option name = "global_release" value = "release/IPM-2.0.0"> -->
         <!-- option name = "clangformat_implem" value = "autotools" / -->
         <option name = "use_cmake" value = "0" />
         <option name = "dist" value = "trusty" />
@@ -38,7 +37,7 @@
         <option name = "use_checkout_explicit" value = "1" />
     </target>
     
-    <classfilename use-cxx-gcc-4-9 = "true"/>
+    <classfilename use-cxx = "true"/>
 
     <include filename = "license.xml" />
     <version major = "1" minor = "0" patch = "0" />
@@ -46,18 +45,13 @@
 
     <use project = "czmq"
         repository = "https://github.com/42ity/czmq.git"
-        release = "v3.0.2-FTY-master"
         min_major = "3" min_minor = "0" min_patch = "2" >
 
         <use project = "libzmq"
-            repository = "https://github.com/42ity/libzmq.git"
-            release = "4.2.0-FTY-master" >
+            repository = "https://github.com/42ity/libzmq.git">
 
             <use project = "libsodium" prefix = "sodium"
-                repository = "https://github.com/42ity/libsodium.git"
-                release = "1.0.5-FTY-master"
-                test = "sodium_init"
-                />
+                repository = "https://github.com/42ity/libsodium.git"/>
         </use>
     </use>
 
@@ -73,8 +67,7 @@
     <use project = "fty-common-logging" libname = "libfty_common_logging"
         header = "fty_log.h"
         repository = "https://github.com/42ity/fty-common-logging.git"
-        test = "fty_common_logging_selftest" >
-    </use>
+        test = "fty_common_logging_selftest" />
 
     <use project = "fty-common-mlm" libname = "libfty_common_mlm" header = "fty_common_mlm.h"
         repository = "https://github.com/42ity/fty-common-mlm.git"
@@ -92,7 +85,6 @@
     <!-- use fty-common-dto -->
     <use project = "fty-common-dto" libname = "libfty_common_dto" header = "fty_common_dto.h"
         repository = "https://github.com/42ity/fty-common-dto.git"
-        release = "master"
         test = "fty_common_dto_selftest" />
     
     <!-- Note: Credential asset mapping -->

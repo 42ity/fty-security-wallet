@@ -1,1 +1,2 @@
+CPPFLAGS += -lpthread
 program_libs += -lpthread
