@@ -61,6 +61,8 @@ BuildRequires:  fty-common-mlm-devel
 BuildRequires:  fty-common-socket-devel
 BuildRequires:  fty-common-messagebus-devel
 BuildRequires:  fty-common-dto-devel
+BuildRequires:  protobuf-devel
+BuildRequires:  fty-lib-certificate-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -94,6 +96,8 @@ Requires:       fty-common-mlm-devel
 Requires:       fty-common-socket-devel
 Requires:       fty-common-messagebus-devel
 Requires:       fty-common-dto-devel
+Requires:       protobuf-devel
+Requires:       fty-lib-certificate-devel
 
 %description devel
 security wallet to manage json documents including a public and secret part development tools

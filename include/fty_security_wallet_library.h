@@ -38,6 +38,8 @@
 #include <fty_common_socket.h>
 #include <fty_common_messagebus.h>
 #include <fty_common_dto.h>
+#include <google/protobuf/stubs/common.h>
+#include <fty-lib-certificate.h>
 
 //  FTY_SECURITY_WALLET version macros for compile-time API detection
 #define FTY_SECURITY_WALLET_VERSION_MAJOR 1
