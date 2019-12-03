@@ -201,9 +201,14 @@ namespace secw
         return si;
     }
 
-    void SecurityWallet::restoreSRRData(const cxxtools::SerializationInfo & si, const std::string & passphrase)
+    void SecurityWallet::restoreSRRData(const cxxtools::SerializationInfo & si, const std::string & passphrase, const std::string & version)
     {
-        //check the phasephase
+        if(version != "1.0")
+        {
+            throw std::runtime_error("Version "+version+" is not supported");
+        }
+        
+        //check the phasephrase
         std::string receivedPassphrase;
         si.getMember("checksum") >>= receivedPassphrase;
 
