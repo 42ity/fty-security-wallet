@@ -244,7 +244,10 @@ namespace secw
                 try
                 {
                     std::unique_lock<std::mutex>(m_lock);
-                    m_activeWallet.restoreSRRData(deserialize(feature.data()), query.passpharse(), feature.version());
+                    
+                    cxxtools::SerializationInfo si = deserialize(feature.data());
+                    log_debug("Si=\n%s", feature.data().c_str());
+                    m_activeWallet.restoreSRRData(si, query.passpharse(), feature.version());
                     featureStatus.set_status(Status::SUCCESS);
                 }
                 catch( std::exception & e)

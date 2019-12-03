@@ -58,7 +58,18 @@ namespace secw
         if(m_pem.empty()) throw SecwInvalidDocumentFormatException(DOC_INTERNAL_CERTIFICATE_PEM);
         if(m_privateKeyPem.empty()) throw SecwInvalidDocumentFormatException(DOC_INTERNAL_CERTIFICATE_PRIVATE_KEY_PEM);
 
-        //#TODO check the certificate
+        //#Check the certificate
+        try
+        {
+            fty::CertificateX509 cert(m_pem);
+            fty::Keys keys(m_privateKeyPem);
+            
+            if(keys.getPublicKey() != cert.getPublicKey()) throw SecwInvalidDocumentFormatException(DOC_INTERNAL_CERTIFICATE_PEM);
+        }
+        catch(...)
+        {
+            throw SecwInvalidDocumentFormatException(DOC_INTERNAL_CERTIFICATE_PEM);
+        }
 
     }
 
