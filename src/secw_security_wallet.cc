@@ -38,6 +38,7 @@
 
 namespace secw
 {
+    static std::string getHardwareUuid();
 /*-----------------------------------------------------------------------------*/
 /*   SecurityWallet                                                            */
 /*-----------------------------------------------------------------------------*/
@@ -181,10 +182,16 @@ namespace secw
 
     cxxtools::SerializationInfo SecurityWallet::getSrrSaveData(const std::string & passphrase)
     {
+        if(passphrase.length() < 8)
+        {
+            throw std::runtime_error("Passphrase must be at least 8 characters!");
+        }
+
         cxxtools::SerializationInfo si;
 
         //add the phasephase
-        si.addMember("checksum") <<= encrypt(passphrase, passphrase);
+        si.addMember("check_passphrase") <<= encrypt(passphrase, passphrase);
+        si.addMember("check_platform") <<= encrypt(getHardwareUuid(), passphrase);
 
         //get the documents
         cxxtools::SerializationInfo & portfolios = si.addMember("portfolios");
@@ -201,16 +208,32 @@ namespace secw
         return si;
     }
 
-    void SecurityWallet::restoreSRRData(const cxxtools::SerializationInfo & si, const std::string & passphrase)
+    void SecurityWallet::restoreSRRData(const cxxtools::SerializationInfo & si, const std::string & passphrase, const std::string & version)
     {
-        //check the phasephase
+        if(version != "1.0")
+        {
+            throw std::runtime_error("Version "+version+" is not supported");
+        }
+        
+        //check the phasephrase
         std::string receivedPassphrase;
-        si.getMember("checksum") >>= receivedPassphrase;
+        if(passphrase.length() < 8)
+        {
+            throw std::runtime_error("Bad passphrase");
+        }
+
+        si.getMember("check_passphrase") >>= receivedPassphrase;
 
         if(passphrase != decrypt(receivedPassphrase, passphrase))
         {
-            throw std::runtime_error("bad passphrase");
+            throw std::runtime_error("Bad passphrase");
         }
+
+        
+        std::string receivedUuid;
+        si.getMember("check_platform") >>= receivedUuid;
+
+        bool isSamePlatform = (getHardwareUuid() == decrypt(receivedUuid, passphrase));
 
         const cxxtools::SerializationInfo& portfolios = si.getMember("portfolios");
 
@@ -219,7 +242,7 @@ namespace secw
         for(size_t index = 0; index < portfolios.memberCount(); index++ )
         {
             Portfolio portfolio;
-            portfolio.loadPortfolioFromSRR(portfolios.getMember(index), passphrase);
+            portfolio.loadPortfolioFromSRR(portfolios.getMember(index), passphrase, isSamePlatform);
 
             listPortfolio.push_back(portfolio);
         }
@@ -278,6 +301,22 @@ namespace secw
             }
         }
         throw SecwUnknownPortfolioException(name);
+    }
+
+
+    static std::string getHardwareUuid()
+    {
+        std::ifstream releaseDetails("/etc/release-details.json");
+
+        cxxtools::SerializationInfo si;
+        cxxtools::JsonDeserializer deserializer(releaseDetails);
+        deserializer.deserialize(si);
+
+        std::string uuid;
+
+        si.getMember("release-details").getMember("uuid") >>= uuid;
+
+        return uuid;
     }
     
 } //namepace secw

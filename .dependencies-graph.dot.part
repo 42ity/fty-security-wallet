@@ -8,3 +8,5 @@
    fty-security-wallet -> fty-common-socket;
    fty-security-wallet -> fty-common-messagebus;
    fty-security-wallet -> fty-common-dto;
+   fty-security-wallet -> protobuf;
+   fty-security-wallet -> fty-lib-certificate;

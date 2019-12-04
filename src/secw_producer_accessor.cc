@@ -1474,6 +1474,59 @@ std::string document;
   }
 
 
+  std::string cert1 =
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIIB2zCCAYWgAwIBAgIUN/HvX8YlwCFba7U0qW0BPgwcAHMwDQYJKoZIhvcNAQEL\n"
+    "BQAwQjELMAkGA1UEBhMCRlIxFTATBgNVBAcMDERlZmF1bHQgQ2l0eTEcMBoGA1UE\n"
+    "CgwTRGVmYXVsdCBDb21wYW55IEx0ZDAeFw0xOTEyMDMxODE1NDJaFw0yMDEyMDIx\n"
+    "ODE1NDJaMEIxCzAJBgNVBAYTAkZSMRUwEwYDVQQHDAxEZWZhdWx0IENpdHkxHDAa\n"
+    "BgNVBAoME0RlZmF1bHQgQ29tcGFueSBMdGQwXDANBgkqhkiG9w0BAQEFAANLADBI\n"
+    "AkEA1/UeazUNyuF0drHPcyzE17GIkuK2U5GkEQlpB3OcL1ngfvLUD014Wbzhn47G\n"
+    "wKTggcqerU85veFJntMNEmZYpQIDAQABo1MwUTAdBgNVHQ4EFgQUcZ2Mbx7cybRC\n"
+    "dyp9TK5YmZcstJ4wHwYDVR0jBBgwFoAUcZ2Mbx7cybRCdyp9TK5YmZcstJ4wDwYD\n"
+    "VR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAANBAJ+Dl5PvMKBAkZ3ozMjbi01O\n"
+    "7ARuj9IBQLsZ+AI9FpqJpc2GQxL+T6KK8Tdyra9V/ogcNZNsSoUsPI421dPKFp0=\n"
+    "-----END CERTIFICATE-----\n";
+
+  std::string key1 =
+    "-----BEGIN PRIVATE KEY-----\n"
+    "MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEA1/UeazUNyuF0drHP\n"
+    "cyzE17GIkuK2U5GkEQlpB3OcL1ngfvLUD014Wbzhn47GwKTggcqerU85veFJntMN\n"
+    "EmZYpQIDAQABAkEAqMsV84WMOj7t4LgqBUPAtzY0IVrCV59GNWq9hO1/7iFJJXvA\n"
+    "g/wvLrJzXpWnuCKaHglAFEr3fUZYZhTTFlsoAQIhAPzpa0sjYUFfmj19tzpz33A6\n"
+    "q1RSA7BMImulNKNRXDPBAiEA2pgvBr5wxtrxGBKaoAWNktGFQIiUH7uP0h5V4Zob\n"
+    "TeUCIEe0klQCWu+jAGMQwqNS+PWj3LGSczNH0rZ8Z3kqdx7BAiAmTrcnCma/Io1P\n"
+    "t6rrUi3ORfOBLK4wpXD91J0eTSBt1QIgA2zWS9eZzbksJKFeKBDxsY+gsamu93v7\n"
+    "0sE2dZY61aM=\n"
+    "-----END PRIVATE KEY-----\n";
+
+  std::string cert2 =
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIIB2zCCAYWgAwIBAgIUUmvLdtGfhPkB3gQTiIoSZcsb5DIwDQYJKoZIhvcNAQEL\n"
+    "BQAwQjELMAkGA1UEBhMCWFgxFTATBgNVBAcMDERlZmF1bHQgQ2l0eTEcMBoGA1UE\n"
+    "CgwTRGVmYXVsdCBDb21wYW55IEx0ZDAeFw0xOTEyMDMxODE5NDRaFw0yMDEyMDIx\n"
+    "ODE5NDRaMEIxCzAJBgNVBAYTAlhYMRUwEwYDVQQHDAxEZWZhdWx0IENpdHkxHDAa\n"
+    "BgNVBAoME0RlZmF1bHQgQ29tcGFueSBMdGQwXDANBgkqhkiG9w0BAQEFAANLADBI\n"
+    "AkEA089g+gpl/ILO62D8geGoHYhQaD6Ceh2ew7hfRa27wmIHA2o0TbZ/5hD+/mAX\n"
+    "BT4YlXiP4eYldLr9XJ38/2PbQwIDAQABo1MwUTAdBgNVHQ4EFgQUAgbmUIAaiJ5N\n"
+    "qooY6x5J7zAmdtMwHwYDVR0jBBgwFoAUAgbmUIAaiJ5NqooY6x5J7zAmdtMwDwYD\n"
+    "VR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAANBAI+gZZIkmCs5KnjmgzdBuk+N\n"
+    "AHxrP15dci7DCMBYNXQu8jKrg8M/SVKGZgjPx4O9KHnLHf8L/KNWIJRQNfo9AhA=\n"
+    "-----END CERTIFICATE-----\n";
+
+  std::string key2 = 
+    "-----BEGIN PRIVATE KEY-----\n"
+    "MIIBVQIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEA089g+gpl/ILO62D8\n"
+    "geGoHYhQaD6Ceh2ew7hfRa27wmIHA2o0TbZ/5hD+/mAXBT4YlXiP4eYldLr9XJ38\n"
+    "/2PbQwIDAQABAkEAnfkKnBKLVBR/nWAdlAUobLZROh59E/Tph5IIRKC569PzWwWR\n"
+    "iA1YHEqLYgppfnQRs+PiilZzV3Hxn140suMSMQIhAPC00HwcPoW3olr+rDSeKO8L\n"
+    "QOW8yE3NrYqzL2BlZmerAiEA4USONGqat1vnwfripCwcj9pqPtLjmpsOraeQLunn\n"
+    "YskCIANAHdSfOQTrPukFqWOogxr/RugTTY0nauGFm+0sUV6zAiAKgDaczOdfasJX\n"
+    "8YkFHCVMs2LGgPApMdcyUyBOf4rQuQIhAKEd5J2xBmB38z5MjTH+azDSpyONDMWz\n"
+    "Bsr0n+mn+QIQ\n"
+    "-----END PRIVATE KEY-----\n";
+
+
 //test 9.1 => insertNewDocument External Certificate
   testNumber = "9.1";
   testName = "insertNewDocument External Certificate";
@@ -1483,7 +1536,9 @@ std::string document;
     ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
-      ExternalCertificatePtr doc = std::make_shared<ExternalCertificate>("Test insert external certificate","<PEM>");
+     
+
+      ExternalCertificatePtr doc = std::make_shared<ExternalCertificate>("Test insert external certificate",cert1);
 
       doc->addUsage("discovery_monitoring");
 
@@ -1522,7 +1577,7 @@ std::string document;
 
       if(doc->getName() != "Test insert external certificate") throw std::runtime_error("Bad document retrieved: name do not match");
       
-      if(doc->getPem() != "<PEM>") throw std::runtime_error("Bad document retrieved: pem do not match");
+      if(doc->getPem() != cert1) throw std::runtime_error("Bad document retrieved: pem do not match");
 
       //doc is valid
 
@@ -1546,7 +1601,7 @@ std::string document;
     ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
-      ExternalCertificatePtr doc = std::make_shared<ExternalCertificate>("Test insert external certificate","<PEM>>");
+      ExternalCertificatePtr doc = std::make_shared<ExternalCertificate>("Test insert external certificate",cert1);
 
       doc->addUsage("discovery_monitoring");
 
@@ -1593,7 +1648,7 @@ std::string document;
 
       //update security name and priv password
       doc->setName("Test update external certificate");
-      doc->setPem("new_pem");
+      doc->setPem(cert2);
 
       //update
       producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(doc));
@@ -1629,7 +1684,7 @@ std::string document;
 
       
       if(doc->getName() != "Test update external certificate") throw std::runtime_error("Bad document retrieved: name do not match");
-      if(doc->getPem() != "new_pem") throw std::runtime_error("Bad document retrieved: pem do not match");
+      if(doc->getPem() != cert2) throw std::runtime_error("Bad document retrieved: pem do not match");
 
       printf(" *<=  Test #%s > OK\n", testNumber.c_str());
       testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -1662,7 +1717,7 @@ std::string document;
 
       
       if(doc->getId() != id ) throw std::runtime_error("Bad document retrieved: id do not match");
-      if(doc->getPem() != "new_pem") throw std::runtime_error("Bad document retrieved: pem do not match");
+      if(doc->getPem() != cert2) throw std::runtime_error("Bad document retrieved: pem do not match");
 
       printf(" *<=  Test #%s > OK\n", testNumber.c_str());
       testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -1765,7 +1820,7 @@ std::string document;
       if(doc == nullptr) throw std::runtime_error("No document retrieved");
 
       //update with wrong data
-      doc->setPem("");
+      doc->setPem("TEST");
 
       //update
       producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(doc));
@@ -1823,7 +1878,7 @@ std::string document;
     ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
-      InternalCertificatePtr doc = std::make_shared<InternalCertificate>("Test insert Internal Certificate","<PEM>", "<PK>");
+      InternalCertificatePtr doc = std::make_shared<InternalCertificate>("Test insert Internal Certificate",cert1, key1);
 
       doc->addUsage("discovery_monitoring");
 
@@ -1862,7 +1917,7 @@ std::string document;
 
       if(doc->getName() != "Test insert Internal Certificate") throw std::runtime_error("Bad document retrieved: name do not match");
       
-      if(doc->getPem() != "<PEM>") throw std::runtime_error("Bad document retrieved: pem do not match");
+      if(doc->getPem() != cert1) throw std::runtime_error("Bad document retrieved: pem do not match");
 
       //doc is valid
 
@@ -1886,7 +1941,7 @@ std::string document;
     ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
-      InternalCertificatePtr doc = std::make_shared<InternalCertificate>("Test insert Internal Certificate","<PEM>", "<PK>");
+      InternalCertificatePtr doc = std::make_shared<InternalCertificate>("Test insert Internal Certificate",cert1, key1);
 
       doc->addUsage("discovery_monitoring");
 
@@ -1933,8 +1988,8 @@ std::string document;
 
       //update security name and priv password
       doc->setName("Test update Internal Certificate");
-      doc->setPem("new_pem");
-      doc->setPrivateKeyPem("new_pk");
+      doc->setPem(cert2);
+      doc->setPrivateKeyPem(key2);
 
       //update
       producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(doc));
@@ -1970,7 +2025,7 @@ std::string document;
 
       
       if(doc->getName() != "Test update Internal Certificate") throw std::runtime_error("Bad document retrieved: name do not match");
-      if(doc->getPem() != "new_pem") throw std::runtime_error("Bad document retrieved: pem do not match");
+      if(doc->getPem() != cert2) throw std::runtime_error("Bad document retrieved: pem do not match");
 
       printf(" *<=  Test #%s > OK\n", testNumber.c_str());
       testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -2003,7 +2058,7 @@ std::string document;
 
       
       if(doc->getId() != id ) throw std::runtime_error("Bad document retrieved: id do not match");
-      if(doc->getPem() != "new_pem") throw std::runtime_error("Bad document retrieved: pem do not match");
+      if(doc->getPem() != cert2) throw std::runtime_error("Bad document retrieved: pem do not match");
 
       printf(" *<=  Test #%s > OK\n", testNumber.c_str());
       testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -2106,8 +2161,8 @@ std::string document;
       if(doc == nullptr) throw std::runtime_error("No document retrieved");
 
       //update with wrong data
-      doc->setPem("");
-      doc->setPrivateKeyPem("");
+      doc->setPem(cert2);
+      doc->setPrivateKeyPem(key1);
 
       //update
       producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(doc));

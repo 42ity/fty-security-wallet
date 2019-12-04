@@ -62,7 +62,6 @@
         header = "cxxtools/allocator.h"
         repository = "https://github.com/42ity/cxxtools.git"/>
 
-    <!-- Note: pure C projects should use fty-log/fty_logger.h, C++ use fty_log.h -->
     <use project = "fty-common-logging" libname = "libfty_common_logging"
         header = "fty_log.h"
         repository = "https://github.com/42ity/fty-common-logging.git"
@@ -85,6 +84,12 @@
     <use project = "fty-common-dto" libname = "libfty_common_dto" header = "fty_common_dto.h"
         repository = "https://github.com/42ity/fty-common-dto.git"
         test = "fty_common_dto_selftest" />
+    
+    <use project = "protobuf" header = "google/protobuf/stubs/common.h"
+        repository = "https://github.com/42ity/protobuf.git"/>
+
+    <use project = "fty-lib-certificate" libname = "libfty_lib_certificate" header = "fty-lib-certificate.h" 
+        repository = "https://github.com/42ity/fty-lib-certificate.git"/>
     
     <!-- Note: Credential asset mapping -->
     <class name = "cam_credential_asset_mapping_server" private = "1" selftest = "0">Credential Asset Mapping Server</class>

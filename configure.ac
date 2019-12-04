@@ -1001,6 +1001,128 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libfty_common_dto
 dnl END of enabled attempts to search for libfty_common_dto
 
 
+was_protobuf_check_lib_detected=no
+
+search_protobuf="yes"
+
+AC_ARG_WITH([protobuf],
+    [
+        AS_HELP_STRING([--with-protobuf],
+        [yes or no. Optionally specify protobuf prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
+    ],
+    [
+        search_protobuf="yes"
+    ],
+    [
+        search_protobuf="yes"
+    ])
+AS_CASE([x"${with_protobuf}"],
+    [xyes], [search_protobuf="yes"],
+    [xno],  [search_protobuf="no"])
+
+dnl We do not abort right now, because the maintainer/developer may have
+dnl something particular in mind, e.g. to build just parts of a project.
+AS_IF([test x"${search_protobuf}" = xno],
+    [AC_MSG_WARN([Required dependency on protobuf was explicitly disabled during configuration by '--with-protobuf=no'; subsequent full build of fty-security-wallet may fail])])
+
+AS_IF([test x"${search_protobuf}" = xyes], [
+    # Archive previously detected and supplied flags
+    PRE_SEARCH_CFLAGS="${CFLAGS}"
+    PRE_SEARCH_LIBS="${LIBS}"
+
+    found_pkgconfig=""
+    PKG_CHECK_MODULES([protobuf], [protobuf >= 0.0.0],
+    [
+        was_protobuf_check_lib_detected=pkgcfg
+        found_pkgconfig="protobuf"
+    ],
+    [
+        AC_MSG_WARN([Attribute 'test' is not set on zproject dependency 'protobuf' - please ensure it is set])
+    ])
+
+dnl END of PKG_CHECK_MODULES and/or direct tests for protobuf
+    AS_CASE(["x${was_protobuf_check_lib_detected}"],
+        [xpkgcfg], [
+                PKGCFG_NAMES_PRIVATE="$PKGCFG_NAMES_PRIVATE ${found_pkgconfig}"
+                CFLAGS="${protobuf_CFLAGS} ${CFLAGS}"
+                LIBS="${protobuf_LIBS} ${LIBS}"
+            ],
+        [xyes], [
+                CFLAGS="${protobuf_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${protobuf_synthetic_libs} ${LDFLAGS}"
+                LIBS="${protobuf_synthetic_libs} ${LIBS}"
+
+                AC_SUBST([protobuf_CFLAGS],[${protobuf_synthetic_cflags}])
+                AC_SUBST([protobuf_LIBS],[${protobuf_synthetic_libs}])
+            ],
+        [xno], [
+            AC_MSG_ERROR([Cannot find pkg-config metadata for protobuf 0.0.0 or higher])
+    ])
+])
+dnl END of enabled attempts to search for protobuf
+
+
+was_fty_lib_certificate_check_lib_detected=no
+
+search_libfty_lib_certificate="yes"
+
+AC_ARG_WITH([libfty_lib_certificate],
+    [
+        AS_HELP_STRING([--with-libfty_lib_certificate],
+        [yes or no. Optionally specify libfty_lib_certificate prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
+    ],
+    [
+        search_libfty_lib_certificate="yes"
+    ],
+    [
+        search_libfty_lib_certificate="yes"
+    ])
+AS_CASE([x"${with_libfty_lib_certificate}"],
+    [xyes], [search_libfty_lib_certificate="yes"],
+    [xno],  [search_libfty_lib_certificate="no"])
+
+dnl We do not abort right now, because the maintainer/developer may have
+dnl something particular in mind, e.g. to build just parts of a project.
+AS_IF([test x"${search_libfty_lib_certificate}" = xno],
+    [AC_MSG_WARN([Required dependency on fty_lib_certificate was explicitly disabled during configuration by '--with-libfty_lib_certificate=no'; subsequent full build of fty-security-wallet may fail])])
+
+AS_IF([test x"${search_libfty_lib_certificate}" = xyes], [
+    # Archive previously detected and supplied flags
+    PRE_SEARCH_CFLAGS="${CFLAGS}"
+    PRE_SEARCH_LIBS="${LIBS}"
+
+    found_pkgconfig=""
+    PKG_CHECK_MODULES([fty_lib_certificate], [libfty_lib_certificate >= 0.0.0],
+    [
+        was_fty_lib_certificate_check_lib_detected=pkgcfg
+        found_pkgconfig="libfty_lib_certificate"
+    ],
+    [
+        AC_MSG_WARN([Attribute 'test' is not set on zproject dependency 'fty-lib-certificate' - please ensure it is set])
+    ])
+
+dnl END of PKG_CHECK_MODULES and/or direct tests for libfty_lib_certificate
+    AS_CASE(["x${was_fty_lib_certificate_check_lib_detected}"],
+        [xpkgcfg], [
+                PKGCFG_NAMES_PRIVATE="$PKGCFG_NAMES_PRIVATE ${found_pkgconfig}"
+                CFLAGS="${fty_lib_certificate_CFLAGS} ${CFLAGS}"
+                LIBS="${fty_lib_certificate_LIBS} ${LIBS}"
+            ],
+        [xyes], [
+                CFLAGS="${fty_lib_certificate_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${fty_lib_certificate_synthetic_libs} ${LDFLAGS}"
+                LIBS="${fty_lib_certificate_synthetic_libs} ${LIBS}"
+
+                AC_SUBST([fty_lib_certificate_CFLAGS],[${fty_lib_certificate_synthetic_cflags}])
+                AC_SUBST([fty_lib_certificate_LIBS],[${fty_lib_certificate_synthetic_libs}])
+            ],
+        [xno], [
+            AC_MSG_ERROR([Cannot find pkg-config metadata for libfty_lib_certificate 0.0.0 or higher])
+    ])
+])
+dnl END of enabled attempts to search for libfty_lib_certificate
+
+
 CFLAGS="${PREVIOUS_CFLAGS}"
 LIBS="${PREVIOUS_LIBS}"
 

@@ -29,6 +29,8 @@
 #include "fty_common_sync_server.h"
 
 #include <cxxtools/serializationinfo.h>
+
+#include "fty_srr_dto.h"
 /**
  * \brief Agent SecurityWalletServer main server actor
  */
@@ -90,6 +92,8 @@ namespace secw
 
         //srr
         void handleSRRRequest(messagebus::Message msg);
+        dto::srr::SaveResponse handleSave(const dto::srr::SaveQuery & query);
+        dto::srr::RestoreResponse handleRestore(const dto::srr::RestoreQuery & query);
     
     public:
         //Command list
@@ -114,8 +118,8 @@ namespace secw
 
         //SRR
         std::unique_ptr<messagebus::MessageBus> m_msgBus;
-
-        std::mutex m_lock;        
+        std::mutex m_lock;
+        dto::srr::SrrQueryProcessor m_srrProcessor;       
  
     };
 

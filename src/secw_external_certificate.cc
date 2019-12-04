@@ -26,6 +26,9 @@
 @end
 */
 #include "fty_security_wallet_classes.h"
+
+#include "libcert_certificate_X509.h"
+
 namespace secw
 {
 /*-----------------------------------------------------------------------------*/
@@ -54,7 +57,15 @@ namespace secw
         //if(m_containPrivateData) throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
         if(m_pem.empty()) throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
 
-        //#TODO check the certificate
+        //check the certificate
+        try
+        {
+            fty::CertificateX509 cert(m_pem);
+        }
+        catch(...)
+        {
+            throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
+        } 
 
     }
 

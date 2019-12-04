@@ -163,7 +163,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
 
             si.getMember(DOC_TYPE_ENTRY) >>= type;
             si.getMember(DOC_ID_ENTRY) >>= id;
-
+            
             const cxxtools::SerializationInfo & publicEntry = si.getMember(DOC_PUBLIC_ENTRY);
             const cxxtools::SerializationInfo & privateSection = si.getMember(DOC_PRIVATE_ENTRY);
 
@@ -182,8 +182,9 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
             {
                 const cxxtools::SerializationInfo & privateEntry = privateSection.getMember("data");
                 doc->updatePrivateDocFromSerializationInfo(privateEntry);
+
             }
-            else if (format == "ENC")
+            else if (format == "ENC" && !encryptionKey.empty())
             {
                 std::string encryptedData;
                 privateSection.getMember("data") >>= encryptedData;
