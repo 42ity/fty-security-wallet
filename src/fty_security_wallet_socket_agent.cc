@@ -36,6 +36,8 @@
 
 #include <cxxtools/jsonserializer.h>
 
+#include <google/protobuf/util/json_util.h>
+
 //  --------------------------------------------------------------------------
 //  Self test
 
@@ -177,6 +179,8 @@ fty_security_wallet_socket_agent_test (bool verbose)
 
         agentSecw.requestStop();
         agentSecwThread.join();
+
+        google::protobuf::ShutdownProtobufLibrary();
     }
 
     zactor_destroy (&broker);
