@@ -852,6 +852,7 @@ namespace secw
 
         //do the update
         portfolio.update(copyOfExistingDoc);
+        m_activeWallet.save();
 
         sendNotificationOnUpdate (portfolioName, docBeforeUpdate, doc);
         return "OK";
