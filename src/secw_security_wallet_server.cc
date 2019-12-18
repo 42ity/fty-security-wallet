@@ -198,7 +198,7 @@ namespace secw
 
             if(featureName == FEATURE_SRR_SECW )
             {
-                f1.set_version("1.0");
+                f1.set_version(ACTIVE_VERSION);
                 try
                 {
                     std::unique_lock<std::mutex>(m_lock);
@@ -223,7 +223,7 @@ namespace secw
         }
         log_debug("Save configuration done");
 
-        return (createSaveResponse(mapFeaturesData)).save();
+        return (createSaveResponse(mapFeaturesData, ACTIVE_VERSION)).save();
     }
 
     dto::srr::RestoreResponse SecurityWalletServer::handleRestore(const dto::srr::RestoreQuery & query)
