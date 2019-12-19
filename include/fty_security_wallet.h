@@ -36,5 +36,6 @@
 
 #define MAPPING_AGENT "credential-asset-mapping"
 #define DEFAULT_STORAGE_MAPPING_PATH  "/etc/fty/fty-security-wallet/mapping.json"
+#define ACTIVE_VERSION                "1.0"
 
 #endif
