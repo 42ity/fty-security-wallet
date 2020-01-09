@@ -287,7 +287,7 @@ namespace secw
             resp.metaData().emplace(messagebus::Message::SUBJECT, msg.metaData().find(messagebus::Message::SUBJECT)->second );
             resp.metaData().emplace(messagebus::Message::FROM, FEATURE_SRR_SECW);
             resp.metaData().emplace(messagebus::Message::TO, msg.metaData().find(messagebus::Message::FROM)->second);
-            resp.metaData().emplace(messagebus::Message::COORELATION_ID, msg.metaData().find(messagebus::Message::COORELATION_ID)->second);
+            resp.metaData().emplace(messagebus::Message::CORRELATION_ID, msg.metaData().find(messagebus::Message::CORRELATION_ID)->second);
             msgBus->sendReply(msg.metaData().find(messagebus::Message::REPLY_TO)->second, resp);
         }
         catch (messagebus::MessageBusException& ex)
