@@ -62,6 +62,20 @@
         header = "cxxtools/allocator.h"
         repository = "https://github.com/42ity/cxxtools.git"/>
 
+    <use project = "tntdb"
+        repository = "https://github.com/42ity/tntdb.git"
+        builddir = "tntdb" test = "tntdb::Date::gmtime" />
+
+    <use project = "fty-common-nut" libname = "libfty_common_nut"
+        header = "fty_common_nut.h"
+        repository = "https://github.com/42ity/fty-common-nut.git"
+        test = "fty_common_nut_selftest" />
+
+    <use project = "fty-common-db" libname = "libfty_common_db"
+        header = "fty_common_db.h"
+        repository = "https://github.com/42ity/fty-common-db.git"
+        test = "fty_common_db_selftest" />
+
     <use project = "fty-common-logging" libname = "libfty_common_logging"
         header = "fty_log.h"
         repository = "https://github.com/42ity/fty-common-logging.git"
@@ -104,6 +118,7 @@
 
     <!-- Note: Secw class -->
     <class name = "secw_security_wallet_server" private = "1" selftest = "0" >Security Wallet Server</class>
+    <class name = "secw_security_wallet_database_proxy" private = "1" selftest = "0" >Security Wallet database proxy</class>
     
     <class name = "secw_security_wallet" private = "1" selftest = "0">Security wallet to manage the storage and access</class>
     <class name = "secw_portfolio" private = "1" selftest = "0">Portfolio to handle documents in the agent</class>

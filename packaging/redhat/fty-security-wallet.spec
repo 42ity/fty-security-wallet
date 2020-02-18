@@ -56,6 +56,9 @@ BuildRequires:  zeromq-devel
 BuildRequires:  czmq-devel >= 3.0.2
 BuildRequires:  malamute-devel >= 1.0.0
 BuildRequires:  cxxtools-devel
+BuildRequires:  tntdb-devel
+BuildRequires:  fty-common-nut-devel
+BuildRequires:  fty-common-db-devel
 BuildRequires:  fty-common-logging-devel
 BuildRequires:  fty-common-mlm-devel
 BuildRequires:  fty-common-socket-devel
@@ -91,6 +94,9 @@ Requires:       zeromq-devel
 Requires:       czmq-devel >= 3.0.2
 Requires:       malamute-devel >= 1.0.0
 Requires:       cxxtools-devel
+Requires:       tntdb-devel
+Requires:       fty-common-nut-devel
+Requires:       fty-common-db-devel
 Requires:       fty-common-logging-devel
 Requires:       fty-common-mlm-devel
 Requires:       fty-common-socket-devel

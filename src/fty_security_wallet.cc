@@ -106,6 +106,8 @@ int main (int argc, char *argv [])
             log_trace("Verbose mode OK");
         }
 
+        DBConn::dbpath();
+
         log_info(SECURITY_WALLET_AGENT " starting");
         
         //create params for SECW
@@ -117,6 +119,7 @@ int main (int argc, char *argv [])
         paramsSecw["ENDPOINT"] = endpoint;
         paramsSecw["AGENT_NAME_SRR"] = secw_actor_name;
         paramsSecw["ENDPOINT_SRR"] = endpoint;
+        paramsSecw["DATABASE_URL"] = DBConn::url;
         
         //start secw agent
         
@@ -128,7 +131,8 @@ int main (int argc, char *argv [])
                                         paramsSecw.at("STORAGE_DATABASE_PATH"),
                                         notificationStream,
                                         paramsSecw.at("ENDPOINT_SRR"),
-                                        paramsSecw.at("AGENT_NAME_SRR"));
+                                        paramsSecw.at("AGENT_NAME_SRR"),
+                                        paramsSecw.at("DATABASE_URL"));
         
         fty::SocketBasicServer agentSecw( serverSecw, socketPath);
 

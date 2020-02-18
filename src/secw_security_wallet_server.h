@@ -23,7 +23,9 @@
 #define SECW_SECURITY_WALLET_SERVER_H_INCLUDED
 
 #include <functional>
+#include <memory>
 #include "secw_security_wallet.h"
+#include "secw_security_wallet_database_proxy.h"
 
 #include "fty_common_client.h"
 #include "fty_common_sync_server.h"
@@ -49,7 +51,8 @@ namespace secw
                                         const std::string & databasePath,
                                         fty::StreamPublisher & streamPublisher,
                                         const std::string & srrEndpoint = "",
-                                        const std::string & srrAgentName = "");
+                                        const std::string & srrAgentName = "",
+                                        const std::string & dbUrl = "");
 
         ~SecurityWalletServer();
         
@@ -61,6 +64,7 @@ namespace secw
 
         SecurityWallet m_activeWallet;
         fty::StreamPublisher & m_streamPublisher;
+        std::unique_ptr<secw::SecurityWalletDatabaseProxy> m_dbProxy;
         
         //Handler for all supported commands
         std::string handleGetListDocumentsWithSecret(const Sender & sender, const std::vector<std::string> & params);

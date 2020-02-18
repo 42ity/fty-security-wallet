@@ -14,6 +14,9 @@ git clone --quiet --depth 1 https://github.com/42ity/libzmq.git libzmq
 git clone --quiet --depth 1 https://github.com/42ity/czmq.git czmq
 git clone --quiet --depth 1 https://github.com/42ity/malamute.git malamute
 git clone --quiet --depth 1 https://github.com/42ity/cxxtools.git cxxtools
+git clone --quiet --depth 1 https://github.com/42ity/tntdb.git tntdb
+git clone --quiet --depth 1 https://github.com/42ity/fty-common-nut.git fty-common-nut
+git clone --quiet --depth 1 https://github.com/42ity/fty-common-db.git fty-common-db
 git clone --quiet --depth 1 https://github.com/42ity/fty-common-logging.git fty-common-logging
 git clone --quiet --depth 1 https://github.com/42ity/fty-common-mlm.git fty-common-mlm
 git clone --quiet --depth 1 https://github.com/42ity/fty-common-socket.git fty-common-socket

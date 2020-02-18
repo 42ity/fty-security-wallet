@@ -17,6 +17,9 @@ AM_CPPFLAGS = \
     ${czmq_CFLAGS} \
     ${malamute_CFLAGS} \
     ${cxxtools_CFLAGS} \
+    ${tntdb_CFLAGS} \
+    ${fty_common_nut_CFLAGS} \
+    ${fty_common_db_CFLAGS} \
     ${fty_common_logging_CFLAGS} \
     ${fty_common_mlm_CFLAGS} \
     ${fty_common_socket_CFLAGS} \
@@ -27,7 +30,7 @@ AM_CPPFLAGS = \
     -D__STDC_FORMAT_MACROS \
     -I$(srcdir)/include
 
-project_libs = ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cxxtools_LIBS} ${fty_common_logging_LIBS} ${fty_common_mlm_LIBS} ${fty_common_socket_LIBS} ${fty_common_messagebus_LIBS} ${fty_common_dto_LIBS} ${protobuf_LIBS} ${fty_lib_certificate_LIBS}
+project_libs = ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cxxtools_LIBS} ${tntdb_LIBS} ${fty_common_nut_LIBS} ${fty_common_db_LIBS} ${fty_common_logging_LIBS} ${fty_common_mlm_LIBS} ${fty_common_socket_LIBS} ${fty_common_messagebus_LIBS} ${fty_common_dto_LIBS} ${protobuf_LIBS} ${fty_lib_certificate_LIBS}
 
 SUBDIRS = doc
 SUBDIRS += include
@@ -53,6 +56,9 @@ EXTRA_DIST += \
     Findczmq.cmake \
     Findmalamute.cmake \
     Findcxxtools.cmake \
+    Findtntdb.cmake \
+    Findfty_common_nut.cmake \
+    Findfty_common_db.cmake \
     Findfty_common_logging.cmake \
     Findfty_common_mlm.cmake \
     Findfty_common_socket.cmake \
@@ -71,6 +77,7 @@ EXTRA_DIST += \
     src/cam_credential_asset_mapping_storage.h \
     src/cam_helpers.h \
     src/secw_security_wallet_server.h \
+    src/secw_security_wallet_database_proxy.h \
     src/secw_security_wallet.h \
     src/secw_portfolio.h \
     src/secw_client_accessor.h \
