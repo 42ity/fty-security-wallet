@@ -66,11 +66,6 @@
         repository = "https://github.com/42ity/tntdb.git"
         builddir = "tntdb" test = "tntdb::Date::gmtime" />
 
-    <use project = "fty-common-nut" libname = "libfty_common_nut"
-        header = "fty_common_nut.h"
-        repository = "https://github.com/42ity/fty-common-nut.git"
-        test = "fty_common_nut_selftest" />
-
     <use project = "fty-common-db" libname = "libfty_common_db"
         header = "fty_common_db.h"
         repository = "https://github.com/42ity/fty-common-db.git"

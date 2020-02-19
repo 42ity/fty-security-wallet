@@ -34,7 +34,6 @@
 #include <malamute.h>
 #include <cxxtools/allocator.h>
 #include <tntdb.h>
-#include <fty_common_nut.h>
 #include <fty_common_db.h>
 #include <fty_log.h>
 #include <fty_common_mlm.h>

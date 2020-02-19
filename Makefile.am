@@ -18,7 +18,6 @@ AM_CPPFLAGS = \
     ${malamute_CFLAGS} \
     ${cxxtools_CFLAGS} \
     ${tntdb_CFLAGS} \
-    ${fty_common_nut_CFLAGS} \
     ${fty_common_db_CFLAGS} \
     ${fty_common_logging_CFLAGS} \
     ${fty_common_mlm_CFLAGS} \
@@ -30,7 +29,7 @@ AM_CPPFLAGS = \
     -D__STDC_FORMAT_MACROS \
     -I$(srcdir)/include
 
-project_libs = ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cxxtools_LIBS} ${tntdb_LIBS} ${fty_common_nut_LIBS} ${fty_common_db_LIBS} ${fty_common_logging_LIBS} ${fty_common_mlm_LIBS} ${fty_common_socket_LIBS} ${fty_common_messagebus_LIBS} ${fty_common_dto_LIBS} ${protobuf_LIBS} ${fty_lib_certificate_LIBS}
+project_libs = ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cxxtools_LIBS} ${tntdb_LIBS} ${fty_common_db_LIBS} ${fty_common_logging_LIBS} ${fty_common_mlm_LIBS} ${fty_common_socket_LIBS} ${fty_common_messagebus_LIBS} ${fty_common_dto_LIBS} ${protobuf_LIBS} ${fty_lib_certificate_LIBS}
 
 SUBDIRS = doc
 SUBDIRS += include
@@ -57,7 +56,6 @@ EXTRA_DIST += \
     Findmalamute.cmake \
     Findcxxtools.cmake \
     Findtntdb.cmake \
-    Findfty_common_nut.cmake \
     Findfty_common_db.cmake \
     Findfty_common_logging.cmake \
     Findfty_common_mlm.cmake \

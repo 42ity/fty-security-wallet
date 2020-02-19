@@ -4,7 +4,6 @@
    fty-security-wallet -> malamute;
    fty-security-wallet -> cxxtools;
    fty-security-wallet -> tntdb;
-   fty-security-wallet -> fty-common-nut;
    fty-security-wallet -> fty-common-db;
    fty-security-wallet -> fty-common-logging;
    fty-security-wallet -> fty-common-mlm;
