@@ -45,7 +45,7 @@ namespace cam
     si.addMember(PROTOCOL_ENTRY) <<= m_protocol;
     si.addMember(PORT_ENTRY) <<= m_port;
     si.addMember(CREDENTIAL_ID_ENTRY) <<= m_credentialId;
-    si.addMember(CREDENTIAL_STATUS_ENTRY) <<= m_status;
+    si.addMember(CREDENTIAL_STATUS_ENTRY) <<= uint8_t(m_status);
     si.addMember(EXTENDED_INFO_ENTRY) <<= m_extendedInfo;
   }
 
