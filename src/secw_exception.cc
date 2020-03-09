@@ -106,7 +106,7 @@ namespace secw
 
     void operator<<= (cxxtools::SerializationInfo& si, const SecwException & exception)
     {
-        si.addMember("errorCode") <<= exception.m_code;
+        si.addMember("errorCode") <<= uint8_t(exception.m_code);
         si.addMember("whatArg") <<= exception.m_whatArg;
         exception.fillSerializationInfo(si.addMember("extraData"));
     }

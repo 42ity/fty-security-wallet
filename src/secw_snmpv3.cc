@@ -111,10 +111,10 @@ namespace secw
 
     void Snmpv3::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const
     {
-        si.addMember(DOC_SNMPV3_SECURITY_LEVEL) <<= m_securityLevel;
+        si.addMember(DOC_SNMPV3_SECURITY_LEVEL) <<= uint8_t(m_securityLevel);
         si.addMember(DOC_SNMPV3_SECURITY_NAME) <<= m_securityName;
-        si.addMember(DOC_SNMPV3_AUTH_PROTOCOL) <<= m_authProtocol;
-        si.addMember(DOC_SNMPV3_PRIV_PROTOCOL) <<= m_privProtocol;
+        si.addMember(DOC_SNMPV3_AUTH_PROTOCOL) <<= uint8_t(m_authProtocol);
+        si.addMember(DOC_SNMPV3_PRIV_PROTOCOL) <<= uint8_t(m_privProtocol);
     }
 
     void Snmpv3::updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
