@@ -22,6 +22,6 @@ mapping-malamute
 
 mapping-storage
     database = /var/lib/fty/fty-security-wallet/mapping.json
-    
+
 log
     config = /etc/fty/ftylog.cfg                    # configuration file for fty-common-logging
