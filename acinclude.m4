@@ -76,3 +76,11 @@ AC_DEFUN([AX_PROJECT_LOCAL_HOOK_CONFIGVARS], [
     eval socketSecurityWallet=$socketSecurityWallet
     eval socketSecurityWalletDir=$socketSecurityWalletDir
 ])
+
+AC_DEFUN([AX_PROJECT_LOCAL_HOOK_FINAL], [
+    AC_MSG_WARN([Running the PROJECT_LOCAL_HOOK_FINAL])
+
+    AC_CONFIG_FILES([
+        src/fty-security-wallet.conf
+    ])
+])
