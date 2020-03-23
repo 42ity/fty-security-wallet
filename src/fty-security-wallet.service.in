@@ -16,7 +16,7 @@ ExecStart=@prefix@/bin/fty-security-wallet -c @sysconfdir@/@PACKAGE@/fty-securit
 
 # This service is only active, as far as consumers are concerned,
 # after it listens on the Unix socket used to interact with it.
-ExecStartPost=/bin/dash -c "while sleep 0.1; do test -S \"@socketSecurityWallet@\" || continue; PIDS=\"`/bin/fuser \"@socketSecurityWallet@\" 2>/dev/null | sed -e 's,^ *,,' -e 's, *$,,'`\" && [ -n \"$PIDS\" ] || continue ; ( for P in $PIDS ; do ls -la /proc/$P/exe ; done | egrep ' @prefix@/bin/fty-security-wallet$' ) && break ; rePIDS=\"(`echo "$PIDS" | sed 's,  *,|,g'`)\" ; ps -ef | grep -v grep | grep -E \"$rePIDS\" && break ; done; echo 'Socket is being listened'"
+ExecStartPost=/bin/dash -c "while sleep 0.1; do test -S \"@socketSecurityWallet@\" || continue; PIDS=\"`/bin/fuser \"@socketSecurityWallet@\" 2>/dev/null | sed -e 's,^ *,,' -e 's, *$,,'`\" && [ -n \"$PIDS\" ] || continue ; ( for P in $PIDS ; do ls -la /proc/$P/exe ; done | egrep ' @prefix@/bin/fty-security-wallet$' ) && break ; rePIDS=\"(`echo \"$PIDS\" | sed 's,  *,|,g'`)\" ; ps -ef | grep -v grep | grep -E \"$rePIDS\" && break ; done; echo 'Socket is being listened'"
 
 # Last agent out should shut the door cleanly
 ExecStopPost=/bin/dash -c "if [ -z \"`/bin/fuser \"@socketSecurityWallet@\" 2>/dev/null | sed -e 's, *,,g'`\" ] ; then rm -f \"@socketSecurityWallet@\" ; fi"
