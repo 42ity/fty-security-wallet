@@ -176,6 +176,175 @@ check-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_R
 	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v
 	$(MAKE) check-empty-selftest-rw
 
+check-cam_credential_asset_mapping_server: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t cam_credential_asset_mapping_server
+	$(MAKE) check-empty-selftest-rw
+check-cam_credential_asset_mapping_server-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t cam_credential_asset_mapping_server
+	$(MAKE) check-empty-selftest-rw
+
+check-cam_credential_asset_mapping_storage: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t cam_credential_asset_mapping_storage
+	$(MAKE) check-empty-selftest-rw
+check-cam_credential_asset_mapping_storage-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t cam_credential_asset_mapping_storage
+	$(MAKE) check-empty-selftest-rw
+
+check-cam_credential_asset_mapping: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t cam_credential_asset_mapping
+	$(MAKE) check-empty-selftest-rw
+check-cam_credential_asset_mapping-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t cam_credential_asset_mapping
+	$(MAKE) check-empty-selftest-rw
+
+check-cam_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t cam_accessor
+	$(MAKE) check-empty-selftest-rw
+check-cam_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t cam_accessor
+	$(MAKE) check-empty-selftest-rw
+
+check-cam_exception: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t cam_exception
+	$(MAKE) check-empty-selftest-rw
+check-cam_exception-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t cam_exception
+	$(MAKE) check-empty-selftest-rw
+
+check-cam_helpers: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t cam_helpers
+	$(MAKE) check-empty-selftest-rw
+check-cam_helpers-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t cam_helpers
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_security_wallet_server: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_security_wallet_server
+	$(MAKE) check-empty-selftest-rw
+check-secw_security_wallet_server-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_security_wallet_server
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_security_wallet: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_security_wallet
+	$(MAKE) check-empty-selftest-rw
+check-secw_security_wallet-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_security_wallet
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_portfolio: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_portfolio
+	$(MAKE) check-empty-selftest-rw
+check-secw_portfolio-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_portfolio
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_client_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_client_accessor
+	$(MAKE) check-empty-selftest-rw
+check-secw_client_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_client_accessor
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_helpers: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_helpers
+	$(MAKE) check-empty-selftest-rw
+check-secw_helpers-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_helpers
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_openssl_wrapper: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_openssl_wrapper
+	$(MAKE) check-empty-selftest-rw
+check-secw_openssl_wrapper-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_openssl_wrapper
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_configuration: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_configuration
+	$(MAKE) check-empty-selftest-rw
+check-secw_configuration-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_configuration
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_document: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_document
+	$(MAKE) check-empty-selftest-rw
+check-secw_document-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_document
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_exception: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_exception
+	$(MAKE) check-empty-selftest-rw
+check-secw_exception-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_exception
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_producer_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_producer_accessor
+	$(MAKE) check-empty-selftest-rw
+check-secw_producer_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_producer_accessor
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_consumer_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_consumer_accessor
+	$(MAKE) check-empty-selftest-rw
+check-secw_consumer_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_consumer_accessor
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_external_certificate: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_external_certificate
+	$(MAKE) check-empty-selftest-rw
+check-secw_external_certificate-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_external_certificate
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_internal_certificate: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_internal_certificate
+	$(MAKE) check-empty-selftest-rw
+check-secw_internal_certificate-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_internal_certificate
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_snmpv3: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_snmpv3
+	$(MAKE) check-empty-selftest-rw
+check-secw_snmpv3-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_snmpv3
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_snmpv1: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_snmpv1
+	$(MAKE) check-empty-selftest-rw
+check-secw_snmpv1-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_snmpv1
+	$(MAKE) check-empty-selftest-rw
+
+check-secw_user_and_password: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t secw_user_and_password
+	$(MAKE) check-empty-selftest-rw
+check-secw_user_and_password-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t secw_user_and_password
+	$(MAKE) check-empty-selftest-rw
+
+check-fty_credential_asset_mapping_mlm_agent: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t fty_credential_asset_mapping_mlm_agent
+	$(MAKE) check-empty-selftest-rw
+check-fty_credential_asset_mapping_mlm_agent-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t fty_credential_asset_mapping_mlm_agent
+	$(MAKE) check-empty-selftest-rw
+
+check-fty_security_wallet_socket_agent: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -t fty_security_wallet_socket_agent
+	$(MAKE) check-empty-selftest-rw
+check-fty_security_wallet_socket_agent-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/fty_security_wallet_selftest -v -t fty_security_wallet_socket_agent
+	$(MAKE) check-empty-selftest-rw
+
+
 # Run the selftest binary under valgrind to check for memory leaks
 memcheck: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
@@ -193,6 +362,343 @@ memcheck-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DI
 		$(builddir)/src/fty_security_wallet_selftest -v
 	$(MAKE) check-empty-selftest-rw
 
+memcheck-cam_credential_asset_mapping_server: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t cam_credential_asset_mapping_server
+	$(MAKE) check-empty-selftest-rw
+memcheck-cam_credential_asset_mapping_server-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t cam_credential_asset_mapping_server
+	$(MAKE) check-empty-selftest-rw
+memcheck-cam_credential_asset_mapping_storage: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t cam_credential_asset_mapping_storage
+	$(MAKE) check-empty-selftest-rw
+memcheck-cam_credential_asset_mapping_storage-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t cam_credential_asset_mapping_storage
+	$(MAKE) check-empty-selftest-rw
+memcheck-cam_credential_asset_mapping: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t cam_credential_asset_mapping
+	$(MAKE) check-empty-selftest-rw
+memcheck-cam_credential_asset_mapping-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t cam_credential_asset_mapping
+	$(MAKE) check-empty-selftest-rw
+memcheck-cam_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t cam_accessor
+	$(MAKE) check-empty-selftest-rw
+memcheck-cam_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t cam_accessor
+	$(MAKE) check-empty-selftest-rw
+memcheck-cam_exception: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t cam_exception
+	$(MAKE) check-empty-selftest-rw
+memcheck-cam_exception-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t cam_exception
+	$(MAKE) check-empty-selftest-rw
+memcheck-cam_helpers: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t cam_helpers
+	$(MAKE) check-empty-selftest-rw
+memcheck-cam_helpers-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t cam_helpers
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_security_wallet_server: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_security_wallet_server
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_security_wallet_server-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_security_wallet_server
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_security_wallet: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_security_wallet
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_security_wallet-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_security_wallet
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_portfolio: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_portfolio
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_portfolio-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_portfolio
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_client_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_client_accessor
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_client_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_client_accessor
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_helpers: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_helpers
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_helpers-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_helpers
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_openssl_wrapper: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_openssl_wrapper
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_openssl_wrapper-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_openssl_wrapper
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_configuration: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_configuration
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_configuration-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_configuration
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_document: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_document
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_document-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_document
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_exception: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_exception
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_exception-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_exception
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_producer_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_producer_accessor
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_producer_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_producer_accessor
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_consumer_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_consumer_accessor
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_consumer_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_consumer_accessor
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_external_certificate: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_external_certificate
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_external_certificate-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_external_certificate
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_internal_certificate: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_internal_certificate
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_internal_certificate-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_internal_certificate
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_snmpv3: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_snmpv3
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_snmpv3-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_snmpv3
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_snmpv1: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_snmpv1
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_snmpv1-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_snmpv1
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_user_and_password: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_user_and_password
+	$(MAKE) check-empty-selftest-rw
+memcheck-secw_user_and_password-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_user_and_password
+	$(MAKE) check-empty-selftest-rw
+memcheck-fty_credential_asset_mapping_mlm_agent: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t fty_credential_asset_mapping_mlm_agent
+	$(MAKE) check-empty-selftest-rw
+memcheck-fty_credential_asset_mapping_mlm_agent-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t fty_credential_asset_mapping_mlm_agent
+	$(MAKE) check-empty-selftest-rw
+memcheck-fty_security_wallet_socket_agent: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t fty_security_wallet_socket_agent
+	$(MAKE) check-empty-selftest-rw
+memcheck-fty_security_wallet_socket_agent-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t fty_security_wallet_socket_agent
+	$(MAKE) check-empty-selftest-rw
+
 # Run the selftest binary under valgrind to check for performance leaks
 callcheck: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
@@ -206,6 +712,247 @@ callcheck-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_D
 		$(builddir)/src/fty_security_wallet_selftest -v
 	$(MAKE) check-empty-selftest-rw
 
+callcheck-cam_credential_asset_mapping_server: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t cam_credential_asset_mapping_server
+	$(MAKE) check-empty-selftest-rw
+callcheck-cam_credential_asset_mapping_server-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t cam_credential_asset_mapping_server
+	$(MAKE) check-empty-selftest-rw
+callcheck-cam_credential_asset_mapping_storage: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t cam_credential_asset_mapping_storage
+	$(MAKE) check-empty-selftest-rw
+callcheck-cam_credential_asset_mapping_storage-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t cam_credential_asset_mapping_storage
+	$(MAKE) check-empty-selftest-rw
+callcheck-cam_credential_asset_mapping: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t cam_credential_asset_mapping
+	$(MAKE) check-empty-selftest-rw
+callcheck-cam_credential_asset_mapping-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t cam_credential_asset_mapping
+	$(MAKE) check-empty-selftest-rw
+callcheck-cam_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t cam_accessor
+	$(MAKE) check-empty-selftest-rw
+callcheck-cam_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t cam_accessor
+	$(MAKE) check-empty-selftest-rw
+callcheck-cam_exception: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t cam_exception
+	$(MAKE) check-empty-selftest-rw
+callcheck-cam_exception-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t cam_exception
+	$(MAKE) check-empty-selftest-rw
+callcheck-cam_helpers: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t cam_helpers
+	$(MAKE) check-empty-selftest-rw
+callcheck-cam_helpers-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t cam_helpers
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_security_wallet_server: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_security_wallet_server
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_security_wallet_server-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_security_wallet_server
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_security_wallet: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_security_wallet
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_security_wallet-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_security_wallet
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_portfolio: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_portfolio
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_portfolio-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_portfolio
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_client_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_client_accessor
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_client_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_client_accessor
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_helpers: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_helpers
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_helpers-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_helpers
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_openssl_wrapper: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_openssl_wrapper
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_openssl_wrapper-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_openssl_wrapper
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_configuration: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_configuration
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_configuration-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_configuration
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_document: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_document
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_document-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_document
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_exception: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_exception
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_exception-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_exception
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_producer_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_producer_accessor
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_producer_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_producer_accessor
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_consumer_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_consumer_accessor
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_consumer_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_consumer_accessor
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_external_certificate: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_external_certificate
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_external_certificate-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_external_certificate
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_internal_certificate: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_internal_certificate
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_internal_certificate-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_internal_certificate
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_snmpv3: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_snmpv3
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_snmpv3-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_snmpv3
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_snmpv1: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_snmpv1
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_snmpv1-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_snmpv1
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_user_and_password: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t secw_user_and_password
+	$(MAKE) check-empty-selftest-rw
+callcheck-secw_user_and_password-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t secw_user_and_password
+	$(MAKE) check-empty-selftest-rw
+callcheck-fty_credential_asset_mapping_mlm_agent: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t fty_credential_asset_mapping_mlm_agent
+	$(MAKE) check-empty-selftest-rw
+callcheck-fty_credential_asset_mapping_mlm_agent-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t fty_credential_asset_mapping_mlm_agent
+	$(MAKE) check-empty-selftest-rw
+callcheck-fty_security_wallet_socket_agent: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -t fty_security_wallet_socket_agent
+	$(MAKE) check-empty-selftest-rw
+callcheck-fty_security_wallet_socket_agent-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/fty_security_wallet_selftest -v -t fty_security_wallet_socket_agent
+	$(MAKE) check-empty-selftest-rw
+
 # Run the selftest binary under gdb for debugging
 debug: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute gdb -q \
@@ -214,7 +961,200 @@ debug: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top
 
 debug-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute gdb -q \
-		$(builddir)/src/fty_security_wallet_selftest -v
+		--args $(builddir)/src/fty_security_wallet_selftest -v
+	$(MAKE) check-empty-selftest-rw
+
+debug-cam_credential_asset_mapping_server: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t cam_credential_asset_mapping_server
+	$(MAKE) check-empty-selftest-rw
+debug-cam_credential_asset_mapping_server-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t cam_credential_asset_mapping_server
+	$(MAKE) check-empty-selftest-rw
+debug-cam_credential_asset_mapping_storage: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t cam_credential_asset_mapping_storage
+	$(MAKE) check-empty-selftest-rw
+debug-cam_credential_asset_mapping_storage-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t cam_credential_asset_mapping_storage
+	$(MAKE) check-empty-selftest-rw
+debug-cam_credential_asset_mapping: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t cam_credential_asset_mapping
+	$(MAKE) check-empty-selftest-rw
+debug-cam_credential_asset_mapping-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t cam_credential_asset_mapping
+	$(MAKE) check-empty-selftest-rw
+debug-cam_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t cam_accessor
+	$(MAKE) check-empty-selftest-rw
+debug-cam_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t cam_accessor
+	$(MAKE) check-empty-selftest-rw
+debug-cam_exception: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t cam_exception
+	$(MAKE) check-empty-selftest-rw
+debug-cam_exception-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t cam_exception
+	$(MAKE) check-empty-selftest-rw
+debug-cam_helpers: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t cam_helpers
+	$(MAKE) check-empty-selftest-rw
+debug-cam_helpers-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t cam_helpers
+	$(MAKE) check-empty-selftest-rw
+debug-secw_security_wallet_server: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_security_wallet_server
+	$(MAKE) check-empty-selftest-rw
+debug-secw_security_wallet_server-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_security_wallet_server
+	$(MAKE) check-empty-selftest-rw
+debug-secw_security_wallet: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_security_wallet
+	$(MAKE) check-empty-selftest-rw
+debug-secw_security_wallet-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_security_wallet
+	$(MAKE) check-empty-selftest-rw
+debug-secw_portfolio: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_portfolio
+	$(MAKE) check-empty-selftest-rw
+debug-secw_portfolio-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_portfolio
+	$(MAKE) check-empty-selftest-rw
+debug-secw_client_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_client_accessor
+	$(MAKE) check-empty-selftest-rw
+debug-secw_client_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_client_accessor
+	$(MAKE) check-empty-selftest-rw
+debug-secw_helpers: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_helpers
+	$(MAKE) check-empty-selftest-rw
+debug-secw_helpers-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_helpers
+	$(MAKE) check-empty-selftest-rw
+debug-secw_openssl_wrapper: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_openssl_wrapper
+	$(MAKE) check-empty-selftest-rw
+debug-secw_openssl_wrapper-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_openssl_wrapper
+	$(MAKE) check-empty-selftest-rw
+debug-secw_configuration: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_configuration
+	$(MAKE) check-empty-selftest-rw
+debug-secw_configuration-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_configuration
+	$(MAKE) check-empty-selftest-rw
+debug-secw_document: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_document
+	$(MAKE) check-empty-selftest-rw
+debug-secw_document-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_document
+	$(MAKE) check-empty-selftest-rw
+debug-secw_exception: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_exception
+	$(MAKE) check-empty-selftest-rw
+debug-secw_exception-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_exception
+	$(MAKE) check-empty-selftest-rw
+debug-secw_producer_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_producer_accessor
+	$(MAKE) check-empty-selftest-rw
+debug-secw_producer_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_producer_accessor
+	$(MAKE) check-empty-selftest-rw
+debug-secw_consumer_accessor: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_consumer_accessor
+	$(MAKE) check-empty-selftest-rw
+debug-secw_consumer_accessor-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_consumer_accessor
+	$(MAKE) check-empty-selftest-rw
+debug-secw_external_certificate: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_external_certificate
+	$(MAKE) check-empty-selftest-rw
+debug-secw_external_certificate-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_external_certificate
+	$(MAKE) check-empty-selftest-rw
+debug-secw_internal_certificate: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_internal_certificate
+	$(MAKE) check-empty-selftest-rw
+debug-secw_internal_certificate-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_internal_certificate
+	$(MAKE) check-empty-selftest-rw
+debug-secw_snmpv3: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_snmpv3
+	$(MAKE) check-empty-selftest-rw
+debug-secw_snmpv3-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_snmpv3
+	$(MAKE) check-empty-selftest-rw
+debug-secw_snmpv1: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_snmpv1
+	$(MAKE) check-empty-selftest-rw
+debug-secw_snmpv1-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_snmpv1
+	$(MAKE) check-empty-selftest-rw
+debug-secw_user_and_password: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t secw_user_and_password
+	$(MAKE) check-empty-selftest-rw
+debug-secw_user_and_password-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t secw_user_and_password
+	$(MAKE) check-empty-selftest-rw
+debug-fty_credential_asset_mapping_mlm_agent: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t fty_credential_asset_mapping_mlm_agent
+	$(MAKE) check-empty-selftest-rw
+debug-fty_credential_asset_mapping_mlm_agent-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t fty_credential_asset_mapping_mlm_agent
+	$(MAKE) check-empty-selftest-rw
+debug-fty_security_wallet_socket_agent: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -t fty_security_wallet_socket_agent
+	$(MAKE) check-empty-selftest-rw
+debug-fty_security_wallet_socket_agent-verbose: src/fty_security_wallet_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/fty_security_wallet_selftest -v -t fty_security_wallet_socket_agent
 	$(MAKE) check-empty-selftest-rw
 
 # Run the selftest binary with verbose switch for tracing

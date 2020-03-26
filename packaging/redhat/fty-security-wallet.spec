@@ -65,6 +65,7 @@ BuildRequires:  fty-common-messagebus-devel
 BuildRequires:  fty-common-dto-devel
 BuildRequires:  protobuf-devel
 BuildRequires:  fty-lib-certificate-devel
+BuildRequires:  systemd-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -102,6 +103,7 @@ Requires:       fty-common-messagebus-devel
 Requires:       fty-common-dto-devel
 Requires:       protobuf-devel
 Requires:       fty-lib-certificate-devel
+Requires:       systemd-devel
 
 %description devel
 security wallet to manage json documents including a public and secret part development tools

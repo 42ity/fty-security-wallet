@@ -38,6 +38,7 @@ Build-Depends: debhelper (>= 9),
     libfty-common-dto-dev,
     libprotobuf-dev,
     libfty-lib-certificate-dev,
+    libsystemd-dev,
     systemd,
     dh-systemd,
     asciidoc-base | asciidoc, xmlto,
@@ -69,6 +70,7 @@ Depends:
     libfty-common-dto-dev,
     libprotobuf-dev,
     libfty-lib-certificate-dev,
+    libsystemd-dev,
     libfty-security-wallet1 (= ${binary:Version})
 Description: fty-security-wallet development tools
  This package contains development files for fty-security-wallet:

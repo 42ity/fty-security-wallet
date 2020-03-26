@@ -25,7 +25,7 @@ if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libsodium-dev >
        ([ -e "libsodium" ]) \
 ; then
 
-    FOLDER_NAME="libsodium"
+    FOLDER_NAME="libsodium-stable"
 
 if [ -d "$FOLDER_NAME" ]; then
     echo "$FOLDER_NAME already exist. Skipped." >&2
@@ -33,19 +33,8 @@ else
     echo ""
     BASE_PWD=${PWD}
     echo "`date`: INFO: Building prerequisite 'libsodium' from Git repository..." >&2
-    if [ "x$REQUESTED_BRANCH" = "x" ]; then
-        echo "git clone https://github.com/42ity/libsodium.git $FOLDER_NAME"
-        $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/libsodium.git $FOLDER_NAME
-    else
-        if git ls-remote --heads https://github.com/42ity/libsodium.git | grep -q "$REQUESTED_BRANCH"; then
-            echo "git clone -b "$REQUESTED_BRANCH" https://github.com/42ity/libsodium.git $FOLDER_NAME"
-            $CI_TIME git clone --quiet --depth 1 -b "$REQUESTED_BRANCH" https://github.com/42ity/libsodium.git $FOLDER_NAME
-        else
-            echo "$REQUESTED_BRANCH not found for https://github.com/42ity/libsodium.git"
-            echo "git clone https://github.com/42ity/libsodium.git $FOLDER_NAME"
-            $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/libsodium.git $FOLDER_NAME
-        fi
-    fi
+    echo "git clone -b stable https://github.com/42ity/libsodium.git $FOLDER_NAME"
+    $CI_TIME git clone --quiet --depth 1 -b stable https://github.com/42ity/libsodium.git $FOLDER_NAME
     echo "Entering in ${PWD}/${FOLDER_NAME}"
     cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
@@ -997,6 +986,16 @@ else
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
+fi
+
+
+# Start of recipe for dependency: systemd
+if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libsystemd-dev >/dev/null 2>&1) || \
+       (command -v brew >/dev/null 2>&1 && brew ls --versions systemd >/dev/null 2>&1) || \
+       ([ -e "systemd" ]) \
+; then
+ echo "INFO: Get 'systemd' using apt-get libsystemd-dev" >&2
+ sudo apt-get install libsystemd-dev -y || exit $?
 fi
 
 
