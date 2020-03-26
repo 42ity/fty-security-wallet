@@ -90,7 +90,10 @@
 
     <use project = "fty-lib-certificate" libname = "libfty_lib_certificate" header = "fty-lib-certificate.h" 
         repository = "https://github.com/42ity/fty-lib-certificate.git"/>
-    
+
+    <use project = "systemd" header = "systemd/sd-daemon.h" libname = "libsystemd"
+        debian_name = "libsystemd-dev" redhat_name = "systemd-devel"/>
+
     <!-- Note: Credential asset mapping -->
     <class name = "cam_credential_asset_mapping_server" private = "1" selftest = "0">Credential Asset Mapping Server</class>
     

@@ -33,6 +33,8 @@
 
 #include "fty_common_socket_basic_mailbox_server.h"
 
+#include <systemd/sd-daemon.h>
+
 #include <thread>
 
 //functions
@@ -132,10 +134,11 @@ int main (int argc, char *argv [])
         
         fty::SocketBasicServer agentSecw( serverSecw, socketPath);
 
-
+        //notify systemd that the socket is ready, so that depending units can start
+        sd_notify(0, "READY=1");
+        
         std::thread agentSecwThread(&fty::SocketBasicServer::run, &agentSecw);
 
-        
         //set configuration parameters for CAM
         Arguments paramsCam;
         
@@ -164,9 +167,11 @@ int main (int argc, char *argv [])
         }
 
         log_info ("Secw Interrupted ...");
+        //notify systemd that the service is stopping, so that depending units can be stopped too
+        sd_notify(0, "STOPPING=1");
+        //actually stop security wallet
         agentSecw.requestStop();
         agentSecwThread.join();
-        
 
         log_info ("Cam Interrupted ...");
         zactor_destroy(&cam_server);
