@@ -24,10 +24,11 @@ AM_CPPFLAGS = \
     ${fty_common_dto_CFLAGS} \
     ${protobuf_CFLAGS} \
     ${fty_lib_certificate_CFLAGS} \
+    ${systemd_CFLAGS} \
     -D__STDC_FORMAT_MACROS \
     -I$(srcdir)/include
 
-project_libs = ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cxxtools_LIBS} ${fty_common_logging_LIBS} ${fty_common_mlm_LIBS} ${fty_common_socket_LIBS} ${fty_common_messagebus_LIBS} ${fty_common_dto_LIBS} ${protobuf_LIBS} ${fty_lib_certificate_LIBS}
+project_libs = ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cxxtools_LIBS} ${fty_common_logging_LIBS} ${fty_common_mlm_LIBS} ${fty_common_socket_LIBS} ${fty_common_messagebus_LIBS} ${fty_common_dto_LIBS} ${protobuf_LIBS} ${fty_lib_certificate_LIBS} ${systemd_LIBS}
 
 SUBDIRS = doc
 SUBDIRS += include
@@ -60,6 +61,7 @@ EXTRA_DIST += \
     Findfty_common_dto.cmake \
     Findprotobuf.cmake \
     Findfty_lib_certificate.cmake \
+    Findsystemd.cmake \
     builds/cmake/Modules/ClangFormat.cmake \
     builds/cmake/clang-format-check.sh.in \
     builds/cmake/Config.cmake.in \

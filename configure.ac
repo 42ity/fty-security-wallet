@@ -1127,6 +1127,90 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libfty_lib_certificate
 dnl END of enabled attempts to search for libfty_lib_certificate
 
 
+was_systemd_check_lib_detected=no
+
+search_libsystemd="yes"
+
+AC_ARG_WITH([libsystemd],
+    [
+        AS_HELP_STRING([--with-libsystemd],
+        [yes or no. Optionally specify libsystemd prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
+    ],
+    [
+        search_libsystemd="yes"
+    ],
+    [
+        search_libsystemd="yes"
+    ])
+AS_CASE([x"${with_libsystemd}"],
+    [xyes], [search_libsystemd="yes"],
+    [xno],  [search_libsystemd="no"])
+
+dnl We do not abort right now, because the maintainer/developer may have
+dnl something particular in mind, e.g. to build just parts of a project.
+AS_IF([test x"${search_libsystemd}" = xno],
+    [AC_MSG_WARN([Required dependency on systemd was explicitly disabled during configuration by '--with-libsystemd=no'; subsequent full build of fty-security-wallet may fail])])
+
+AS_IF([test x"${search_libsystemd}" = xyes], [
+    # Archive previously detected and supplied flags
+    PRE_SEARCH_CFLAGS="${CFLAGS}"
+    PRE_SEARCH_LIBS="${LIBS}"
+
+    found_pkgconfig=""
+    PKG_CHECK_MODULES([systemd], [libsystemd >= 0.0.0],
+    [
+        was_systemd_check_lib_detected=pkgcfg
+        found_pkgconfig="libsystemd"
+    ],
+    [
+        AC_MSG_NOTICE([Package libsystemd not found; falling back to defined compilability tests])
+
+        systemd_synthetic_cflags=""
+        systemd_synthetic_libs="-lsystemd"
+
+        if test -n "${with_libsystemd}" && test x"${with_libsystemd}" != xyes && test x"${with_libsystemd}" != xno; then
+            if test -r "${with_libsystemd}/include/systemd/sd-daemon.h"; then
+                systemd_synthetic_cflags="-I${with_libsystemd}/include"
+                systemd_synthetic_libs="-L${with_libsystemd}/lib -lsystemd"
+            else
+            AC_MSG_ERROR([Header file ${with_libsystemd}/include/systemd/sd-daemon.h was not found. Please check libsystemd prefix])
+            fi
+        else
+            AC_CHECK_HEADER([systemd/sd-daemon.h], [],
+            AC_MSG_ERROR([Header file systemd/sd-daemon.h was not found in default search paths])
+                )
+        fi
+
+        AC_CHECK_LIB([libsystemd], [sd_listen_fds],
+            [
+                was_systemd_check_lib_detected=yes
+                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lsystemd"
+            ],
+            [AC_MSG_ERROR([cannot link with -lsystemd, install libsystemd])])
+    ])
+
+dnl END of PKG_CHECK_MODULES and/or direct tests for libsystemd
+    AS_CASE(["x${was_systemd_check_lib_detected}"],
+        [xpkgcfg], [
+                PKGCFG_NAMES_PRIVATE="$PKGCFG_NAMES_PRIVATE ${found_pkgconfig}"
+                CFLAGS="${systemd_CFLAGS} ${CFLAGS}"
+                LIBS="${systemd_LIBS} ${LIBS}"
+            ],
+        [xyes], [
+                CFLAGS="${systemd_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${systemd_synthetic_libs} ${LDFLAGS}"
+                LIBS="${systemd_synthetic_libs} ${LIBS}"
+
+                AC_SUBST([systemd_CFLAGS],[${systemd_synthetic_cflags}])
+                AC_SUBST([systemd_LIBS],[${systemd_synthetic_libs}])
+            ],
+        [xno], [
+            AC_MSG_ERROR([Cannot find pkg-config metadata for libsystemd 0.0.0 or higher])
+    ])
+])
+dnl END of enabled attempts to search for libsystemd
+
+
 CFLAGS="${PREVIOUS_CFLAGS}"
 LIBS="${PREVIOUS_LIBS}"
 
@@ -1515,6 +1599,7 @@ echo
 echo Configure complete! Now proceed with:
 echo "    - 'make'               compile the project"
 echo "    - 'make check'         run the project's selftest"
+echo "    - 'make check-<test-name>'    run the project's selftest"
 echo "    - 'make install'       install the project to $prefix"
 echo "    - 'make bindings       install enabled language bindings (Python, etc)"
 echo
@@ -1531,7 +1616,7 @@ echo "    - 'make coverage'      generate project's selftest coverage report"
 echo "                           expects --with-gcov option for configure"
 echo "    - 'make clang-format-check'   check if project sources conform"
 echo "                           to style requirements"
-echo "    - 'make clang-format'         modify project sources to conform"
+echo "    - 'make clang-format'  modify project sources to conform"
 echo "                           to style requirements"
 echo "    - 'make clang-format-diff'    modify as above and print 'git diff'"
 echo
