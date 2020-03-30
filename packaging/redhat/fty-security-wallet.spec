@@ -123,7 +123,7 @@ This package contains development files for fty-security-wallet: security wallet
 
 %build
 sh autogen.sh
-%{configure} --enable-drafts=%{DRAFTS} --with-systemd-units
+%{configure} --enable-drafts=%{DRAFTS} --with-systemd-units --with-libsystemd=yes
 make %{_smp_mflags}
 
 %install

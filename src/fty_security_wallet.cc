@@ -138,9 +138,11 @@ int main (int argc, char *argv [])
         
         fty::SocketBasicServer agentSecw( serverSecw, socketPath);
 
+#if defined (HAVE_LIBSYSTEMD)
         //notify systemd that the socket is ready, so that depending units can start
         sd_notify(0, "READY=1");
-        
+#endif
+
         std::thread agentSecwThread(&fty::SocketBasicServer::run, &agentSecw);
 
         //set configuration parameters for CAM
@@ -171,8 +173,11 @@ int main (int argc, char *argv [])
         }
 
         log_info ("Secw Interrupted ...");
+#if defined (HAVE_LIBSYSTEMD)
         //notify systemd that the service is stopping, so that depending units can be stopped too
         sd_notify(0, "STOPPING=1");
+        //TODO: somehow wait here to make sure all consumers have disconnected?
+#endif
         //actually stop security wallet
         agentSecw.requestStop();
         agentSecwThread.join();

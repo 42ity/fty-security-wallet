@@ -206,6 +206,10 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     # Only use --enable-Werror on projects that are expected to have it
     # (and it is not our duty to check prerequisite projects anyway)
     CONFIG_OPTS+=("${CONFIG_OPT_WERROR}")
+    if [ -n "${CONFIG_OPTS_CUSTOM-}" ] ; then
+        # Not quoted, to split tokens if needed
+        CONFIG_OPTS+=( ${CONFIG_OPT_CUSTOM} )
+    fi
     $CI_TIME ./autogen.sh 2> /dev/null
     $CI_TIME ./configure --enable-drafts=yes "${CONFIG_OPTS[@]}"
     case "$BUILD_TYPE" in
