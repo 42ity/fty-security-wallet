@@ -25,7 +25,7 @@ if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libsodium-dev >
        ([ -e "libsodium" ]) \
 ; then
 
-    FOLDER_NAME="libsodium-stable"
+    FOLDER_NAME="libsodium"
 
 if [ -d "$FOLDER_NAME" ]; then
     echo "$FOLDER_NAME already exist. Skipped." >&2
@@ -33,15 +33,26 @@ else
     echo ""
     BASE_PWD=${PWD}
     echo "`date`: INFO: Building prerequisite 'libsodium' from Git repository..." >&2
-    echo "git clone -b stable https://github.com/42ity/libsodium.git $FOLDER_NAME"
-    $CI_TIME git clone --quiet --depth 1 -b stable https://github.com/42ity/libsodium.git $FOLDER_NAME
+    if [ "x$REQUESTED_BRANCH" = "x" ]; then
+        echo "git clone https://github.com/42ity/libsodium.git $FOLDER_NAME"
+        $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/libsodium.git $FOLDER_NAME
+    else
+        if git ls-remote --heads https://github.com/42ity/libsodium.git | grep -q "$REQUESTED_BRANCH"; then
+            echo "git clone -b "$REQUESTED_BRANCH" https://github.com/42ity/libsodium.git $FOLDER_NAME"
+            $CI_TIME git clone --quiet --depth 1 -b "$REQUESTED_BRANCH" https://github.com/42ity/libsodium.git $FOLDER_NAME
+        else
+            echo "$REQUESTED_BRANCH not found for https://github.com/42ity/libsodium.git"
+            echo "git clone https://github.com/42ity/libsodium.git $FOLDER_NAME"
+            $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/libsodium.git $FOLDER_NAME
+        fi
+    fi
     echo "Entering in ${PWD}/${FOLDER_NAME}"
     cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
     if [ -e ci_dependencies.sh ]; then
-        PROPAGATED_BRANCH="`git branch | grep * | cut -d ' ' -f2`"
+        PROPAGATED_BRANCH="`git branch | grep \* | cut -d ' ' -f2`"
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'libsodium' using ci_dependencies.sh the default branch..." >&2
@@ -111,7 +122,7 @@ else
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
     if [ -e ci_dependencies.sh ]; then
-        PROPAGATED_BRANCH="`git branch | grep * | cut -d ' ' -f2`"
+        PROPAGATED_BRANCH="`git branch | grep \* | cut -d ' ' -f2`"
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'libzmq' using ci_dependencies.sh the default branch..." >&2
@@ -181,7 +192,7 @@ else
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
     if [ -e ci_dependencies.sh ]; then
-        PROPAGATED_BRANCH="`git branch | grep * | cut -d ' ' -f2`"
+        PROPAGATED_BRANCH="`git branch | grep \* | cut -d ' ' -f2`"
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'czmq' using ci_dependencies.sh the default branch..." >&2
@@ -251,7 +262,7 @@ else
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
     if [ -e ci_dependencies.sh ]; then
-        PROPAGATED_BRANCH="`git branch | grep * | cut -d ' ' -f2`"
+        PROPAGATED_BRANCH="`git branch | grep \* | cut -d ' ' -f2`"
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'malamute' using ci_dependencies.sh the default branch..." >&2
@@ -321,7 +332,7 @@ else
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
     if [ -e ci_dependencies.sh ]; then
-        PROPAGATED_BRANCH="`git branch | grep * | cut -d ' ' -f2`"
+        PROPAGATED_BRANCH="`git branch | grep \* | cut -d ' ' -f2`"
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'cxxtools' using ci_dependencies.sh the default branch..." >&2
@@ -391,7 +402,7 @@ else
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
     if [ -e ci_dependencies.sh ]; then
-        PROPAGATED_BRANCH="`git branch | grep * | cut -d ' ' -f2`"
+        PROPAGATED_BRANCH="`git branch | grep \* | cut -d ' ' -f2`"
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-logging' using ci_dependencies.sh the default branch..." >&2
@@ -461,7 +472,7 @@ else
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
     if [ -e ci_dependencies.sh ]; then
-        PROPAGATED_BRANCH="`git branch | grep * | cut -d ' ' -f2`"
+        PROPAGATED_BRANCH="`git branch | grep \* | cut -d ' ' -f2`"
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-mlm' using ci_dependencies.sh the default branch..." >&2
@@ -531,7 +542,7 @@ else
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
     if [ -e ci_dependencies.sh ]; then
-        PROPAGATED_BRANCH="`git branch | grep * | cut -d ' ' -f2`"
+        PROPAGATED_BRANCH="`git branch | grep \* | cut -d ' ' -f2`"
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-socket' using ci_dependencies.sh the default branch..." >&2
@@ -601,7 +612,7 @@ else
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
     if [ -e ci_dependencies.sh ]; then
-        PROPAGATED_BRANCH="`git branch | grep * | cut -d ' ' -f2`"
+        PROPAGATED_BRANCH="`git branch | grep \* | cut -d ' ' -f2`"
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-messagebus' using ci_dependencies.sh the default branch..." >&2
@@ -671,7 +682,7 @@ else
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
     if [ -e ci_dependencies.sh ]; then
-        PROPAGATED_BRANCH="`git branch | grep * | cut -d ' ' -f2`"
+        PROPAGATED_BRANCH="`git branch | grep \* | cut -d ' ' -f2`"
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-dto' using ci_dependencies.sh the default branch..." >&2
@@ -741,7 +752,7 @@ else
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
     if [ -e ci_dependencies.sh ]; then
-        PROPAGATED_BRANCH="`git branch | grep * | cut -d ' ' -f2`"
+        PROPAGATED_BRANCH="`git branch | grep \* | cut -d ' ' -f2`"
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'protobuf' using ci_dependencies.sh the default branch..." >&2
@@ -811,7 +822,7 @@ else
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
     if [ -e ci_dependencies.sh ]; then
-        PROPAGATED_BRANCH="`git branch | grep * | cut -d ' ' -f2`"
+        PROPAGATED_BRANCH="`git branch | grep \* | cut -d ' ' -f2`"
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-lib-certificate' using ci_dependencies.sh the default branch..." >&2

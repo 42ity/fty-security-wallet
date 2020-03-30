@@ -20,10 +20,10 @@ if [ "$BUILD_TYPE" == "default" ]; then
     md5sum *.zip *.tar.gz > MD5SUMS
     sha1sum *.zip *.tar.gz > SHA1SUMS
     cd -
-elif [ "$BUILD_TYPE" == "bindings" ] && [ "$BINDING" == "jni" ]; then
-    ( cd bindings/jni && TERM=dumb PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./gradlew clean bintrayUpload )
-    cp bindings/jni/android/fty_security_wallet-android.jar fty_security_wallet-android-1.0.0.jar
-    export FTY_SECURITY_WALLET_DEPLOYMENT=fty_security_wallet-android-1.0.0.jar
+elif [ "$BUILD_TYPE" == "bindings" ] && [ "$BINDING" == "jni" ] && [ -z "$BINDING_OPTS" ]; then
+    ( cd bindings/jni && TERM=dumb ./gradlew clean bintrayUpload -PisRelease -PbuildPrefix=/tmp/jni_build )
+elif [ "$BUILD_TYPE" == "bindings" ] && [ "$BINDING" == "jni" ] && [ "$BINDING_OPTS" == "android" ]; then
+    export FTY_SECURITY_WALLET_DEPLOYMENT=bindings/jni/fty_security_wallet-jni/android/fty_security_wallet-android-*.jar
 else
     export FTY_SECURITY_WALLET_DEPLOYMENT=""
 fi
