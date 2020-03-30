@@ -66,6 +66,10 @@ PKG_PROG_PKG_CONFIG
 # Check endianess of the system
 AC_C_BIGENDIAN
 
+# Optional project-local hook (acinclude.m4, add AC_DEFUN([AX_PROJECT_LOCAL_HOOK], [whatever]) )
+ifdef([AX_PROJECT_LOCAL_HOOK],
+    [AX_PROJECT_LOCAL_HOOK])
+
 # See if cppcheck is in PATH; this variable unblocks the "cppcheck" recipe
 # (note that "make cppcheck.xml" can be used - and perhaps fail - regardless)
 AC_CHECK_PROG([WITH_CPPCHECK], [cppcheck], [true], [false])
@@ -1508,6 +1512,12 @@ AS_IF([test "x$enable_Werror" = "xyes" || test "x$enable_Werror" = "xauto"],
         ])])])
 ])
 
+# Optional project-local hook to (re-)define some variables that can be used
+# in your project files generated from .in templates - in your acinclude.m4,
+# add AC_DEFUN([AX_PROJECT_LOCAL_HOOK_CONFIGVARS], [whatever])
+ifdef([AX_PROJECT_LOCAL_HOOK_CONFIGVARS],
+    [AX_PROJECT_LOCAL_HOOK_CONFIGVARS])
+
 # Specify output files
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
@@ -1522,6 +1532,12 @@ AM_COND_IF([WITH_SYSTEMD_UNITS],
     ])],
     [])
 
+
+# Optional project-local hook to put some finishing touches in your configure
+# script, override something compared to zproject-generated code, etc. - in
+# your acinclude.m4, add AC_DEFUN([AX_PROJECT_LOCAL_HOOK_FINAL], [whatever])
+ifdef([AX_PROJECT_LOCAL_HOOK_FINAL],
+    [AX_PROJECT_LOCAL_HOOK_FINAL])
 
 AC_OUTPUT
 

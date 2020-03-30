@@ -11,7 +11,7 @@ secw-malamute
     address = security-wallet     #   Agent address
 
 secw-socket
-    socket = /run/fty-security-wallet/secw.socket #   Malamute endpoint
+    socket = @socketSecurityWallet@ #   Direct socket endpoint
 
 secw-storage
     database = /var/lib/fty/fty-security-wallet/database.json
@@ -22,6 +22,6 @@ mapping-malamute
 
 mapping-storage
     database = /var/lib/fty/fty-security-wallet/mapping.json
-    
+
 log
     config = /etc/fty/ftylog.cfg                    # configuration file for fty-common-logging
