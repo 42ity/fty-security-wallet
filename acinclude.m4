@@ -75,6 +75,13 @@ AC_DEFUN([AX_PROJECT_LOCAL_HOOK_CONFIGVARS], [
 
     eval socketSecurityWallet=$socketSecurityWallet
     eval socketSecurityWalletDir=$socketSecurityWalletDir
+
+    AS_CASE(["x${was_systemd_check_lib_detected}"],
+        [xpkgcfg], [systemd_service_type=notify],
+        [xyes], [systemd_service_type=notify],
+        [systemd_service_type=simple])
+    AC_SUBST(systemd_service_type)
+    eval systemd_service_type=$systemd_service_type
 ])
 
 AC_DEFUN([AX_PROJECT_LOCAL_HOOK_FINAL], [
