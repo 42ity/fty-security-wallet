@@ -84,7 +84,7 @@ int main (int argc, char *argv [])
             log_debug (SECURITY_WALLET_AGENT ": loading configuration file from '%s' ...", config_file);
             mlm::ZConfig config(config_file);
 
-            verbose |= (config.getEntry("secw_server/verbose", "false") == "true");
+            verbose |= (config.getEntry("server/verbose", "false") == "true");
 
             endpoint = config.getEntry("secw-malamute/endpoint", DEFAULT_ENDPOINT);
             socketPath = config.getEntry("secw-socket/socket", DEFAULT_SOCKET);
