@@ -14,6 +14,7 @@ fty-security-wallet.cfg
 # + systemd service unit for daemons (if any):
 fty-security-wallet.service
 
+# Note: manually added
 # + systemd-tmpfiles config:
 fty-security-wallet.conf
 
