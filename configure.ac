@@ -1129,7 +1129,7 @@ dnl END of enabled attempts to search for libfty_lib_certificate
 
 was_systemd_check_lib_detected=no
 
-search_libsystemd="yes"
+search_libsystemd="no"
 
 AC_ARG_WITH([libsystemd],
     [
@@ -1146,10 +1146,6 @@ AS_CASE([x"${with_libsystemd}"],
     [xyes], [search_libsystemd="yes"],
     [xno],  [search_libsystemd="no"])
 
-dnl We do not abort right now, because the maintainer/developer may have
-dnl something particular in mind, e.g. to build just parts of a project.
-AS_IF([test x"${search_libsystemd}" = xno],
-    [AC_MSG_WARN([Required dependency on systemd was explicitly disabled during configuration by '--with-libsystemd=no'; subsequent full build of fty-security-wallet may fail])])
 
 AS_IF([test x"${search_libsystemd}" = xyes], [
     # Archive previously detected and supplied flags
@@ -1159,6 +1155,7 @@ AS_IF([test x"${search_libsystemd}" = xyes], [
     found_pkgconfig=""
     PKG_CHECK_MODULES([systemd], [libsystemd >= 0.0.0],
     [
+        AC_DEFINE(HAVE_LIBSYSTEMD, 1, [The optional libsystemd library is to be used])
         was_systemd_check_lib_detected=pkgcfg
         found_pkgconfig="libsystemd"
     ],
@@ -1173,11 +1170,11 @@ AS_IF([test x"${search_libsystemd}" = xyes], [
                 systemd_synthetic_cflags="-I${with_libsystemd}/include"
                 systemd_synthetic_libs="-L${with_libsystemd}/lib -lsystemd"
             else
-            AC_MSG_ERROR([Header file ${with_libsystemd}/include/systemd/sd-daemon.h was not found. Please check libsystemd prefix])
+            AC_MSG_WARN([Header file ${with_libsystemd}/include/systemd/sd-daemon.h was not found. Please check libsystemd prefix])
             fi
         else
             AC_CHECK_HEADER([systemd/sd-daemon.h], [],
-            AC_MSG_ERROR([Header file systemd/sd-daemon.h was not found in default search paths])
+            AC_MSG_WARN([Header file systemd/sd-daemon.h was not found in default search paths])
                 )
         fi
 
@@ -1185,8 +1182,9 @@ AS_IF([test x"${search_libsystemd}" = xyes], [
             [
                 was_systemd_check_lib_detected=yes
                 PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lsystemd"
+                AC_DEFINE(HAVE_LIBSYSTEMD, 1, [The optional libsystemd library is to be used (as -lsystemd)])
             ],
-            [AC_MSG_ERROR([cannot link with -lsystemd, install libsystemd])])
+            [])
     ])
 
 dnl END of PKG_CHECK_MODULES and/or direct tests for libsystemd
@@ -1205,7 +1203,7 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libsystemd
                 AC_SUBST([systemd_LIBS],[${systemd_synthetic_libs}])
             ],
         [xno], [
-            AC_MSG_ERROR([Cannot find pkg-config metadata for libsystemd 0.0.0 or higher])
+            AC_MSG_WARN([Cannot find pkg-config metadata for libsystemd 0.0.0 or higher])
     ])
 ])
 dnl END of enabled attempts to search for libsystemd

@@ -50,6 +50,8 @@ env:
   matrix:
     - BUILD_TYPE=default
     - BUILD_TYPE=default-Werror
+### Custom addition: check for compilability without libsystemd-dev
+    - BUILD_TYPE=default CONFIG_OPTS_CUSTOM="--with-libsystemd=no"
 ### Note: we don't use CMake
 #   - BUILD_TYPE=cmake
 #   - BUILD_TYPE=android
