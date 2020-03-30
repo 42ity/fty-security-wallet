@@ -33,8 +33,6 @@
 
 #include "fty_common_socket_basic_mailbox_server.h"
 
-#include <systemd/sd-daemon.h>
-
 #include <thread>
 
 //functions
