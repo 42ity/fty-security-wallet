@@ -134,6 +134,7 @@ int main (int argc, char *argv [])
 
 #if defined (HAVE_LIBSYSTEMD)
         //notify systemd that the socket is ready, so that depending units can start
+        log_debug (SECURITY_WALLET_AGENT ": notifying systemd that this unit is ready to serve");
         sd_notify(0, "READY=1");
 #endif
 
@@ -168,6 +169,7 @@ int main (int argc, char *argv [])
         log_info ("Secw Interrupted ...");
 #if defined (HAVE_LIBSYSTEMD)
         //notify systemd that the service is stopping, so that depending units can be stopped too
+        log_debug (SECURITY_WALLET_AGENT ": notifying systemd that this unit is beginning its shutdown");
         sd_notify(0, "STOPPING=1");
         //TODO: somehow wait here to make sure all consumers have disconnected?
 #endif
