@@ -132,12 +132,6 @@ int main (int argc, char *argv [])
 
         fty::SocketBasicServer agentSecw( serverSecw, socketPath);
 
-#if defined (HAVE_LIBSYSTEMD)
-        //notify systemd that the socket is ready, so that depending units can start
-        log_debug (SECURITY_WALLET_AGENT ": notifying systemd that this unit is ready to serve");
-        sd_notify(0, "READY=1");
-#endif
-
         std::thread agentSecwThread(&fty::SocketBasicServer::run, &agentSecw);
 
         //set configuration parameters for CAM
@@ -149,6 +143,14 @@ int main (int argc, char *argv [])
 
         //start broker agent
         zactor_t *cam_server = zactor_new (fty_credential_asset_mapping_mlm_agent,static_cast<void*>(&paramsCam));
+
+#if defined (HAVE_LIBSYSTEMD)
+        //notify systemd that the socket is ready, so that depending units can start
+        // TODO: somehow self-check that the agent/actor/threads are all usable
+        // and ready to respond to queries - only then notify that we are ready
+        log_debug (SECURITY_WALLET_AGENT ": notifying systemd that this unit is ready to serve");
+        sd_notify(0, "READY=1");
+#endif
 
         while (true)
         {
