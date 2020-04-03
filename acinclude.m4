@@ -105,7 +105,10 @@ AC_DEFUN([AX_PROJECT_LOCAL_HOOK_CONFIGVARS], [
 AC_DEFUN([AX_PROJECT_LOCAL_HOOK_FINAL], [
     AC_MSG_WARN([Running the PROJECT_LOCAL_HOOK_FINAL])
 
-    AC_CONFIG_FILES([
-        src/fty-security-wallet.conf
-    ])
+    dnl # This component's systemd-tmpfiles config is generated
+    AM_COND_IF([WITH_SYSTEMD_UNITS],
+        [AC_CONFIG_FILES([
+                 src/fty-security-wallet.conf
+        ])],
+    [])
 ])
