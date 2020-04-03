@@ -50,6 +50,8 @@ env:
   matrix:
     - BUILD_TYPE=default
     - BUILD_TYPE=default-Werror
+### Custom addition: check for compilability without libsystemd-dev
+    - BUILD_TYPE=default CONFIG_OPTS_CUSTOM="--with-libsystemd=no"
 ### Note: we don't use CMake
 #   - BUILD_TYPE=cmake
 #   - BUILD_TYPE=android
@@ -57,6 +59,7 @@ env:
 
 # Prerequisite packages provided by OS distro and used "as is"
 pkg_deps_prereqs_distro: &pkg_deps_prereqs_distro
+    - libsystemd-dev
 
 # Prerequisite packages that may be built from source or used from
 # prebuilt packages of that source (usually not from an OS distro)

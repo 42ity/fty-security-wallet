@@ -1,4 +1,4 @@
 # Create directory for fty-security-wallet
 d /var/lib/fty/fty-security-wallet/ 0700 secw-daemon secw-daemon
-d /run/fty-security-wallet/ 0777 secw-daemon secw-daemon
+d @socketSecurityWalletDir@/ 0777 secw-daemon secw-daemon
 x /var/lib/fty/fty-security-wallet/*

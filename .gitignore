@@ -32,9 +32,9 @@ src/fty_security_wallet_selftest
 core
 
 # Distcheck workspace and archives
-fty-security-wallet-*/
-fty-security-wallet-*.tar.gz
-fty-security-wallet-*.zip
+/fty-security-wallet-*/
+/fty-security-wallet-*.tar.gz
+/fty-security-wallet-*.zip
 
 # Man pages
 doc/*.1
@@ -73,6 +73,11 @@ compile_commands.json
 DartConfiguration.tcl
 install_manifest.txt
 Testing/
+
+# CMake in general
+builds/cmake/
+CMake*
+*.cmake
 
 # Repositories downloaded by CI integration scripts
 tmp-deps/
@@ -131,7 +136,3 @@ nbproject/
 
 # editor backups
 *~
-# CMake in general
-builds/cmake/
-CMake*
-*.cmake
