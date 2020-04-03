@@ -17,6 +17,19 @@ AC_DEFUN([AX_FTY_SECURITY_WALLET_SOCKET_PATH_CONFIGVARS], [
     eval socketSecurityWalletDir=$socketSecurityWalletDir
 ])
 
+AC_DEFUN([AX_SET_SYSTEMD_SERVICE_TYPE], [
+    dnl # Our components can define their service Type=@systemd_service_type@
+    dnl # if they optionally support sd_notify() and based on build arguments
+    dnl # during packaging, use the simple or notify integration with systemd.
+    dnl # This does not impact components that explicitly set a Type value.
+    AS_CASE(["x${was_systemd_check_lib_detected}"],
+        [xpkgcfg], [systemd_service_type=notify],
+        [xyes], [systemd_service_type=notify],
+        [systemd_service_type=simple])
+    AC_SUBST(systemd_service_type)
+    eval systemd_service_type=$systemd_service_type
+])
+
 AC_DEFUN([AX_PROJECT_LOCAL_HOOK], [
     AC_MSG_WARN([Running the PROJECT_LOCAL_HOOK])
 
@@ -86,13 +99,7 @@ AC_DEFUN([AX_PROJECT_LOCAL_HOOK_CONFIGVARS], [
     AC_SUBST(PREFIXDIR)
 
     AX_FTY_SECURITY_WALLET_SOCKET_PATH_CONFIGVARS
-
-    AS_CASE(["x${was_systemd_check_lib_detected}"],
-        [xpkgcfg], [systemd_service_type=notify],
-        [xyes], [systemd_service_type=notify],
-        [systemd_service_type=simple])
-    AC_SUBST(systemd_service_type)
-    eval systemd_service_type=$systemd_service_type
+    AX_SET_SYSTEMD_SERVICE_TYPE
 ])
 
 AC_DEFUN([AX_PROJECT_LOCAL_HOOK_FINAL], [
