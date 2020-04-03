@@ -1,14 +1,26 @@
 # Customized (manually maintained) bits of configure.ac for fty-warranty
 
-AC_DEFUN([AX_PROJECT_LOCAL_HOOK], [
-    AC_MSG_WARN([Running the PROJECT_LOCAL_HOOK])
-
+AC_DEFUN([AX_FTY_SECURITY_WALLET_SOCKET_PATH_ARG], [
+    dnl # Reference this routine in AX_PROJECT_LOCAL_HOOK
+    dnl # These paths are in sync with definition in fty-security-wallet acinclude.m4
+    dnl # TODO: Default to rooting at "runstatedir" and default that to "/run" in packaging
     AC_ARG_WITH([socketSecurityWallet],
         [AS_HELP_STRING([--with-socketSecurityWallet=PATH], [Filename of fty-security-wallet service Unix socket])],,
         [with_socketSecurityWallet=/run/fty-security-wallet/secw.socket])
     AC_SUBST([socketSecurityWallet], [$with_socketSecurityWallet])
     AC_SUBST([socketSecurityWalletDir], [`dirname $with_socketSecurityWallet`])
+])
 
+AC_DEFUN([AX_FTY_SECURITY_WALLET_SOCKET_PATH_CONFIGVARS], [
+    dnl # Reference this routine at the end of AX_PROJECT_LOCAL_HOOK_CONFIGVARS
+    eval socketSecurityWallet=$socketSecurityWallet
+    eval socketSecurityWalletDir=$socketSecurityWalletDir
+])
+
+AC_DEFUN([AX_PROJECT_LOCAL_HOOK], [
+    AC_MSG_WARN([Running the PROJECT_LOCAL_HOOK])
+
+    AX_FTY_SECURITY_WALLET_SOCKET_PATH_ARG
 ])
 
 AC_DEFUN([AX_PROJECT_LOCAL_HOOK_CONFIGVARS], [
@@ -73,8 +85,7 @@ AC_DEFUN([AX_PROJECT_LOCAL_HOOK_CONFIGVARS], [
     AC_DEFINE_UNQUOTED(PREFIXDIR, "${conftemp}", [Default root path for component])
     AC_SUBST(PREFIXDIR)
 
-    eval socketSecurityWallet=$socketSecurityWallet
-    eval socketSecurityWalletDir=$socketSecurityWalletDir
+    AX_FTY_SECURITY_WALLET_SOCKET_PATH_CONFIGVARS
 
     AS_CASE(["x${was_systemd_check_lib_detected}"],
         [xpkgcfg], [systemd_service_type=notify],
