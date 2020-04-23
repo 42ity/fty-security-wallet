@@ -41,9 +41,6 @@
 #include <google/protobuf/stubs/common.h>
 #include <fty-lib-certificate.h>
 #include <fty_service_status.h>
-#if defined (HAVE_LIBSYSTEMD)
-#include <systemd/sd-daemon.h>
-#endif
 
 //  FTY_SECURITY_WALLET version macros for compile-time API detection
 #define FTY_SECURITY_WALLET_VERSION_MAJOR 1

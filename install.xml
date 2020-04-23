@@ -9,13 +9,6 @@ Installation model
 
 <install>
     <item type = "systemd-tmpfiles" />
-    <!-- Note/TODO: normally a packaged config would go to a path like
-         /usr/share/componentname/... and be installed/merged with an
-         ipc-meta-setup scriptlet during first boot with that version.
-         This would avoid conflicts between newer delivered versions
-         overlaid by locally customized older copy. Currently however,
-         this file is not intended to be edited in production instances.
-      -->
     <item path = "/etc/fty/fty-security-wallet" name = "../src/configuration.json" />
-    <item path = "/usr/share/bios/setup/" name = "../setup/30-secw-update-database-right.sh" />
+    <item path = "/usr/share/bios/setup/" name = "../src/30-secw-update-database-right.sh" />
 </install>

@@ -64,7 +64,6 @@ BuildRequires:  fty-common-dto-devel
 BuildRequires:  protobuf-devel
 BuildRequires:  fty-lib-certificate-devel
 BuildRequires:  fty-service-status-devel
-BuildRequires:  systemd-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -101,7 +100,6 @@ Requires:       fty-common-dto-devel
 Requires:       protobuf-devel
 Requires:       fty-lib-certificate-devel
 Requires:       fty-service-status-devel
-Requires:       systemd-devel
 
 %description devel
 security wallet to manage json documents including a public and secret part development tools
@@ -121,7 +119,7 @@ This package contains development files for fty-security-wallet: security wallet
 
 %build
 sh autogen.sh
-%{configure} --enable-drafts=%{DRAFTS} --with-systemd-units --with-libsystemd=yes
+%{configure} --enable-drafts=%{DRAFTS} --with-systemd-units
 make %{_smp_mflags}
 
 %install

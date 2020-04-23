@@ -50,7 +50,7 @@ int main (int argc, char *argv [])
     statusProviders.setForAll(fty::OperatingStatus::Starting);
 
     using Arguments = std::map<std::string, std::string>;
-
+    
     try
     {
         ftylog_setInstance(SECURITY_WALLET_AGENT,"");
@@ -76,7 +76,7 @@ int main (int argc, char *argv [])
                 ++argn;
             }
         }
-
+        
         // Parse config file
         std::string secw_actor_name(SECURITY_WALLET_AGENT);
         std::string endpoint(DEFAULT_ENDPOINT);
@@ -93,7 +93,7 @@ int main (int argc, char *argv [])
             log_debug (SECURITY_WALLET_AGENT ": loading configuration file from '%s' ...", config_file);
             mlm::ZConfig config(config_file);
 
-            verbose |= (config.getEntry("server/verbose", "false") == "true");
+            verbose |= (config.getEntry("secw_server/verbose", "false") == "true");
 
             endpoint = config.getEntry("secw-malamute/endpoint", DEFAULT_ENDPOINT);
             socketPath = config.getEntry("secw-socket/socket", DEFAULT_SOCKET);
@@ -116,40 +116,42 @@ int main (int argc, char *argv [])
         }
 
         log_info(SECURITY_WALLET_AGENT " starting");
-
+        
         //create params for SECW
         Arguments paramsSecw;
-
+        
         paramsSecw["STORAGE_CONFIGURATION_PATH"] = storage_access_path;
         paramsSecw["STORAGE_DATABASE_PATH"] = storage_database_path;
         paramsSecw["AGENT_NAME"] = secw_actor_name;
         paramsSecw["ENDPOINT"] = endpoint;
         paramsSecw["AGENT_NAME_SRR"] = secw_actor_name;
         paramsSecw["ENDPOINT_SRR"] = endpoint;
-
+        
         //start secw agent
-
+        
         //create a stream publisher for notification
         mlm::MlmStreamClient notificationStream(SECURITY_WALLET_AGENT, SECW_NOTIFICATIONS, 1000, paramsSecw.at("ENDPOINT"));
-
+    
         //create the server
         secw::SecurityWalletServer serverSecw(  paramsSecw.at("STORAGE_CONFIGURATION_PATH"),
                                         paramsSecw.at("STORAGE_DATABASE_PATH"),
                                         notificationStream,
                                         paramsSecw.at("ENDPOINT_SRR"),
                                         paramsSecw.at("AGENT_NAME_SRR"));
-
+        
         fty::SocketBasicServer agentSecw( serverSecw, socketPath);
+
 
         std::thread agentSecwThread(&fty::SocketBasicServer::run, &agentSecw);
 
+        
         //set configuration parameters for CAM
         Arguments paramsCam;
-
+        
         paramsCam["STORAGE_MAPPING_PATH"] = storage_mapping_path;
         paramsCam["AGENT_NAME"] = mapping_actor_name;
         paramsCam["ENDPOINT"] = endpoint;
-
+        
         //start broker agent
         zactor_t *cam_server = zactor_new (fty_credential_asset_mapping_mlm_agent,static_cast<void*>(&paramsCam));
 
@@ -177,6 +179,7 @@ int main (int argc, char *argv [])
         //actually stop security wallet
         agentSecw.requestStop();
         agentSecwThread.join();
+        
 
         log_info ("Cam Interrupted ...");
         zactor_destroy(&cam_server);
