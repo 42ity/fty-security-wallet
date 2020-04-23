@@ -11,17 +11,6 @@
     <target name = "debian" />
     <target name = "redhat" />
 
-    <target name = "travis" >
-        <option name = "recursive_dependencies" value = "true"/>
-        <!-- option name = "clangformat_implem" value = "autotools" / -->
-        <option name = "use_cmake" value = "0" />
-        <option name = "shadow_gcc" value = "2" />
-        <!-- option name = "clangformat_require_good" value = "1" / -->
-        <option name = "clangformat_allow_failures" value = "1" />
-        <option name = "use_pkg_deps_prereqs_source" value = "0" />
-        <option name = "require_gitignore" value = "1" />
-    </target>
-
     <target name = "jenkins" >
         <option name = "agent_label" value = "devel-image &amp;&amp; x86_64" />
         <option name = "triggers_pollSCM" value = "H/2 * * * *" />
@@ -91,9 +80,8 @@
     <use project = "fty-lib-certificate" libname = "libfty_lib_certificate" header = "fty-lib-certificate.h"
         repository = "https://github.com/42ity/fty-lib-certificate.git"/>
 
-    <!-- Linux-only, so optional -->
-    <use project = "systemd" optional = "1" header = "systemd/sd-daemon.h" libname = "libsystemd"
-        debian_name = "libsystemd-dev" redhat_name = "systemd-devel"/>
+    <!-- fty-service-status -->
+    <use project = "fty-service-status" header = "fty_service_status.h" debian_name = "fty-service-status-dev"/>
 
     <!-- Note: Credential asset mapping -->
     <class name = "cam_credential_asset_mapping_server" private = "1" selftest = "0">Credential Asset Mapping Server</class>

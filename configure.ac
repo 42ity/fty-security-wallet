@@ -1127,6 +1127,67 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libfty_lib_certificate
 dnl END of enabled attempts to search for libfty_lib_certificate
 
 
+was_fty_service_status_check_lib_detected=no
+
+search_fty_service_status="yes"
+
+AC_ARG_WITH([fty-service-status],
+    [
+        AS_HELP_STRING([--with-fty-service-status],
+        [yes or no. Optionally specify fty-service-status prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
+    ],
+    [
+        search_fty_service_status="yes"
+    ],
+    [
+        search_fty_service_status="yes"
+    ])
+AS_CASE([x"${with_fty_service_status}"],
+    [xyes], [search_fty_service_status="yes"],
+    [xno],  [search_fty_service_status="no"])
+
+dnl We do not abort right now, because the maintainer/developer may have
+dnl something particular in mind, e.g. to build just parts of a project.
+AS_IF([test x"${search_fty_service_status}" = xno],
+    [AC_MSG_WARN([Required dependency on fty_service_status was explicitly disabled during configuration by '--with-fty-service-status=no'; subsequent full build of fty-security-wallet may fail])])
+
+AS_IF([test x"${search_fty_service_status}" = xyes], [
+    # Archive previously detected and supplied flags
+    PRE_SEARCH_CFLAGS="${CFLAGS}"
+    PRE_SEARCH_LIBS="${LIBS}"
+
+    found_pkgconfig=""
+    PKG_CHECK_MODULES([fty_service_status], [fty-service-status >= 0.0.0],
+    [
+        was_fty_service_status_check_lib_detected=pkgcfg
+        found_pkgconfig="fty-service-status"
+    ],
+    [
+        AC_MSG_WARN([Attribute 'test' is not set on zproject dependency 'fty-service-status' - please ensure it is set])
+    ])
+
+dnl END of PKG_CHECK_MODULES and/or direct tests for fty_service_status
+    AS_CASE(["x${was_fty_service_status_check_lib_detected}"],
+        [xpkgcfg], [
+                PKGCFG_NAMES_PRIVATE="$PKGCFG_NAMES_PRIVATE ${found_pkgconfig}"
+                CFLAGS="${fty_service_status_CFLAGS} ${CFLAGS}"
+                LIBS="${fty_service_status_LIBS} ${LIBS}"
+            ],
+        [xyes], [
+                CFLAGS="${fty_service_status_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${fty_service_status_synthetic_libs} ${LDFLAGS}"
+                LIBS="${fty_service_status_synthetic_libs} ${LIBS}"
+
+                AC_SUBST([fty_service_status_CFLAGS],[${fty_service_status_synthetic_cflags}])
+                AC_SUBST([fty_service_status_LIBS],[${fty_service_status_synthetic_libs}])
+            ],
+        [xno], [
+            AC_MSG_ERROR([Cannot find pkg-config metadata for fty-service-status 0.0.0 or higher])
+    ])
+])
+dnl END of enabled attempts to search for fty_service_status
+
+
 was_systemd_check_lib_detected=no
 
 search_libsystemd="no"
@@ -1521,7 +1582,6 @@ AC_CONFIG_FILES([Makefile
                  doc/Makefile
                  include/Makefile
                  src/libfty_security_wallet.pc
-                 src/fty-security-wallet.cfg
                 ])
 
 AM_COND_IF([WITH_SYSTEMD_UNITS],

@@ -40,6 +40,7 @@
 #include <fty_common_dto.h>
 #include <google/protobuf/stubs/common.h>
 #include <fty-lib-certificate.h>
+#include <fty_service_status.h>
 #if defined (HAVE_LIBSYSTEMD)
 #include <systemd/sd-daemon.h>
 #endif

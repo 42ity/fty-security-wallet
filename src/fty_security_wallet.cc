@@ -34,12 +34,20 @@
 #include "fty_common_socket_basic_mailbox_server.h"
 
 #include <thread>
+#include <fty_service_status.h>
 
 //functions
 void usage();
 
 int main (int argc, char *argv [])
 {
+    //start service status
+    fty::ServiceStatusPluginWrapperCollection statusProviders(SECURITY_WALLET_AGENT);
+    int pluginLoaded = statusProviders.addAll("/usr/libexec/service_status_plugins/", std::regex(".*\\.so"));
+    log_debug (SECURITY_WALLET_AGENT ": '%i' notification plugin loaded", pluginLoaded);
+
+    statusProviders.setForAll(fty::HealthState::Ok);
+    statusProviders.setForAll(fty::OperatingStatus::Starting);
 
     using Arguments = std::map<std::string, std::string>;
 
@@ -57,6 +65,7 @@ int main (int argc, char *argv [])
             if (streq (argv [argn], "--help")
             ||  streq (argv [argn], "-h")) {
                 usage();
+                statusProviders.setForAll(fty::OperatingStatus::Stopped);
                 return 0;
             }
             else if (streq (argv [argn], "--verbose") || streq (argv [argn], "-v")) {
@@ -144,13 +153,7 @@ int main (int argc, char *argv [])
         //start broker agent
         zactor_t *cam_server = zactor_new (fty_credential_asset_mapping_mlm_agent,static_cast<void*>(&paramsCam));
 
-#if defined (HAVE_LIBSYSTEMD)
-        //notify systemd that the socket is ready, so that depending units can start
-        // TODO: somehow self-check that the agent/actor/threads are all usable
-        // and ready to respond to queries - only then notify that we are ready
-        log_debug (SECURITY_WALLET_AGENT ": notifying systemd that this unit is ready to serve");
-        sd_notify(0, "READY=1");
-#endif
+        statusProviders.setForAll(fty::OperatingStatus::InService);
 
         while (true)
         {
@@ -169,12 +172,8 @@ int main (int argc, char *argv [])
         }
 
         log_info ("Secw Interrupted ...");
-#if defined (HAVE_LIBSYSTEMD)
-        //notify systemd that the service is stopping, so that depending units can be stopped too
-        log_debug (SECURITY_WALLET_AGENT ": notifying systemd that this unit is beginning its shutdown");
-        sd_notify(0, "STOPPING=1");
-        //TODO: somehow wait here to make sure all consumers have disconnected?
-#endif
+        statusProviders.setForAll(fty::OperatingStatus::Stopping);
+
         //actually stop security wallet
         agentSecw.requestStop();
         agentSecwThread.join();
@@ -182,16 +181,22 @@ int main (int argc, char *argv [])
         log_info ("Cam Interrupted ...");
         zactor_destroy(&cam_server);
 
+        statusProviders.setForAll(fty::OperatingStatus::Stopped);
+
         return 0;
     }
     catch(std::exception & e)
     {
         log_error (SECURITY_WALLET_AGENT ": Error '%s'", e.what());
+        statusProviders.setForAll(fty::HealthState::NonRecoverableFailure);
+        statusProviders.setForAll(fty::OperatingStatus::Aborted);
         exit(EXIT_FAILURE);
     }
     catch(...)
     {
         log_error (SECURITY_WALLET_AGENT ": Error unknown");
+        statusProviders.setForAll(fty::HealthState::NonRecoverableFailure);
+        statusProviders.setForAll(fty::OperatingStatus::Aborted);
         exit(EXIT_FAILURE);
     }
 

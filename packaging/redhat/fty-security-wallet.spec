@@ -63,6 +63,7 @@ BuildRequires:  fty-common-messagebus-devel
 BuildRequires:  fty-common-dto-devel
 BuildRequires:  protobuf-devel
 BuildRequires:  fty-lib-certificate-devel
+BuildRequires:  fty-service-status-devel
 BuildRequires:  systemd-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
@@ -99,6 +100,7 @@ Requires:       fty-common-messagebus-devel
 Requires:       fty-common-dto-devel
 Requires:       protobuf-devel
 Requires:       fty-lib-certificate-devel
+Requires:       fty-service-status-devel
 Requires:       systemd-devel
 
 %description devel
