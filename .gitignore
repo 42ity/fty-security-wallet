@@ -32,9 +32,9 @@ src/fty_security_wallet_selftest
 core
 
 # Distcheck workspace and archives
-fty-security-wallet-*/
-fty-security-wallet-*.tar.gz
-fty-security-wallet-*.zip
+/fty-security-wallet-*/
+/fty-security-wallet-*.tar.gz
+/fty-security-wallet-*.zip
 
 # Man pages
 doc/*.1
