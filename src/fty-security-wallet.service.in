@@ -11,7 +11,18 @@ EnvironmentFile=-@prefix@/share/fty/etc/default/fty
 EnvironmentFile=-@prefix@/share/fty/etc/default/fty__%n.conf
 EnvironmentFile=-@sysconfdir@/default/fty
 EnvironmentFile=-@sysconfdir@/default/fty__%n.conf
-EnvironmentFile=@sysconfdir@/default/bios-db-rw
+# Note: the database interaction here is complicated.
+# This service is needed to e.g. seed and serve the SSL certificates
+# during first boot long before the database appears, but also has a
+# bit of direct database interaction when it is available. So we do
+# not want it to fail the startup when/if database is not running,
+# but also to know how to access it when it does, for proxyDocuments.
+# Note2: Devs said that so far we do not want to restart secw when
+# the database appears (which may be relevant also for system boots
+# other than the first one - first run to serve the certificate for
+# web-servers, then fty-db.target starts, then restart with ability
+# to access the database... for some reason, we do not do that now).
+EnvironmentFile=-@sysconfdir@/default/bios-db-rw
 Environment="prefix=@prefix@"
 ExecStart=@prefix@/bin/fty-security-wallet -c @sysconfdir@/@PACKAGE@/fty-security-wallet.cfg
 
