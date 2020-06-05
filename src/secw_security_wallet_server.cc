@@ -93,14 +93,14 @@ namespace secw
     SecurityWalletServer::~SecurityWalletServer()
     {
         //ensure nothing else is on going
-        std::unique_lock<std::mutex>(m_lock);
+        std::unique_lock<std::mutex> m_lock;
     }
 
     std::vector<std::string> SecurityWalletServer::handleRequest(const Sender & sender, const std::vector<std::string> & payload)
     {
         log_debug("process SRR");
         //ensure nothing else is on going
-        std::unique_lock<std::mutex>(m_lock);
+        std::unique_lock<std::mutex> m_lock;
 
         try
         {
@@ -201,7 +201,7 @@ namespace secw
                 f1.set_version(ACTIVE_VERSION);
                 try
                 {
-                    std::unique_lock<std::mutex>(m_lock);
+                    std::unique_lock<std::mutex> m_lock;
                     f1.set_data(serialize(m_activeWallet.getSrrSaveData(query.passpharse())));
                     fs1.mutable_status()->set_status(Status::SUCCESS);
                 }
@@ -243,7 +243,7 @@ namespace secw
             {
                 try
                 {
-                    std::unique_lock<std::mutex>(m_lock);
+                    std::unique_lock<std::mutex> m_lock;
                     
                     cxxtools::SerializationInfo si = deserialize(feature.data());
                     log_debug("Si=\n%s", feature.data().c_str());
