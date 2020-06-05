@@ -52,7 +52,7 @@ namespace secw
   ClientAccessor::ClientAccessor( fty::SyncClient & requestClient)
    : m_requestClient(requestClient), m_ptrStreamClient(nullptr)
   {}
-    
+
   ClientAccessor::ClientAccessor( fty::SyncClient & requestClient, fty::StreamSubscriber & subscriberClient)
    : m_requestClient(requestClient), m_ptrStreamClient(&subscriberClient)
   {}
@@ -70,7 +70,7 @@ namespace secw
   {
     std::vector<std::string> payload = {command};
     std::copy(frames.begin(), frames.end(), back_inserter(payload));
-    
+
     std::vector<std::string> receivedFrames = m_requestClient.syncRequestWithReply(payload);
 
     //check if the first frame we get is an error
@@ -99,21 +99,21 @@ namespace secw
       std::unique_lock<std::mutex> lock(m_handlerFunctionLock);
       shouldBeRunning = ((m_createdCallback) || (m_updatedCallback) || (m_deletedCallback) || (m_startedCallback));
     }
-    
+
     //check if we need to subscribe
     if(shouldBeRunning && !m_isRegistered)
     {
       m_registrationId = m_ptrStreamClient->subscribe(std::bind(&ClientAccessor::callbackHandler, this, _1));
       m_isRegistered = true;
     }
-    
+
     //check if we need to unsubscribe
     if(shouldBeRunning && !m_isRegistered)
     {
       m_ptrStreamClient->unsubscribe(m_registrationId);
       m_isRegistered = false;
     }
-    
+
   }
 
   void ClientAccessor::setCallbackOnUpdate(UpdatedCallback updatedCallback)
@@ -136,14 +136,14 @@ namespace secw
   void ClientAccessor::setCallbackOnCreate(CreatedCallback createdCallback)
   {
     if(!m_ptrStreamClient) return; // no stream listener
-    
+
     //1. Set the handler
     {
       //lock the mutex to set the handler
       std::unique_lock<std::mutex> lock(m_handlerFunctionLock);
       m_createdCallback = createdCallback;
     }
-    
+
     //2. Update thread if needed
     updateNotificationThread();
 
@@ -152,7 +152,7 @@ namespace secw
   void ClientAccessor::setCallbackOnDelete(DeletedCallback deletedCallback)
   {
     if(!m_ptrStreamClient) return; // no stream listener
-    
+
     //1. Set the handler
     {
       //lock the mutex to set the handler
@@ -167,7 +167,7 @@ namespace secw
   void ClientAccessor::setCallbackOnStart(StartedCallback startedCallback)
   {
     if(!m_ptrStreamClient) return; // no stream listener
-    
+
     //1. Set the handler
     {
       //lock the mutex to set the handler
@@ -178,7 +178,7 @@ namespace secw
     //2. Update thread if needed
     updateNotificationThread();
   }
-  
+
   void ClientAccessor::callbackHandler( const std::vector<std::string> & payload)
   {
        try

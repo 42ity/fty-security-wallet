@@ -31,7 +31,7 @@
 
 namespace cam
 {
-  
+
   /**
    * Some typedef to make the code more clear
    */
@@ -53,7 +53,7 @@ namespace cam
 
   /**
    * Some key definition for serialization
-   * 
+   *
    */
   static constexpr const char* SERVICE_ID_ENTRY = "cam_service";
   static constexpr const char* ASSET_ID_ENTRY = "cam_asset";
@@ -70,13 +70,13 @@ namespace cam
   {
   public:
     explicit CredentialAssetMapping();
-    
+
     void fillSerializationInfo(cxxtools::SerializationInfo& si) const;
     void fromSerializationInfo(const cxxtools::SerializationInfo& si);
 
     std::string toString() const;
 
-    // Attributs 
+    // Attributs
     AssetId m_assetId;
     ServiceId m_serviceId;
     Protocol m_protocol;

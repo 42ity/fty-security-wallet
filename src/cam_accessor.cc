@@ -34,7 +34,7 @@ namespace cam
     : m_mlmClient(), m_requestClient(requestClient)
   {
   }
-  
+
   Accessor::Accessor(   const ClientId & clientId,
                         uint32_t timeout,
                         const std::string & endPoint)
@@ -46,7 +46,7 @@ namespace cam
                         )),
      m_requestClient(*m_mlmClient)
   {
-      
+
   }
 
   Accessor::~Accessor()
@@ -104,7 +104,7 @@ namespace cam
   }
 
   /*bool isMappingExisting(const AssetId & assetId, const ServiceId & serviceId) const;*/
-  
+
   void Accessor::updateCredentialId(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol, const CredentialId & credentialId)
   {
     CredentialAssetMapping mapping;
@@ -284,7 +284,7 @@ namespace cam
   {
     std::vector<std::string> payload = {command};
     std::copy(frames.begin(), frames.end(), back_inserter(payload));
-    
+
     std::vector<std::string> receivedFrames = m_requestClient.syncRequestWithReply(payload);
 
     //check if the first frame we get is an error
@@ -316,7 +316,7 @@ namespace cam
 std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & syncClient)
 {
   std::vector<std::pair<std::string,bool>> testsResults;
-  
+
   using namespace cam;
 
   printf(" ** cam_accessor_test: \n");
@@ -334,7 +334,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
       try
       {
         Accessor accessor(syncClient);
-        
+
         AssetId assetId("asset-1");
         ServiceId serviceId("test-usage");
         Protocol protocol("http");
@@ -395,7 +395,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
     printf("\n-----------------------------------------------------------------------\n");
     {
       printf(" *=>  Test #%s %s\n", testNumber.c_str(), testName.c_str());
-      
+
       AssetId assetId("asset-XXXXX");
       ServiceId serviceId("usage-XXXXX");
       Protocol protocol("protocol-XXXXX");
@@ -440,7 +440,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
     Port port("80");
     CredentialId credId("Test-mapping");
     Status status(Status::VALID);
-    
+
     std::string key("key");
     std::string data("data");
     MapExtendedInfo extendedInfo;
@@ -477,7 +477,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
       try
       {
         Accessor accessor(syncClient);
-        
+
         const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
 
         if(mapping.m_assetId != assetId)
@@ -645,7 +645,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
       {
         Accessor accessor(syncClient);
         accessor.removeMapping(assetId, serviceId, protocol);
-        
+
         throw std::runtime_error("Mapping is removed");
       }
       catch(const CamMappingDoesNotExistException & e)
@@ -682,7 +682,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
     Port port("80");
     CredentialId credId("Test-mapping-update");
     Status status(Status::VALID);
-    
+
     std::string key("key");
     std::string data("data");
     MapExtendedInfo extendedInfo;
@@ -722,7 +722,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
 
         credId = "new_cred";
         accessor.updateCredentialId(assetId, serviceId, protocol, credId);
-        
+
         const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
 
         if(mapping.m_assetId != assetId)
@@ -782,7 +782,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
       {
         Accessor accessor(syncClient);
         accessor.updateCredentialId("XXXXXX", "XXXXXX", "XXXXX", credId);
-        
+
         throw std::runtime_error("Mapping is updated");
       }
       catch(const CamMappingDoesNotExistException &)
@@ -811,7 +811,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
         status = Status::ERROR;
 
         accessor.updateStatus(assetId, serviceId, protocol, status);
-        
+
         const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
 
         if(mapping.m_assetId != assetId)
@@ -871,7 +871,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
       {
         Accessor accessor(syncClient);
         accessor.updateStatus("XXXXXX", "XXXXXX", "XXXX", status);
-        
+
         throw std::runtime_error("Mapping is updated");
       }
       catch(const CamMappingDoesNotExistException &)
@@ -905,7 +905,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
         extendedInfo[extraKey] = extraData;
 
         accessor.updateExtendedInfo(assetId, serviceId, protocol, extendedInfo);
-        
+
         const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
 
         if(mapping.m_assetId != assetId)
@@ -965,7 +965,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
       {
         Accessor accessor(syncClient);
         accessor.updateExtendedInfo("XXXXXX", "XXXXXX", "XXXXXX", extendedInfo);
-        
+
         throw std::runtime_error("Mapping is updated");
       }
       catch(const CamMappingDoesNotExistException &)
@@ -994,7 +994,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
         port = "443";
 
         accessor.updatePort(assetId, serviceId, protocol, port);
-        
+
         const CredentialAssetMapping mapping = accessor.getMapping(assetId, serviceId, protocol);
 
         if(mapping.m_assetId != assetId)
@@ -1054,7 +1054,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
       {
         Accessor accessor(syncClient);
         accessor.updatePort("XXXXXX", "XXXXXX", "XXXX", port);
-        
+
         throw std::runtime_error("Mapping is updated");
       }
       catch(const CamMappingDoesNotExistException &)
@@ -1107,7 +1107,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
       try
       {
         Accessor accessor(syncClient);
-        
+
         AssetId assetId("asset-1");
         ServiceId serviceId("test-usage");
         Protocol protocol("http");
@@ -1174,7 +1174,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
       try
       {
         Accessor accessor(syncClient);
-        
+
         AssetId assetId("assetA");
 
         const std::vector<CredentialAssetMapping> mappings = accessor.getAssetMappings(assetId);
@@ -1205,7 +1205,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
       try
       {
         Accessor accessor(syncClient);
-        
+
         AssetId assetId("XXXXXX");
 
         const std::vector<CredentialAssetMapping> mappings = accessor.getAssetMappings(assetId);
@@ -1240,7 +1240,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
       try
       {
         Accessor accessor(syncClient);
-        
+
         CredentialId credId("credC");
 
         const std::vector<CredentialAssetMapping> mappings = accessor.getCredentialMappings(credId);
@@ -1271,7 +1271,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
       try
       {
         Accessor accessor(syncClient);
-        
+
         CredentialId credId("XXXXXX");
 
         const std::vector<CredentialAssetMapping> mappings = accessor.getCredentialMappings(credId);
@@ -1306,7 +1306,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
       try
       {
         Accessor accessor(syncClient);
-        
+
         CredentialId credId("credC");
 
         uint32_t counter = accessor.countCredentialMappingsForCredential(credId);
@@ -1337,7 +1337,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
       try
       {
         Accessor accessor(syncClient);
-        
+
         CredentialId credId("XXXXXX");
 
         uint32_t counter = accessor.countCredentialMappingsForCredential(credId);
@@ -1360,7 +1360,7 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
     }
 
   } // 8.X
-  
+
   //test 9.X
   {
     //test 9.1
@@ -1374,9 +1374,9 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
         Accessor accessor(syncClient);
 
         const std::map<CredentialId, uint32_t> counters = accessor.getAllCredentialCounter();
-        
+
         CredentialId credId("credC");
-        
+
         if(counters.count(credId) == 0)
         {
           throw std::runtime_error("No mapping counted for "+credId);
@@ -1408,10 +1408,10 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
       try
       {
         Accessor accessor(syncClient);
-        
+
         CredentialId credId("XXXXXX");
         const std::map<CredentialId, uint32_t> counters = accessor.getAllCredentialCounter();
-        
+
         if(counters.count(credId) != 0)
         {
           throw std::runtime_error("Mapping counted for "+credId);
@@ -1517,8 +1517,8 @@ std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & 
     }
 
   } // 10.X
-  
+
 
   return testsResults;
-  
+
 }

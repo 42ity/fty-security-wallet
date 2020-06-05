@@ -52,7 +52,7 @@ namespace secw
         uint8_t errorCode = 0;
         std::string whatArg;
         cxxtools::SerializationInfo extraData;
-        
+
         try
         {
             si.getMember("errorCode") >>= errorCode;
@@ -61,7 +61,7 @@ namespace secw
         }
         catch(...)
         {}
-              
+
         switch(errorCode)
         {
             case UNSUPPORTED_COMMAND:           throw SecwUnsupportedCommandException(whatArg);
@@ -85,7 +85,7 @@ namespace secw
         m_code(code),
         m_whatArg(whatArg)
     {}
-    
+
     const char* SecwException::what() const noexcept
     {
         return m_whatArg.c_str();
@@ -111,7 +111,7 @@ namespace secw
         exception.fillSerializationInfo(si.addMember("extraData"));
     }
 
-//Protected 
+//Protected
     void SecwException::fillSerializationInfo(cxxtools::SerializationInfo& /*si*/) const
     {}
 

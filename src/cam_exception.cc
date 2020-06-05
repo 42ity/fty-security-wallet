@@ -45,7 +45,7 @@ namespace cam
         uint8_t errorCode = 0;
         std::string whatArg;
         cxxtools::SerializationInfo extraData;
-        
+
         try
         {
             si.getMember("errorCode") >>= errorCode;
@@ -54,7 +54,7 @@ namespace cam
         }
         catch(...)
         {}
-        
+
 
         switch(errorCode)
         {
@@ -77,7 +77,7 @@ namespace cam
         m_code(code),
         m_whatArg("Unknown error")
     {}
-    
+
     const char* CamException::what() const noexcept
     {
         return m_whatArg.c_str();
@@ -103,7 +103,7 @@ namespace cam
         exception.fillSerializationInfo(si.addMember("extraData"));
     }
 
-//Protected 
+//Protected
     void CamException::fillSerializationInfo(cxxtools::SerializationInfo& /*si*/) const
     {}
 

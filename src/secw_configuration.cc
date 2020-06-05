@@ -74,7 +74,7 @@ namespace secw
 
     return usageIds;
   }
-  
+
   std::string PortfolioConfiguration::getPortfolioName() const
   {
     return m_portfolioName;
@@ -178,7 +178,7 @@ namespace secw
   std::set<UsageId> differenceBetween2UsagesIdSet(const std::set<UsageId> & a, const std::set<UsageId> & b)
   {
       std::set<UsageId> diff;
-      
+
       //check if all a are in b
       for(const UsageId & usage : a)
       {
@@ -187,7 +187,7 @@ namespace secw
               diff.insert(usage);
           }
       }
-      
+
       //check if all b are in a
       for(const UsageId & usage : b)
       {
@@ -196,7 +196,7 @@ namespace secw
             diff.insert(usage);
         }
       }
-      
+
       return diff;
   }
 

@@ -54,9 +54,9 @@ namespace secw
     {
     public:
         explicit SecwException(const std::string & whatArg, ErrorCode code = ErrorCode::GENERIC);
-        
+
         virtual ~SecwException(){}
-        
+
         const char* what() const noexcept override;
 
         inline ErrorCode getErrorCode() const { return m_code; }
@@ -68,13 +68,13 @@ namespace secw
 
         //throw the good exception base on the error payload
         static void throwSecwException(const std::string & data);
-        
+
     protected:
         virtual void fillSerializationInfo(cxxtools::SerializationInfo& si) const;
-        
+
     private:
         ErrorCode m_code;
-        std::string m_whatArg; 
+        std::string m_whatArg;
 
     };
 
@@ -194,7 +194,7 @@ namespace secw
             SecwException(whatArg, ErrorCode::IMPOSSIBLE_TO_LOAD_PORTFOLIO)
         {}
     };
-    
+
 // Tag is unknown
     class SecwUnknownTagException : public SecwException
     {
@@ -203,7 +203,7 @@ namespace secw
             SecwException(whatArg, ErrorCode::UNKNOWN_TAG)
         {}
     };
-    
+
 // document do not exist
     class SecwDocumentDoNotExistException : public SecwException
     {
@@ -228,7 +228,7 @@ namespace secw
 
         inline Id getDocumentId() const { return m_documentId; }
     };
-    
+
 // Illegal action by the client
     class SecwIllegalAccess : public SecwException
     {

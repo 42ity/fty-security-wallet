@@ -29,10 +29,10 @@ namespace secw
     class ExternalCertificate;
 
     using ExternalCertificatePtr   = std::shared_ptr<ExternalCertificate>;
-    
+
     /**
      * Some key definition for serialization
-     * 
+     *
      */
     static constexpr const char* DOC_EXTERNAL_CERTIFICATE_PEM = "secw_external_certificate_pem";
 
@@ -56,7 +56,7 @@ namespace secw
 
         /**
          * \brief try to cast a document to a UserAndPassword shared ptr
-         * 
+         *
          * \return shared ptr on UserAndPassword or null shared ptr in case of error
          */
         static ExternalCertificatePtr tryToCast(DocumentPtr doc);

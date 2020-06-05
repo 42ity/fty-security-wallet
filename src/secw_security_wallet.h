@@ -51,11 +51,11 @@ namespace secw
     private:
         std::string m_pathConfiguration;
         std::string m_pathDatabase;
-        
+
         std::map<std::string, PortfolioConfiguration> m_configurations;
         std::vector<Portfolio> m_portfolios;
     };
 
-} // namepsace secw 
+} // namepsace secw
 
 #endif

@@ -63,7 +63,7 @@ namespace secw
         {
             fty::CertificateX509 cert(m_pem);
             fty::Keys keys(m_privateKeyPem);
-            
+
             if(keys.getPublicKey() != cert.getPublicKey()) throw SecwInvalidDocumentFormatException(DOC_INTERNAL_CERTIFICATE_PEM);
         }
         catch(...)

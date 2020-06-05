@@ -33,13 +33,13 @@ namespace cam
   using ClientId = std::string;
 
   class ClientAccessor;
-  
+
   class Accessor
   {
   public:
-    
+
     explicit Accessor( mlm::MlmSyncClient & requestClient);
-    
+
     /**
      * @deprecated
      * @brief Construct a new Accessor object using malamute
@@ -51,7 +51,7 @@ namespace cam
     explicit Accessor(const ClientId & clientId,
                 uint32_t timeout,
                 const std::string & endPoint);
-    
+
     ~Accessor();
 
     void createMapping( const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol,
@@ -87,16 +87,16 @@ namespace cam
 
     const std::map<CredentialId, uint32_t> getAllCredentialCounter() const;
 
-  
+
   private:
     //for backward compatibility
     std::shared_ptr<mlm::MlmSyncClient> m_mlmClient;
 
     fty::SyncClient & m_requestClient;
-    
+
     std::vector<std::string> sendCommand(const std::string & command, const std::vector<std::string> & frames) const;
   };
-  
+
 } //namespace cam
 
 std::vector<std::pair<std::string,bool>> cam_accessor_test(mlm::MlmSyncClient & syncClient);

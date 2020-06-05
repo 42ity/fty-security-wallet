@@ -54,7 +54,7 @@ namespace secw
 //Private
     void Snmpv1::fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const
     {
-        
+
     }
 
     void Snmpv1::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const

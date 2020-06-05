@@ -26,7 +26,7 @@
 
 //  @interface
 //  Create an security wallet actor
-void 
+void
     fty_security_wallet_mlm_agent(zsock_t *pipe, void *args);
 
 //  Self test

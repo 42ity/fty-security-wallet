@@ -38,7 +38,7 @@ namespace secw
 {
     using Command   = std::string;
     using Sender    = std::string;
-    
+
     using FctCommandHandler = std::function<std::string (const Sender &, const std::vector<std::string> &)>;
 
     class SecurityWalletServer final : public fty::SyncServer
@@ -52,31 +52,31 @@ namespace secw
                                         const std::string & srrAgentName = "");
 
         ~SecurityWalletServer();
-        
+
         std::vector<std::string> handleRequest(const Sender & sender, const std::vector<std::string> & payload) override;
-        
+
     private:
         // List of supported commands with a reference to the handler for this command.
         std::map<Command, FctCommandHandler> m_supportedCommands;
 
         SecurityWallet m_activeWallet;
         fty::StreamPublisher & m_streamPublisher;
-        
+
         //Handler for all supported commands
         std::string handleGetListDocumentsWithSecret(const Sender & sender, const std::vector<std::string> & params);
         std::string handleGetListDocumentsWithoutSecret(const Sender & sender, const std::vector<std::string> & params);
-        
+
         std::string handleGetDocumentWithSecret(const Sender & sender, const std::vector<std::string> & params);
         std::string handleGetDocumentWithoutSecret(const Sender & sender, const std::vector<std::string> & params);
 
         std::string handleGetDocumentWithSecretByName(const Sender & sender, const std::vector<std::string> & params);
         std::string handleGetDocumentWithoutSecretByName(const Sender & sender, const std::vector<std::string> & params);
-        
+
         std::string handleGetListPortfolio(const Sender & sender, const std::vector<std::string> & params);
 
         std::string handleGetConsumerUsages(const Sender & sender, const std::vector<std::string> & params);
         std::string handleGetProducerUsages(const Sender & sender, const std::vector<std::string> & params);
-        
+
         std::string handleCreate(const Sender & sender, const std::vector<std::string> & params);
         std::string handleDelete(const Sender & sender, const std::vector<std::string> & params);
         std::string handleUpdate(const Sender & sender, const std::vector<std::string> & params);
@@ -86,7 +86,7 @@ namespace secw
         void sendNotificationOnDelete (const std::string & portfolio, const DocumentPtr oldDocument);
         void sendNotificationOnUpdate (const std::string & portfolio, const DocumentPtr oldDocument, const DocumentPtr newDocument);
 
-        
+
         std::string serializeListDocumentsPrivate(const std::string & portfolioName, const std::set<UsageId> & usages);
         std::string serializeListDocumentsPublic(const std::string & portfolioName, const std::set<UsageId> & usages);
 
@@ -94,7 +94,7 @@ namespace secw
         void handleSRRRequest(messagebus::Message msg);
         dto::srr::SaveResponse handleSave(const dto::srr::SaveQuery & query);
         dto::srr::RestoreResponse handleRestore(const dto::srr::RestoreQuery & query);
-    
+
     public:
         //Command list
         static constexpr const char* GET_PORTFOLIO_LIST = "GET_PORTFOLIO_LIST";
@@ -103,7 +103,7 @@ namespace secw
         static constexpr const char* GET_PRODUCER_USAGES = "GET_PRODUCER_USAGES";
 
         static constexpr const char* GET_LIST_WITH_SECRET = "GET_LIST_WITH_SECRET";
-        
+
         static constexpr const char* GET_LIST_WITHOUT_SECRET = "GET_LIST_WITHOUT_SECRET";
 
         static constexpr const char* GET_WITHOUT_SECRET = "GET_WITHOUT_SECRET";
@@ -119,8 +119,8 @@ namespace secw
         //SRR
         std::unique_ptr<messagebus::MessageBus> m_msgBus;
         std::mutex m_lock;
-        dto::srr::SrrQueryProcessor m_srrProcessor;       
- 
+        dto::srr::SrrQueryProcessor m_srrProcessor;
+
     };
 
 } // namespace secw

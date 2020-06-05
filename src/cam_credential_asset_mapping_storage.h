@@ -29,20 +29,20 @@
 namespace cam
 {
   using Hash = std::string;
-  
+
   class CredentialAssetMappingStorage
   {
   public:
     explicit CredentialAssetMappingStorage(const std::string & databasePath);
     void save() const;
-    
+
     const CredentialAssetMapping & getMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const;
     void setMapping(const CredentialAssetMapping & mapping);
 
     void removeMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol);
 
     bool isMappingExisting(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const;
-    
+
     std::vector<CredentialAssetMapping> getMappings(const AssetId & assetId, const ServiceId & serviceId) const;
     std::vector<CredentialAssetMapping> getAllMappings() const;
 
@@ -54,7 +54,7 @@ namespace cam
     std::vector<CredentialAssetMapping> getAssetMappings(const AssetId & assetId) const;
 
     static constexpr const uint8_t MAPPING_VERSION = 1;
-    
+
   private:
     std::string m_pathDatabase;
     std::map<Hash, CredentialAssetMapping> m_mappings;
@@ -62,6 +62,6 @@ namespace cam
     static Hash computeHash(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol);
   };
 
-} // namepsace cam 
+} // namepsace cam
 
 #endif

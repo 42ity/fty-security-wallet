@@ -35,7 +35,7 @@ namespace secw
 
     /**
      * Some key definition for serialization
-     * 
+     *
      */
     static constexpr const char* DOC_SNMPV1_COMMUNITY_NAME = "secw_snmpv1_community_name";
 
@@ -61,7 +61,7 @@ namespace secw
 
         /**
          * \brief try to cast a document to a Snmpv1 shared ptr
-         * 
+         *
          * \return shared ptr on snmpv1 or null shared ptr in case of error
          */
         static Snmpv1Ptr tryToCast(DocumentPtr doc);

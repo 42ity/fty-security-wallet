@@ -40,7 +40,7 @@ namespace secw
   {
       m_clientAccessor = std::make_shared<ClientAccessor>(requestClient);
   }
-  
+
   ProducerAccessor::ProducerAccessor( fty::SocketSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient)
   {
       m_clientAccessor = std::make_shared<ClientAccessor>(requestClient, subscriberClient);
@@ -87,7 +87,7 @@ namespace secw
     const UsageId & usageId) const
   {
     std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_LIST_WITHOUT_SECRET, {portfolio,usageId});
-    
+
     //the first frame should contain the data
     if(frames.size() < 1)
     {
@@ -95,11 +95,11 @@ namespace secw
     }
 
     cxxtools::SerializationInfo si = deserialize(frames.at(0));
-    
+
     std::vector<DocumentPtr> documents;
-    
+
     si >>= documents;
-    
+
     return documents;
   }
 
@@ -133,7 +133,7 @@ namespace secw
     const Id & id) const
   {
     std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_WITHOUT_SECRET, {portfolio,id});
-    
+
     //the first frame should contain the data
     if(frames.size() < 1)
     {
@@ -141,11 +141,11 @@ namespace secw
     }
 
     cxxtools::SerializationInfo si = deserialize(frames.at(0));
-    
+
     DocumentPtr document;
-    
+
     si >>= document;
-    
+
     return document;
   }
 
@@ -154,7 +154,7 @@ namespace secw
     const std::string & name) const
   {
     std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_WITHOUT_SECRET_BY_NAME, {portfolio,name});
-    
+
     //the first frame should contain the data
     if(frames.size() < 1)
     {
@@ -162,11 +162,11 @@ namespace secw
     }
 
     cxxtools::SerializationInfo si = deserialize(frames.at(0));
-    
+
     DocumentPtr document;
-    
+
     si >>= document;
-    
+
     return document;
   }
 
@@ -182,7 +182,7 @@ namespace secw
     std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::CREATE, {portfolio,jsonDoc});
 
     return frames.at(0);
-  }  
+  }
 
   void ProducerAccessor::updateDocument(
     const std::string & portfolio,
@@ -194,7 +194,7 @@ namespace secw
     //update
     m_clientAccessor->sendCommand(SecurityWalletServer::UPDATE, {portfolio,jsonDoc});
 
-  }  
+  }
 
   void ProducerAccessor::deleteDocument(
     const std::string & portfolio,
@@ -261,7 +261,7 @@ void callbackUpdated(const std::string& portfolio, secw::DocumentPtr oldDoc, sec
 }
 
 void callbackDeleted(const std::string& portfolio, secw::DocumentPtr oldDoc, std::mutex * mut, std::condition_variable * condvar)
-{ 
+{
   log_debug ("callback DELETED");
   std::unique_lock<std::mutex> lock(*mut);
   g_action = "DELETED";
@@ -281,10 +281,10 @@ void callbackDeleted(const std::string& portfolio, secw::DocumentPtr oldDoc, std
 std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::SocketSyncClient & syncClient, mlm::MlmStreamClient & streamClient)
 {
   std::vector<std::pair<std::string,bool>> testsResults;
-  
+
   std::mutex g_lock;
   std::condition_variable g_condvar;
-  
+
   using namespace secw;
 
   printf(" ** secw_producer_accessor_test: \n");
@@ -306,16 +306,16 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       {
         throw std::runtime_error("Portfolio default is not in the list of portfolio");
       }
-      
+
       printf(" *<=  Test #1.1 > OK\n");
-      
+
       testsResults.emplace_back (" Test #1.1 getPortfolioList",true);
     }
     catch(const std::exception& e)
     {
       printf(" *<=  Test #1.1 > Failed\n");
       printf("Error: %s\n\n",e.what());
-      
+
       testsResults.emplace_back (" Test #1.1 getPortfolioList",false);
     }
 
@@ -378,16 +378,16 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       {
         throw std::runtime_error("Usage 'mass_device_management' is not in the list of producer usages");
       }
-      
+
       printf(" *<=  Test #2.1 > OK\n");
-      
+
       testsResults.emplace_back (" Test #2.1 getProducerUsages",true);
     }
     catch(const std::exception& e)
     {
       printf(" *<=  Test #2.1 > Failed\n");
       printf("Error: %s\n\n",e.what());
-      
+
       testsResults.emplace_back (" Test #2.1 getProducerUsages",false);
     }
 
@@ -406,12 +406,12 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       {
         throw std::runtime_error("Not the good number of documents: expected 4, received "+std::to_string(doc.size()));
       }
-      
+
       if(doc[0]->isContainingPrivateData())
       {
         throw std::runtime_error("Document is containing private data");
       }
-      
+
       printf(" *<=  Test #3.1 > OK\n");
       testsResults.emplace_back (" Test #3.1 getListDocumentsWithoutPrivateData",true);
 
@@ -437,12 +437,12 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       {
         throw std::runtime_error("Not the good number of documents: expected 1, received "+std::to_string(doc.size()));
       }
-      
+
       if(doc[0]->isContainingPrivateData())
       {
         throw std::runtime_error("Document is containing private data");
       }
-      
+
       printf(" *<=  Test #3.2 > OK");
       testsResults.emplace_back (" Test #3.2 getListDocumentsWithoutPrivateData usage=discovery_monitoring",true);
 
@@ -496,7 +496,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       {
         throw std::runtime_error("Document is containing private data");
       }
-      
+
       printf(" *<=  Test #4.1 > OK\n");
       testsResults.emplace_back (" Test #4.1 getDocumentWithoutPrivateData",true);
 
@@ -532,7 +532,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       testsResults.emplace_back (" Test #4.2 getDocumentWithoutPrivateData => SecwDocumentDoNotExistException",false);
     }
   }
-  
+
  //test 4.3 => getDocumentWithoutPrivateData
   printf("\n-----------------------------------------------------------------------\n");
   {
@@ -546,7 +546,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       {
         throw std::runtime_error("Document is containing private data");
       }
-      
+
       printf(" *<=  Test #4.3 > OK\n");
       testsResults.emplace_back (" Test #4.3 getDocumentWithoutPrivateDataByName",true);
 
@@ -660,7 +660,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       if(snmpv3->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
 
       if(snmpv3->getName() != "Test insert snmpv3") throw std::runtime_error("Bad document retrieved: name do not match");
-      
+
       if(snmpv3->getSecurityName() != "test security name") throw std::runtime_error("Bad document retrieved: security name do not match");
       if(snmpv3->getSecurityLevel() != Snmpv3SecurityLevel::AUTH_PRIV) throw std::runtime_error("Bad document retrieved: security level do not match");
       if(snmpv3->getAuthProtocol() != Snmpv3AuthProtocol::MD5) throw std::runtime_error("Bad document retrieved: auth protocol do not match");
@@ -760,7 +760,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       if(snmpv3->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
 
       if(snmpv3->getName() != "Test update snmpv3") throw std::runtime_error("Bad document retrieved: name do not match: "+snmpv3->getName());
-      
+
       if(snmpv3->getSecurityName() != "test update security snmpv3") throw std::runtime_error("Bad document retrieved: security name do not match");
       if(snmpv3->getSecurityLevel() != Snmpv3SecurityLevel::AUTH_PRIV) throw std::runtime_error("Bad document retrieved: security level do not match");
       if(snmpv3->getAuthProtocol() != Snmpv3AuthProtocol::MD5) throw std::runtime_error("Bad document retrieved: auth protocol do not match");
@@ -926,7 +926,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
 
       if(doc->getName() != "Test insert username") throw std::runtime_error("Bad document retrieved: name do not match");
-      
+
       if(doc->getUsername() != "username") throw std::runtime_error("Bad document retrieved: username do not match");
 
       //doc is valid
@@ -1033,7 +1033,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       if(doc->getUsageIds().count("discovery_monitoring") == 0) throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
       if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
 
-      
+
       if(doc->getName() != "Test update username") throw std::runtime_error("Bad document retrieved: name do not match");
       if(doc->getUsername() != "new_username") throw std::runtime_error("Bad document retrieved: username do not match");
 
@@ -1066,7 +1066,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       if(doc->getUsageIds().count("discovery_monitoring") == 0) throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
       if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
 
-      
+
       if(doc->getId() != id ) throw std::runtime_error("Bad document retrieved: id do not match");
       if(doc->getUsername() != "new_username") throw std::runtime_error("Bad document retrieved: username do not match");
 
@@ -1268,7 +1268,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
 
       if(doc->getName() != "Test insert snmpv1") throw std::runtime_error("Bad document retrieved: name do not match");
-      
+
       if(doc->getCommunityName() != "community") throw std::runtime_error("Bad document retrieved: community do not match");
 
       //doc is valid
@@ -1335,7 +1335,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       if(doc->getUsageIds().count("discovery_monitoring") == 0) throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
       if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
 
-      
+
       if(doc->getName() != "Test update snmpv1") throw std::runtime_error("Bad document retrieved: name do not match");
       if(doc->getCommunityName() != "new_community") throw std::runtime_error("Bad document retrieved: community do not match");
 
@@ -1432,7 +1432,7 @@ std::string document;
                 "test auth password",
                 Snmpv3PrivProtocol::AES,
                 "test priv password");
-      
+
       snmpv3Doc->validate();
 
       document <<= snmpv3Doc;
@@ -1459,7 +1459,7 @@ std::string document;
       DocumentPtr doc;
 
       document >>= doc;
-      
+
       doc->validate();
 
       printf(" *<=  Test #%s > OK\n", testNumber.c_str());
@@ -1514,7 +1514,7 @@ std::string document;
     "AHxrP15dci7DCMBYNXQu8jKrg8M/SVKGZgjPx4O9KHnLHf8L/KNWIJRQNfo9AhA=\n"
     "-----END CERTIFICATE-----\n";
 
-  std::string key2 = 
+  std::string key2 =
     "-----BEGIN PRIVATE KEY-----\n"
     "MIIBVQIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEA089g+gpl/ILO62D8\n"
     "geGoHYhQaD6Ceh2ew7hfRa27wmIHA2o0TbZ/5hD+/mAXBT4YlXiP4eYldLr9XJ38\n"
@@ -1536,7 +1536,7 @@ std::string document;
     ProducerAccessor producerAccessor(syncClient, streamClient);
     try
     {
-     
+
 
       ExternalCertificatePtr doc = std::make_shared<ExternalCertificate>("Test insert external certificate",cert1);
 
@@ -1576,7 +1576,7 @@ std::string document;
       if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
 
       if(doc->getName() != "Test insert external certificate") throw std::runtime_error("Bad document retrieved: name do not match");
-      
+
       if(doc->getPem() != cert1) throw std::runtime_error("Bad document retrieved: pem do not match");
 
       //doc is valid
@@ -1682,7 +1682,7 @@ std::string document;
       if(doc->getUsageIds().count("discovery_monitoring") == 0) throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
       if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
 
-      
+
       if(doc->getName() != "Test update external certificate") throw std::runtime_error("Bad document retrieved: name do not match");
       if(doc->getPem() != cert2) throw std::runtime_error("Bad document retrieved: pem do not match");
 
@@ -1715,7 +1715,7 @@ std::string document;
       if(doc->getUsageIds().count("discovery_monitoring") == 0) throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
       if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
 
-      
+
       if(doc->getId() != id ) throw std::runtime_error("Bad document retrieved: id do not match");
       if(doc->getPem() != cert2) throw std::runtime_error("Bad document retrieved: pem do not match");
 
@@ -1916,7 +1916,7 @@ std::string document;
       if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
 
       if(doc->getName() != "Test insert Internal Certificate") throw std::runtime_error("Bad document retrieved: name do not match");
-      
+
       if(doc->getPem() != cert1) throw std::runtime_error("Bad document retrieved: pem do not match");
 
       //doc is valid
@@ -2023,7 +2023,7 @@ std::string document;
       if(doc->getUsageIds().count("discovery_monitoring") == 0) throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
       if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
 
-      
+
       if(doc->getName() != "Test update Internal Certificate") throw std::runtime_error("Bad document retrieved: name do not match");
       if(doc->getPem() != cert2) throw std::runtime_error("Bad document retrieved: pem do not match");
 
@@ -2056,7 +2056,7 @@ std::string document;
       if(doc->getUsageIds().count("discovery_monitoring") == 0) throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
       if(doc->getUsageIds().size() != 1) throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
 
-      
+
       if(doc->getId() != id ) throw std::runtime_error("Bad document retrieved: id do not match");
       if(doc->getPem() != cert2) throw std::runtime_error("Bad document retrieved: pem do not match");
 
@@ -2213,6 +2213,6 @@ std::string document;
 
 //end of tests
   return testsResults;
-  
+
 }
 

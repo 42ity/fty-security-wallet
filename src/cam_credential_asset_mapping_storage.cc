@@ -42,7 +42,7 @@ namespace cam
         log_info(" Loading mapping from %s ...", m_pathDatabase.c_str());
         try
         {
-            struct stat buffer;   
+            struct stat buffer;
             bool fileExist =  (stat (m_pathDatabase.c_str(), &buffer) == 0);
 
             //try to open portfolio if exist
@@ -51,7 +51,7 @@ namespace cam
                 std::ifstream input;
 
                 input.open(m_pathDatabase);
-                
+
                 cxxtools::SerializationInfo rootSi;
                 cxxtools::JsonDeserializer deserializer(input);
                 deserializer.deserialize(rootSi);
@@ -63,7 +63,7 @@ namespace cam
                 {
                     std::vector<CredentialAssetMapping> listOfmapping;
                     rootSi.getMember("mappings") >>= listOfmapping;
-                    
+
                     for( const CredentialAssetMapping &  mapping : listOfmapping)
                     {
                         try
@@ -108,7 +108,7 @@ namespace cam
     void CredentialAssetMappingStorage::save() const
     {
         log_debug("Update mapping database");
-        
+
         //create the file content
         cxxtools::SerializationInfo rootSi;
 
@@ -125,14 +125,14 @@ namespace cam
 
         //open the file
         std::ofstream output(m_pathDatabase.c_str());
-        
+
         cxxtools::JsonSerializer serializer(output);
         serializer.beautify(true);
         serializer.serialize(rootSi);
 
         output.close();
     }
-    
+
     const CredentialAssetMapping & CredentialAssetMappingStorage::getMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const
     {
         Hash hash = computeHash(assetId, serviceId, protocol);
@@ -174,7 +174,7 @@ namespace cam
     bool CredentialAssetMappingStorage::isMappingExisting(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const
     {
         Hash hash = computeHash(assetId, serviceId, protocol);
-        
+
         bool isMappingExisting = true;
         try
         {
@@ -201,7 +201,7 @@ namespace cam
             }
         }
 
-        return  list;   
+        return  list;
     }
 
     std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getCredentialMappings(const CredentialId & credentialId) const
@@ -216,7 +216,7 @@ namespace cam
             }
         }
 
-        return list;  
+        return list;
     }
 
     std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getMappings(const AssetId & assetId, const ServiceId & serviceId) const
@@ -231,7 +231,7 @@ namespace cam
             }
         }
 
-        return list;  
+        return list;
     }
 
     std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getAllMappings() const
@@ -243,7 +243,7 @@ namespace cam
             list.push_back(item.second);
         }
 
-        return list;  
+        return list;
     }
 
     std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getAssetMappings(const AssetId & assetId) const
@@ -258,7 +258,7 @@ namespace cam
             }
         }
 
-        return  list; 
+        return  list;
     }
 
     Hash CredentialAssetMappingStorage::computeHash(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol)
@@ -266,4 +266,4 @@ namespace cam
         return "A"+assetId+"|S"+serviceId+"|P:"+protocol;
     }
 
-} // namepsace cam 
+} // namepsace cam

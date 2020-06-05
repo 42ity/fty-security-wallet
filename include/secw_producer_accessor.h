@@ -68,47 +68,47 @@ namespace secw
   using StartedCallback = std::function<void()>;
 
   class ClientAccessor;
-  
+
   /**
-   * @brief Give Producer access: 
+   * @brief Give Producer access:
    * A producer has a list of usageId define by the server configuration.
    * A producer can retrieve any documents from the server.
    * A producer can add or remove in usageIds of the document only if those usage ids are in the list define for him.
    * A producer can write any part of a document part of the documents.
-   * 
+   *
    * A customer can only read the public part of document.
    * A customer can add a new document in the server.
-   * 
+   *
    * @exception For exceptions list, see secw_exception.h
-   * 
+   *
    */
   class ProducerAccessor
   {
   public:
-      
+
     explicit ProducerAccessor( fty::SocketSyncClient & requestClient);
     explicit ProducerAccessor( fty::SocketSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient);
-    
+
     /**
      * @brief Get the List of Portfolio name
-     * 
-     * @return std::vector<std::string> 
+     *
+     * @return std::vector<std::string>
      */
     std::vector<std::string> getPortfolioList() const;
 
     /**
      * @brief Get the List of usages that the producer can use
-     * 
-     * @return std::set<UsageId> 
+     *
+     * @return std::set<UsageId>
      */
     std::set<UsageId> getProducerUsages(const std::string & portfolioName = "default") const;
-    
+
     /**
      * @brief Get the List Documents Without Private Data
-     * 
+     *
      * @param portfolio name
      * @param usageId (optional)
-     * @return std::vector<DocumentPtr> 
+     * @return std::vector<DocumentPtr>
      */
     std::vector<DocumentPtr> getListDocumentsWithoutPrivateData(
       const std::string & portfolio,
@@ -116,9 +116,9 @@ namespace secw
 
     /**
      * @brief Get the List Documents Without Private Data from a list of id.
-     * 
+     *
      * If a document cannot be retrived (bad id), this document will not be on the list.
-     * 
+     *
      * @param portfolio name
      * @param list of id requested
      * @return std::vector<DocumentPtr> contain the documents which have been retrieved.
@@ -126,10 +126,10 @@ namespace secw
     std::vector<DocumentPtr> getListDocumentsWithoutPrivateData(
       const std::string & portfolio,
       const std::vector<Id> & ids ) const;
-    
+
     /**
      * @brief Get a Document Without Private Data object
-     * 
+     *
      * @param portfolio name
      * @param id of the document
      * @return DocumentPtr on the document.
@@ -140,7 +140,7 @@ namespace secw
 
     /**
      * @brief Get a Document Without Private Data object
-     * 
+     *
      * @param portfolio name
      * @param name of the document
      * @return DocumentPtr on the document.
@@ -151,7 +151,7 @@ namespace secw
 
     /**
      * @brief Insert a new document into the server database
-     * 
+     *
      * @param portfolio name
      * @param document
      * @return Id of the new document
@@ -162,7 +162,7 @@ namespace secw
 
     /**
      * @brief Update a document into the server database. The document must exist into the database.
-     * 
+     *
      * @param portfolio name
      * @param document
      */
@@ -172,7 +172,7 @@ namespace secw
 
     /**
      * @brief Update a document from the server database. The document must exist into the database.
-     * 
+     *
      * @param portfolio name
      * @param id of the document to be removed
      */
@@ -204,12 +204,12 @@ namespace secw
      * @param callback
      */
     void setCallbackOnStart(StartedCallback startedCallback= nullptr);
-  
+
   private:
-   
+
     std::shared_ptr<ClientAccessor> m_clientAccessor;
   };
-  
+
 } //namespace secw
 
 //  @interface for unit tests

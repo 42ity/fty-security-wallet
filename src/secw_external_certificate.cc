@@ -65,7 +65,7 @@ namespace secw
         catch(...)
         {
             throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
-        } 
+        }
 
     }
 

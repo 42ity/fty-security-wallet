@@ -45,7 +45,7 @@ namespace secw
 //Public
     SecurityWallet::SecurityWallet(const std::string & configurationPath, const std::string & databasePath):
         m_pathConfiguration(configurationPath), m_pathDatabase(databasePath)
-    { 
+    {
         try
         {
             reload();
@@ -54,7 +54,7 @@ namespace secw
         {
             exit(EXIT_FAILURE);
         }
-        
+
 
         //attempt to save the database and ensure that we can write
         try
@@ -66,7 +66,7 @@ namespace secw
             log_error("Error while saving into database file %s\n %s",m_pathDatabase.c_str(), e.what());
             exit(EXIT_FAILURE);
         }
-        
+
     }
 
     void SecurityWallet::reload()
@@ -75,20 +75,20 @@ namespace secw
         m_portfolios.clear();
 
         //Load Config and then Database
-        
+
         //Load Config
         try
         {
-            struct stat buffer;   
+            struct stat buffer;
             bool fileExist =  (stat (m_pathConfiguration.c_str(), &buffer) == 0);
-        
+
             if(!fileExist)
             {
                 throw std::runtime_error("File does not exist!");
             }
-            
+
             std::ifstream input;
-            
+
             input.open(m_pathConfiguration);
 
             cxxtools::SerializationInfo rootSi;
@@ -120,21 +120,21 @@ namespace secw
             log_error("Error while loading configuration file %s\n %s",m_pathConfiguration.c_str(), e.what());
             throw;
         }
-        
-        
+
+
         //Load database
         try
         {
-            struct stat buffer;   
+            struct stat buffer;
             bool fileExist =  (stat (m_pathDatabase.c_str(), &buffer) == 0);
-        
+
             //try to open portfolio if exist
             if(fileExist)
             {
                 std::ifstream input;
 
                 input.open(m_pathDatabase);
-                
+
                 cxxtools::SerializationInfo rootSi;
                 cxxtools::JsonDeserializer deserializer(input);
                 deserializer.deserialize(rootSi);
@@ -195,16 +195,16 @@ namespace secw
 
         //get the documents
         cxxtools::SerializationInfo & portfolios = si.addMember("portfolios");
-       
+
         for(const Portfolio & portfolio : m_portfolios)
         {
             log_debug("Save portfolio <%s>", portfolio.getName().c_str());
             portfolio.serializePortfolioSRR(portfolios.addMember(""), passphrase);
         }
 
-        
+
         portfolios.setCategory(cxxtools::SerializationInfo::Array);
-        
+
         return si;
     }
 
@@ -214,7 +214,7 @@ namespace secw
         {
             throw std::runtime_error("Version "+version+" is not supported");
         }
-        
+
         //check the phasephrase
         std::string receivedPassphrase;
         if(passphrase.length() < 8)
@@ -229,7 +229,7 @@ namespace secw
             throw std::runtime_error("Bad passphrase");
         }
 
-        
+
         std::string receivedUuid;
         si.getMember("check_platform") >>= receivedUuid;
 
@@ -238,7 +238,7 @@ namespace secw
         const cxxtools::SerializationInfo& portfolios = si.getMember("portfolios");
 
         std::vector<Portfolio> listPortfolio;
-            
+
         for(size_t index = 0; index < portfolios.memberCount(); index++ )
         {
             Portfolio portfolio;
@@ -263,7 +263,7 @@ namespace secw
 
         //open the file
         std::ofstream output(m_pathDatabase.c_str());
-        
+
         cxxtools::JsonSerializer serializer(output);
         serializer.beautify(true);
         serializer.serialize(rootSi);
@@ -318,5 +318,5 @@ namespace secw
 
         return uuid;
     }
-    
+
 } //namepace secw

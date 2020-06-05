@@ -50,9 +50,9 @@ namespace cam
     public:
         explicit CamException(const std::string & whatArg, ErrorCode code = ErrorCode::GENERIC);
         explicit CamException(ErrorCode code = ErrorCode::GENERIC);
-        
+
         virtual ~CamException(){}
-        
+
         const char* what() const noexcept override;
 
         inline ErrorCode getErrorCode() const { return m_code; }
@@ -64,10 +64,10 @@ namespace cam
 
         //throw the good exception base on the error payload
         static void throwCamException(const std::string & data);
-        
+
     protected:
         virtual void fillSerializationInfo(cxxtools::SerializationInfo& si) const;
-        
+
     private:
         ErrorCode m_code;
 
@@ -143,7 +143,7 @@ namespace cam
 
         inline std::string getArgument() const { return m_argument; }
     };
-    
+
 // Mapping do not exist
     class CamMappingDoesNotExistException : public CamException
     {
@@ -191,7 +191,7 @@ namespace cam
             si.addMember("service") <<= m_service;
             si.addMember("protocol") <<= m_protocol;
         }
-        
+
     public:
         explicit CamMappingAlreadyExistsException(const std::string & asset, const std::string & service, const std::string & protocol) :
             CamException(ErrorCode::MAPPING_ALREADY_EXISTS),
@@ -209,7 +209,7 @@ namespace cam
             extraData.getMember("service") >>= m_service;
             extraData.getMember("protocol") >>= m_protocol;
         }
-        
+
         inline std::string getAssetId() const { return m_asset; }
         inline std::string getServiceId() const { return m_service; }
         inline std::string getProtocol() const { return m_protocol; }

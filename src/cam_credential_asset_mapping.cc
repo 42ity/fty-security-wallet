@@ -58,11 +58,11 @@ namespace cam
       si.getMember(PROTOCOL_ENTRY) >>= m_protocol;
       si.getMember(PORT_ENTRY) >>= m_port;
       si.getMember(CREDENTIAL_ID_ENTRY) >>= m_credentialId;
-      
+
       uint8_t status = 0;
       si.getMember(CREDENTIAL_STATUS_ENTRY) >>= status;
       m_status = static_cast<Status>(status);
-      
+
       si.getMember(EXTENDED_INFO_ENTRY) >>= m_extendedInfo;
     }
     /*catch(const std::exception& e)
@@ -97,7 +97,7 @@ namespace cam
   void operator>>= (const std::string& str, CredentialAssetMapping & mapping)
   {
       cxxtools::SerializationInfo si;
-      
+
       try
       {
           std::stringstream input;

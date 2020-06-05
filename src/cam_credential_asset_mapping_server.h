@@ -39,7 +39,7 @@ namespace cam
     using Command   = std::string;
     using Sender    = std::string;
     using Subject   = std::string;
-    
+
     using FctCommandHandler = std::function<std::string (const Sender &, const std::vector<std::string> &)>;
 
     class CredentialAssetMappingServer final : public fty::SyncServer
@@ -47,14 +47,14 @@ namespace cam
 
     public:
         explicit CredentialAssetMappingServer(const std::string & storagePath);
-        
+
         std::vector<std::string> handleRequest(const Sender & sender, const std::vector<std::string> & payload) override;
-        
+
         // List of supported commands with a reference to the handler for this command.
         std::map<Command, FctCommandHandler> m_supportedCommands;
 
         CredentialAssetMappingStorage m_activeMapping;
-        
+
         //Handler for all supported commands
         std::string handleCreateMapping(const Sender & sender, const std::vector<std::string> & params);
         std::string handleGetMapping(const Sender & sender, const std::vector<std::string> & params);
@@ -70,7 +70,7 @@ namespace cam
         std::string handleGetCredentialMappings(const Sender & sender, const std::vector<std::string> & params);
         std::string handleCountCredentialMappingsForCredential(const Sender & sender, const std::vector<std::string> & params);
 
-    
+
     public:
         //Command list
         static constexpr const char* CREATE_MAPPING = "CREATE_MAPPING";
@@ -91,7 +91,7 @@ namespace cam
         static constexpr const char* COUNT_CRED_MAPPINGS = "COUNT_CRED_MAPPINGS";
 
     };
-    
+
 } // namespace cam
 
 #endif

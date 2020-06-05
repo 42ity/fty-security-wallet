@@ -31,7 +31,7 @@ namespace secw
 {
   class Portfolio;
   class Document;
-  
+
   /**
    * Some typedef to make the code more clear
    */
@@ -47,7 +47,7 @@ namespace secw
 
   /**
    * Some key definition for serialization
-   * 
+   *
    */
   static constexpr const char* DOC_ID_ENTRY = "secw_doc_id";
   static constexpr const char* DOC_NAME_ENTRY = "secw_doc_name";
@@ -69,7 +69,7 @@ namespace secw
     bool isContainingPrivateData() const;
 
     const std::string & getName() const;
-    void setName(const std::string & name); 
+    void setName(const std::string & name);
 
     void addTag(const Tag & tag);
     void removeTag(const Tag & tag);
@@ -84,52 +84,52 @@ namespace secw
 
     /**
      * \brief Clone any document - useful to apply modification before to update
-     * 
+     *
      * \return shared ptr on a document
      */
     virtual DocumentPtr clone() const = 0;
-    
+
     /**
      * \brief Destructor
-     * 
+     *
      */
     virtual ~Document(){/*log_debug("Cleaning document %s", m_name.c_str());*/}
 
     /**
      * \brief Give information if the object document contain private data or only the public data
-     * 
+     *
      * \return true if the document contain private data
      */
     bool containPrivateData() const;
 
     /**
      * \brief Append the serialization of the document with header, public and private (secret) part.
-     * 
+     *
      * \param[in|out] cxxtools::SerializationInfo
      */
     void fillSerializationInfoWithSecret(cxxtools::SerializationInfo& si) const;
 
     /**
      * \brief Append the serialization of the document with header and public.
-     * 
+     *
      * \param[in|out] cxxtools::SerializationInfo
      */
     void fillSerializationInfoWithoutSecret(cxxtools::SerializationInfo& si) const;
 
     /**
      * \brief Append the serialization of the document for SRR.
-     * 
+     *
      * \param[in|out] cxxtools::SerializationInfo
      * \param[in] enctyption key use to encrypt private part
      */
     void fillSerializationInfoSRR(cxxtools::SerializationInfo& si, const std::string & encryptionKey) const;
 
- 
+
 
   //Classe methods
    /**
      * \brief return a document Ptr from a serilization from SRR
-     * 
+     *
      * \return DocumentPtr
      */
 
@@ -137,14 +137,14 @@ namespace secw
 
     /**
      * \brief return the list of all supported types od documents
-     * 
+     *
      * \return list of types
      */
     static std::vector<DocumentType> getSupportedTypes();
 
     /**
      * \brief return if we supported the Type
-     * 
+     *
      * \param[in] Type for check
      * \return true if we support the type
      */
@@ -152,19 +152,19 @@ namespace secw
 
     /**
      * \brief Tell if the data in the document are valid: for example password cannot be empty.
-     * 
+     *
      * \exceptions: In case it's not valid.
      */
     virtual void validate() const = 0;
 
     /**
      * \brief friend stream operator use to load data from data base
-     * 
+     *
      * \param[in] serialization info
-     * \param[out] shared pointer on document 
+     * \param[out] shared pointer on document
      */
     friend void operator>>= (const cxxtools::SerializationInfo& si, DocumentPtr & doc);
-    
+
   protected:
     explicit Document(const DocumentType & type) :
       m_type(type)
@@ -178,7 +178,7 @@ namespace secw
 
     //This map is use to define the supported type and how to build them
     static std::map<DocumentType, FctDocumentFactory> m_documentFactoryFuntions;
-    
+
     bool m_containPrivateData = true;
 
     virtual void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const = 0;
@@ -186,7 +186,7 @@ namespace secw
 
     virtual void updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) = 0;
     virtual void updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) = 0;
-    
+
   private:
     void fillSerializationInfoHeaderDoc(cxxtools::SerializationInfo& si) const;
 

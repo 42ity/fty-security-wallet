@@ -68,7 +68,7 @@ namespace secw
     }
 
     void Snmpv3::setPrivPassword(const std::string & privPassword)
-    { 
+    {
         m_privPassword = privPassword;
         m_containPrivateData = true;
     }
@@ -102,11 +102,11 @@ namespace secw
         {
             si.addMember(DOC_SNMPV3_AUTH_PASSWORD) <<= m_authPassword;
         }
-        
+
         if(!m_privPassword.empty())
         {
             si.addMember(DOC_SNMPV3_PRIV_PASSWORD) <<= m_privPassword;
-        }   
+        }
     }
 
     void Snmpv3::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const

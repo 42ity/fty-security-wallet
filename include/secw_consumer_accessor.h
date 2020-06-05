@@ -68,47 +68,47 @@ namespace secw
   using StartedCallback = std::function<void()>;
 
   class ClientAccessor;
-  
+
   /**
-   * @brief Give consumer access: 
+   * @brief Give consumer access:
    * A consumer has a list of usageId define by the server configuration.
    * A consumer can read to documents which have a usageId in the list of the customer usageId.
    * A consumer can read to the private part of the documents.
-   * 
+   *
    * A customer cannot do any modification on the document in the server.
    * A customer cannot do creation of document in the server.
-   * 
+   *
    * @exception For exceptions list, see secw_exception.h
-   * 
+   *
    */
   class ConsumerAccessor
   {
   public:
-      
+
     explicit ConsumerAccessor( fty::SocketSyncClient & requestClient);
     explicit ConsumerAccessor( fty::SocketSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient);
-    
+
     /**
      * @brief Get the List of portfolio name
-     * 
-     * @return std::vector<std::string> 
+     *
+     * @return std::vector<std::string>
      */
     std::vector<std::string> getPortfolioList() const;
 
     /**
      * @brief Get the List of usages that the consumer can access
      * @param portfolio name (default value "default")
-     * 
-     * @return std::set<UsageId> 
+     *
+     * @return std::set<UsageId>
      */
     std::set<UsageId> getConsumerUsages(const std::string & portfolioName = "default") const;
-    
+
     /**
      * @brief Get the List Documents With Private Data
-     * 
+     *
      * @param portfolio name
      * @param usageId (optional)
-     * @return std::vector<DocumentPtr> 
+     * @return std::vector<DocumentPtr>
      */
     std::vector<DocumentPtr> getListDocumentsWithPrivateData(
       const std::string & portfolio,
@@ -116,9 +116,9 @@ namespace secw
 
     /**
      * @brief Get the List Documents With Private Data from a list of id.
-     * 
+     *
      * If a document cannot be retrived (bad id or none access right), this document will not be on the list.
-     * 
+     *
      * @param portfolio name
      * @param list of id requested
      * @return std::vector<DocumentPtr> contain the documents which have been retrieved.
@@ -126,10 +126,10 @@ namespace secw
     std::vector<DocumentPtr> getListDocumentsWithPrivateData(
       const std::string & portfolio,
       const std::vector<Id> & ids) const;
-    
+
     /**
      * @brief Get a Document With Private Data object
-     * 
+     *
      * @param portfolio name
      * @param id of the document
      * @return DocumentPtr on the document.
@@ -141,7 +141,7 @@ namespace secw
 
     /**
      * @brief Get a Document With Private Data object
-     * 
+     *
      * @param portfolio name
      * @param name of the document
      * @return DocumentPtr on the document.
@@ -175,12 +175,12 @@ namespace secw
      */
     void setCallbackOnStart(StartedCallback startedCallback= nullptr);
 
-  
+
   private:
     std::shared_ptr<ClientAccessor> m_clientAccessor;
-    
+
   };
-  
+
 } //namespace secw
 
 //  @interface

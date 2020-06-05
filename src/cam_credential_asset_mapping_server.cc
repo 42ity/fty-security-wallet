@@ -66,7 +66,7 @@ namespace cam
 
         m_supportedCommands[COUNT_CRED_MAPPINGS] = std::bind(&CredentialAssetMappingServer::handleCountCredentialMappingsForCredential, this, _1, _2);
     }
-        
+
     std::vector<std::string> CredentialAssetMappingServer::handleRequest(const Sender & sender, const std::vector<std::string> & payload)
     {
         try
@@ -92,7 +92,7 @@ namespace cam
 
             FctCommandHandler cmdHandler = m_supportedCommands[cmd];
 
-            // Declaring new vector 
+            // Declaring new vector
             std::vector<std::string> params(payload.begin()+1, payload.end());
 
             std::string result = cmdHandler(sender, params);
@@ -123,7 +123,7 @@ namespace cam
     {
         /*
         * Parameters for this command:
-        * 
+        *
         * 0. asset id
         * 1. usage id
         * 2. protocol
@@ -141,9 +141,9 @@ namespace cam
         const CredentialAssetMapping & mapping = m_activeMapping.getMapping(assetId, serviceId, protocol);
 
         cxxtools::SerializationInfo si;
-    
+
         mapping.fillSerializationInfo(si);
-        
+
         return serialize(si);
     }
 
@@ -151,30 +151,30 @@ namespace cam
     {
         /*
         * Parameters for this command:
-        * 
+        *
         * 0. CredentialMapping object in json
         */
-        
+
         if(params.size() < 1)
         {
             throw CamBadCommandArgumentException("", "Command needs at least 1 argument");
         }
-        
+
         const cxxtools::SerializationInfo si = deserialize(params.at(0));
 
         CredentialAssetMapping mapping;
-        
+
         mapping.fromSerializationInfo(si);
-        
+
         if(m_activeMapping.isMappingExisting(mapping.m_assetId, mapping.m_serviceId, mapping.m_protocol))
         {
             throw CamMappingAlreadyExistsException(mapping.m_assetId, mapping.m_serviceId, mapping.m_protocol);
         }
-        
+
         m_activeMapping.setMapping(mapping);
-        
+
         m_activeMapping.save();
-        
+
         return "";
     }
 
@@ -182,7 +182,7 @@ namespace cam
     {
         /*
         * Parameters for this command:
-        * 
+        *
         * 0. asset id
         * 1. usage id
         * 2. protocol
@@ -198,9 +198,9 @@ namespace cam
         const Protocol & protocol = params.at(2);
 
         m_activeMapping.removeMapping(assetId, serviceId, protocol);
-        
+
         m_activeMapping.save();
-        
+
         return "";
     }
 
@@ -208,30 +208,30 @@ namespace cam
     {
         /*
         * Parameters for this command:
-        * 
+        *
         * 0. CredentialMapping object in json
         */
-        
+
         if(params.size() < 1)
         {
             throw CamBadCommandArgumentException("", "Command needs at least 1 argument");
         }
-        
+
         const cxxtools::SerializationInfo si = deserialize(params.at(0));
 
         CredentialAssetMapping mapping;
-        
+
         mapping.fromSerializationInfo(si);
-        
+
         if(! m_activeMapping.isMappingExisting(mapping.m_assetId, mapping.m_serviceId, mapping.m_protocol))
         {
             throw CamMappingDoesNotExistException(mapping.m_assetId, mapping.m_serviceId, mapping.m_protocol);
         }
-        
+
         m_activeMapping.setMapping(mapping);
-        
+
         m_activeMapping.save();
-        
+
         return "";
     }
 
@@ -239,7 +239,7 @@ namespace cam
     {
         /*
         * Parameters for this command:
-        * 
+        *
         * 0. CredentialMapping object in json
         */
 
@@ -251,7 +251,7 @@ namespace cam
         const cxxtools::SerializationInfo si = deserialize(params.at(0));
 
         CredentialAssetMapping receivedMapping;
-        
+
         receivedMapping.fromSerializationInfo(si);
 
         CredentialAssetMapping existingMapping = m_activeMapping.getMapping(receivedMapping.m_assetId, receivedMapping.m_serviceId, receivedMapping.m_protocol);
@@ -261,9 +261,9 @@ namespace cam
         existingMapping.m_status = Status::UNKNOWN;
 
         m_activeMapping.setMapping(existingMapping);
-        
+
         m_activeMapping.save();
-        
+
         return "";
     }
 
@@ -271,7 +271,7 @@ namespace cam
     {
         /*
         * Parameters for this command:
-        * 
+        *
         * 0. CredentialMapping object in json
         */
 
@@ -283,7 +283,7 @@ namespace cam
         const cxxtools::SerializationInfo si = deserialize(params.at(0));
 
         CredentialAssetMapping receivedMapping;
-        
+
         receivedMapping.fromSerializationInfo(si);
 
         CredentialAssetMapping existingMapping = m_activeMapping.getMapping(receivedMapping.m_assetId, receivedMapping.m_serviceId, receivedMapping.m_protocol);
@@ -293,9 +293,9 @@ namespace cam
         existingMapping.m_status = Status::UNKNOWN;
 
         m_activeMapping.setMapping(existingMapping);
-        
+
         m_activeMapping.save();
-        
+
         return "";
     }
 
@@ -303,7 +303,7 @@ namespace cam
     {
         /*
         * Parameters for this command:
-        * 
+        *
         * 0. CredentialMapping object in json
         */
 
@@ -315,7 +315,7 @@ namespace cam
         const cxxtools::SerializationInfo si = deserialize(params.at(0));
 
         CredentialAssetMapping receivedMapping;
-        
+
         receivedMapping.fromSerializationInfo(si);
 
         CredentialAssetMapping existingMapping = m_activeMapping.getMapping(receivedMapping.m_assetId, receivedMapping.m_serviceId, receivedMapping.m_protocol);
@@ -324,9 +324,9 @@ namespace cam
         existingMapping.m_status = receivedMapping.m_status;
 
         m_activeMapping.setMapping(existingMapping);
-        
+
         m_activeMapping.save();
-        
+
         return "";
     }
 
@@ -334,7 +334,7 @@ namespace cam
     {
         /*
         * Parameters for this command:
-        * 
+        *
         * 0. CredentialMapping object in json
         */
 
@@ -346,7 +346,7 @@ namespace cam
         const cxxtools::SerializationInfo si = deserialize(params.at(0));
 
         CredentialAssetMapping receivedMapping;
-        
+
         receivedMapping.fromSerializationInfo(si);
 
         CredentialAssetMapping existingMapping = m_activeMapping.getMapping(receivedMapping.m_assetId, receivedMapping.m_serviceId, receivedMapping.m_protocol);
@@ -355,9 +355,9 @@ namespace cam
         existingMapping.m_extendedInfo = receivedMapping.m_extendedInfo;
 
         m_activeMapping.setMapping(existingMapping);
-        
+
         m_activeMapping.save();
-        
+
         return "";
     }
 
@@ -365,7 +365,7 @@ namespace cam
     {
         /*
         * Parameters for this command:
-        * 
+        *
         * 0. asset id
         */
 
@@ -377,7 +377,7 @@ namespace cam
         const AssetId & assetId = params.at(0);
 
         std::vector<CredentialAssetMapping> mappings = m_activeMapping.getAssetMappings(assetId);
-        
+
         cxxtools::SerializationInfo si;
 
         si <<= mappings;
@@ -389,7 +389,7 @@ namespace cam
     {
         /*
         * Parameters for this command:
-        * 
+        *
         * 0. asset id
         * 1. service id
         */
@@ -403,7 +403,7 @@ namespace cam
         const ServiceId & serviceId = params.at(1);
 
         std::vector<CredentialAssetMapping> mappings = m_activeMapping.getMappings(assetId, serviceId);
-        
+
         cxxtools::SerializationInfo si;
 
         si <<= mappings;
@@ -418,7 +418,7 @@ namespace cam
         */
 
         std::vector<CredentialAssetMapping> mappings = m_activeMapping.getAllMappings();
-        
+
         cxxtools::SerializationInfo si;
 
         si <<= mappings;
@@ -432,7 +432,7 @@ namespace cam
     {
         /*
         * Parameters for this command:
-        * 
+        *
         * 0. credential id
         */
 
@@ -444,7 +444,7 @@ namespace cam
         const CredentialId & credentialId = params.at(0);
 
         std::vector<CredentialAssetMapping> mappings = m_activeMapping.getCredentialMappings(credentialId);
-        
+
         cxxtools::SerializationInfo si;
 
         si <<= mappings;
@@ -456,7 +456,7 @@ namespace cam
     {
         /*
         * Parameters for this command:
-        * 
+        *
         * 0. credential id
         */
 
@@ -468,7 +468,7 @@ namespace cam
         const CredentialId & credentialId = params.at(0);
 
         std::vector<CredentialAssetMapping> mappings = m_activeMapping.getCredentialMappings(credentialId);
-        
+
         cxxtools::SerializationInfo si;
 
         si <<= static_cast<uint32_t>(mappings.size());

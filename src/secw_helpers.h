@@ -25,7 +25,7 @@
 namespace secw
 {
   cxxtools::SerializationInfo deserialize(const std::string & json);
-  
+
   std::string serialize(const cxxtools::SerializationInfo & si);
 
   bool hasCommonUsageIds( const std::set<std::string> &  usages1, const std::set<std::string> &  usages2);

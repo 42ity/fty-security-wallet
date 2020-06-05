@@ -82,12 +82,12 @@ fty_security_wallet_socket_agent_test (bool verbose)
         source.close();
     }
 
-    //create the broker 
+    //create the broker
     zactor_t *broker = zactor_new (mlm_server, (void*) "Malamute");
     zstr_sendx (broker, "BIND", endpoint, NULL);
     if (verbose)
         zstr_send (broker, "VERBOSE");
-    
+
     //New section => we need to destroy clients before broker
     {
         //setup parameters for the agent
@@ -97,7 +97,7 @@ fty_security_wallet_socket_agent_test (bool verbose)
         paramsSecw["STORAGE_DATABASE_PATH"] = SELFTEST_DIR_RW"/data.json";
         paramsSecw["AGENT_NAME"] = SECURITY_WALLET_AGENT;
         paramsSecw["ENDPOINT"] = endpoint;
-        
+
         //create a stream publisher for notification
         mlm::MlmStreamClient notificationStream(SECURITY_WALLET_AGENT, SECW_NOTIFICATIONS, 1000, paramsSecw.at("ENDPOINT"));
 
@@ -105,10 +105,10 @@ fty_security_wallet_socket_agent_test (bool verbose)
         secw::SecurityWalletServer serverSecw(  paramsSecw.at("STORAGE_CONFIGURATION_PATH"),
                                         paramsSecw.at("STORAGE_DATABASE_PATH"),
                                         notificationStream);
-        
+
         fty::SocketBasicServer agentSecw( serverSecw, "secw-test.socket");
         std::thread agentSecwThread(&fty::SocketBasicServer::run, &agentSecw);
-  
+
         //create the 2 Clients
         fty::SocketSyncClient syncClient("secw-test.socket");
         mlm::MlmStreamClient streamClient("secw-server-test", SECW_NOTIFICATIONS, 1000, endpoint);
@@ -116,7 +116,7 @@ fty_security_wallet_socket_agent_test (bool verbose)
         //Tests from the lib
         std::vector<std::pair<std::string,bool>> testLibConsumerResults = secw_consumer_accessor_test(syncClient, streamClient);
         std::vector<std::pair<std::string,bool>> testLibProducerResults = secw_producer_accessor_test(syncClient, streamClient);
-        
+
         printf("\n-----------------------------------------------------------------------\n");
 
         uint32_t testsPassed = 0;

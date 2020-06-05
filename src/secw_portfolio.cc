@@ -61,7 +61,7 @@ namespace secw
         DocumentPtr copyDoc = doc->clone();
 
         copyDoc->m_id = id;
-        
+
         m_documents[id] = copyDoc;
         m_mapNameDocuments[copyDoc->getName()] = copyDoc;
 
@@ -79,7 +79,7 @@ namespace secw
         m_mapNameDocuments.erase(m_documents[id]->getName());
         m_documents.erase(id);
     }
-    
+
     void Portfolio::update(const DocumentPtr & doc)
     {
         Id id = doc->getId();
@@ -110,15 +110,15 @@ namespace secw
         m_documents[id] = copyDoc;
         m_mapNameDocuments[copyDoc->getName()] = copyDoc;
     }
-    
-    
+
+
     DocumentPtr Portfolio::getDocument(const Id & id) const
     {
         if(m_documents.count(id) < 1)
         {
             throw SecwDocumentDoNotExistException(id);
         }
-            
+
         return m_documents.at(id)->clone();
     }
 
@@ -128,7 +128,7 @@ namespace secw
         {
             throw SecwNameDoesNotExistException(name);
         }
-            
+
         return m_mapNameDocuments.at(name)->clone();
     }
 
@@ -167,7 +167,7 @@ namespace secw
                     break;
             default: throw SecwImpossibleToLoadPortfolioException("Version "+std::to_string(version)+" not supported");
         }
-        
+
     }
 
     void Portfolio::serializePortfolio(cxxtools::SerializationInfo& si) const
@@ -201,7 +201,7 @@ namespace secw
             default: throw SecwImpossibleToLoadPortfolioException("Version "+std::to_string(version)+" not supported");
         }
     }
-    
+
     void Portfolio::serializePortfolioSRR(cxxtools::SerializationInfo& si, const std::string & encryptiondKey) const
     {
         si.addMember("version") <<= PORTFOLIO_VERSION;
@@ -211,7 +211,7 @@ namespace secw
         for (const auto pDoc : getListDocuments() )
         {
 
-            pDoc->fillSerializationInfoSRR(siDocuments.addMember(""), encryptiondKey); 
+            pDoc->fillSerializationInfoSRR(siDocuments.addMember(""), encryptiondKey);
         }
 
         siDocuments.setCategory(cxxtools::SerializationInfo::Array);
@@ -224,16 +224,16 @@ namespace secw
         {
             si.getMember("name") >>= m_name;
             const cxxtools::SerializationInfo& documents = si.getMember("documents");
-            
+
             size_t count = 0;
-            
+
             for(size_t index = 0; index < documents.memberCount(); index++ )
             {
                 try
                 {
                     DocumentPtr doc;
                     documents.getMember(index) >>= doc;
-                    
+
                     doc->validate();
 
                     m_documents[doc->getId()] = doc;
@@ -245,10 +245,10 @@ namespace secw
                 {
                     log_error("Impossible to load a document from portfolio %s: %s", m_name.c_str(), e.what());
                 }
-                
-                
+
+
             }
-            
+
             log_debug("Portfolio %s loaded with %i documents",m_name.c_str(), count );
 
         }
@@ -264,15 +264,15 @@ namespace secw
         {
             si.getMember("name") >>= m_name;
             const cxxtools::SerializationInfo& documents = si.getMember("documents");
-            
+
             size_t count = 0;
-            
+
             for( size_t index = 0; index < documents.memberCount(); index++ )
             {
                 try
                 {
-                    DocumentPtr doc = Document::createFromSRR(documents.getMember(index), encryptiondKey);              
-                    
+                    DocumentPtr doc = Document::createFromSRR(documents.getMember(index), encryptiondKey);
+
                     if((!isSameInstance) && (doc->getType() == "InternalCertificate") )
                     {
                         log_info("Skip InternalCertificate because the instance is not the same.");
@@ -292,10 +292,10 @@ namespace secw
                 {
                     log_error("Impossible to load a document from portfolio %s: %s", m_name.c_str(), e.what());
                 }
-                
-                
+
+
             }
-            
+
             log_debug("Portfolio %s loaded with %i documents",m_name.c_str(), count );
 
         }

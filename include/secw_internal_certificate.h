@@ -29,10 +29,10 @@ namespace secw
     class InternalCertificate;
 
     using InternalCertificatePtr   = std::shared_ptr<InternalCertificate>;
-    
+
     /**
      * Some key definition for serialization
-     * 
+     *
      */
     static constexpr const char* DOC_INTERNAL_CERTIFICATE_PEM = "secw_internal_certificate_pem";
     static constexpr const char* DOC_INTERNAL_CERTIFICATE_PRIVATE_KEY_PEM = "secw_internal_certificate_private_key_pem";
@@ -62,7 +62,7 @@ namespace secw
 
         /**
          * \brief try to cast a document to a UserAndPassword shared ptr
-         * 
+         *
          * \return shared ptr on UserAndPassword or null shared ptr in case of error
          */
         static InternalCertificatePtr tryToCast(DocumentPtr doc);

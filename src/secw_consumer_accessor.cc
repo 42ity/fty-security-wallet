@@ -41,7 +41,7 @@ namespace secw
   {
       m_clientAccessor = std::make_shared<ClientAccessor>(requestClient);
   }
-  
+
   ConsumerAccessor::ConsumerAccessor( fty::SocketSyncClient & requestClient, mlm::MlmStreamClient & subscriberClient)
   {
       m_clientAccessor = std::make_shared<ClientAccessor>(requestClient, subscriberClient);
@@ -88,7 +88,7 @@ namespace secw
     const UsageId & usageId) const
   {
     std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_LIST_WITH_SECRET, {portfolio,usageId});
-    
+
     //the first frame should contain the data
     if(frames.size() < 1)
     {
@@ -96,11 +96,11 @@ namespace secw
     }
 
     cxxtools::SerializationInfo si = deserialize(frames.at(0));
-    
+
     std::vector<DocumentPtr> documents;
-    
+
     si >>= documents;
-    
+
     return documents;
   }
 
@@ -121,7 +121,7 @@ namespace secw
         //filter exceptions => ID not found and noit access to this id
         if( (e.getErrorCode() != DOCUMENT_DO_NOT_EXIST) && (e.getErrorCode() != ILLEGAL_ACCESS) )
         {
-          throw; //throw 
+          throw; //throw
         }
       }
     }
@@ -134,7 +134,7 @@ namespace secw
     const Id & id) const
   {
     std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_WITH_SECRET, {portfolio,id});
-    
+
     //the first frame should contain the data
     if(frames.size() < 1)
     {
@@ -142,11 +142,11 @@ namespace secw
     }
 
     cxxtools::SerializationInfo si = deserialize(frames.at(0));
-    
+
     DocumentPtr document;
-    
+
     si >>= document;
-    
+
     return document;
   }
 
@@ -155,7 +155,7 @@ namespace secw
     const std::string & name) const
   {
     std::vector<std::string> frames = m_clientAccessor->sendCommand(SecurityWalletServer::GET_WITH_SECRET_BY_NAME, {portfolio,name});
-    
+
     //the first frame should contain the data
     if(frames.size() < 1)
     {
@@ -163,14 +163,14 @@ namespace secw
     }
 
     cxxtools::SerializationInfo si = deserialize(frames.at(0));
-    
+
     DocumentPtr document;
-    
+
     si >>= document;
-    
+
     return document;
   }
-  
+
   void ConsumerAccessor::setCallbackOnUpdate(UpdatedCallback updatedCallback)
   {
     m_clientAccessor->setCallbackOnUpdate(updatedCallback);
@@ -202,7 +202,7 @@ namespace secw
 std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::SocketSyncClient & syncClient, mlm::MlmStreamClient & streamClient)
 {
   std::vector<std::pair<std::string,bool>> testsResults;
-  
+
   using namespace secw;
 
   printf(" ** secw_consumer_accessor_test: \n");
@@ -220,16 +220,16 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::Socket
       {
         throw std::runtime_error("Portfolio default is not in the list of portfolio");
       }
-      
+
       printf(" *<=  Test #1.1 > OK\n");
-      
+
       testsResults.emplace_back (" Test #1.1 getPortfolioList",true);
     }
     catch(const std::exception& e)
     {
       printf(" *<=  Test #1.1 > Failed\n");
       printf("Error: %s\n\n",e.what());
-      
+
       testsResults.emplace_back (" Test #1.1 getPortfolioList",false);
     }
 
@@ -242,7 +242,7 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::Socket
     std::string portfolioName("XXXXX");
 
     ConsumerAccessor consumerAccessor(syncClient, streamClient);
-    
+
     try
     {
       consumerAccessor.getDocumentWithPrivateData(portfolioName, "XXXXX-XXXXXXXXX");
@@ -262,7 +262,7 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::Socket
         printf("Error: missmatch of portfolio name %s, %s\n\n",e.getPortfolioName().c_str(),portfolioName.c_str());
         testsResults.emplace_back (" Test #1.2 SecwUnknownPortfolioException",false);
       }
-      
+
     }
     catch(const std::exception& e)
     {
@@ -290,16 +290,16 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::Socket
       {
         throw std::runtime_error("Usage 'discovery_monitoring' is not in the list of consumer usages");
       }
-      
+
       printf(" *<=  Test #2.1 > OK\n");
-      
+
       testsResults.emplace_back (" Test #2.1 getConsumerUsages",true);
     }
     catch(const std::exception& e)
     {
       printf(" *<=  Test #2.1 > Failed\n");
       printf("Error: %s\n\n",e.what());
-      
+
       testsResults.emplace_back (" Test #2.1 getConsumerUsages",false);
     }
 
@@ -318,12 +318,12 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::Socket
       {
         throw std::runtime_error("Not the good number of documents: expected 1, received "+std::to_string(doc.size()));
       }
-      
+
       if(!doc[0]->isContainingPrivateData())
       {
         throw std::runtime_error("Document is not containing private data");
       }
-      
+
       printf(" *<=  Test #3.1 > OK\n");
       testsResults.emplace_back (" Test #3.1 getListDocumentsWithPrivateData",true);
 
@@ -349,12 +349,12 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::Socket
       {
         throw std::runtime_error("Not the good number of documents: expected 1, received "+std::to_string(doc.size()));
       }
-      
+
       if(!doc[0]->isContainingPrivateData())
       {
         throw std::runtime_error("Document is not containing private data");
       }
-      
+
       printf(" *<=  Test #3.2 > OK");
       testsResults.emplace_back (" Test #3.2 getListDocumentsWithPrivateData usage=discovery_monitoring",true);
 
@@ -404,7 +404,7 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::Socket
       {
         throw std::runtime_error("Document is not containing private data");
       }
-      
+
       printf(" *<=  Test #4.1 > OK\n");
       testsResults.emplace_back (" Test #4.1 getDocumentWithPrivateData",true);
 
@@ -454,7 +454,7 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::Socket
       {
         throw std::runtime_error("Document is not containing private data");
       }
-      
+
       printf(" *<=  Test #4.3 > OK\n");
       testsResults.emplace_back (" Test #4.3 getDocumentWithPrivateDataByName",true);
 
@@ -492,5 +492,5 @@ std::vector<std::pair<std::string,bool>> secw_consumer_accessor_test(fty::Socket
   }
 
   return testsResults;
-  
+
 }

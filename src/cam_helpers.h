@@ -27,7 +27,7 @@
 namespace cam
 {
   cxxtools::SerializationInfo deserialize(const std::string & json);
-  
+
   std::string serialize(const cxxtools::SerializationInfo & si);
 
 } //namespace cam

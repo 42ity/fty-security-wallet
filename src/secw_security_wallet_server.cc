@@ -86,7 +86,7 @@ namespace secw
 
             // Listen all incoming request
             m_msgBus->receive("ETN.Q.IPMCORE.SECUWALLET", std::bind(&SecurityWalletServer::handleSRRRequest, this, _1));
-        }  
+        }
 
     }
 
@@ -125,7 +125,7 @@ namespace secw
 
             FctCommandHandler cmdHandler = m_supportedCommands[cmd];
 
-            // Declaring new vector 
+            // Declaring new vector
             std::vector<std::string> params(payload.begin()+1, payload.end());
 
             std::string result = cmdHandler(sender, params);
@@ -153,22 +153,22 @@ namespace secw
 
     void SecurityWalletServer::handleSRRRequest(messagebus::Message msg)
     {
-        
+
         using namespace dto;
         using namespace dto::srr;
-        
+
         log_debug("Configuration handle request");
         try
         {
             UserData response;
-            
+
             // Get request
             UserData data = msg.userData();
             Query query;
             data >> query;
 
             response << (m_srrProcessor.processQuery(query));
-            
+
             // Send response
             sendResponse(m_msgBus, msg, response);
         }
@@ -186,7 +186,7 @@ namespace secw
     {
         using namespace dto;
         using namespace dto::srr;
-        
+
         log_debug("Saving configuration");
         std::map<FeatureName, FeatureAndStatus> mapFeaturesData;
 
@@ -194,7 +194,7 @@ namespace secw
         {
             FeatureAndStatus fs1;
             Feature & f1 = *(fs1.mutable_feature());
-            
+
 
             if(featureName == FEATURE_SRR_SECW )
             {
@@ -210,14 +210,14 @@ namespace secw
                     fs1.mutable_status()->set_status(Status::FAILED);
                     fs1.mutable_status()->set_error(e.what());
                 }
-                
+
             }
             else
             {
                 fs1.mutable_status()->set_status(Status::FAILED);
                 fs1.mutable_status()->set_error("Feature is not supported!");
             }
-            
+
             mapFeaturesData[featureName] = fs1;
 
         }
@@ -232,19 +232,19 @@ namespace secw
         using namespace dto::srr;
 
         std::map<FeatureName, FeatureStatus> mapStatus;
-        
+
         for(const auto& item: query.map_features_data())
         {
             const FeatureName& featureName = item.first;
             const Feature& feature = item.second;
-            
+
             FeatureStatus featureStatus;
             if(featureName == FEATURE_SRR_SECW)
             {
                 try
                 {
                     std::unique_lock<std::mutex> m_lock;
-                    
+
                     cxxtools::SerializationInfo si = deserialize(feature.data());
                     log_debug("Si=\n%s", feature.data().c_str());
                     m_activeWallet.restoreSRRData(si, query.passpharse(), feature.version());
@@ -255,23 +255,23 @@ namespace secw
                     featureStatus.set_status(Status::FAILED);
                     featureStatus.set_error(e.what());
                 }
-                
+
             }
             else
             {
                 featureStatus.set_status(Status::FAILED);
                 featureStatus.set_error("Feature is not supported!");
             }
-            
+
             mapStatus[featureName] = featureStatus;
         }
-        
+
         log_debug("Restore configuration done");
-        
+
         return (createRestoreResponse(mapStatus)).restore();
     }
 
-    
+
     /**
      * Send response on message bus.
      * @param msg
@@ -303,7 +303,7 @@ namespace secw
     {
         /*
          * No parameters for this command.
-         * 
+         *
          */
 
         cxxtools::SerializationInfo si;
@@ -316,7 +316,7 @@ namespace secw
     {
         /*
          * Parameters for this command:
-         * 
+         *
          * 0. name of the portfolio
          */
 
@@ -337,7 +337,7 @@ namespace secw
     {
         /*
          * Parameters for this command:
-         * 
+         *
          * 0. name of the portfolio
          */
 
@@ -359,7 +359,7 @@ namespace secw
     {
         /*
          * Parameters for this command:
-         * 
+         *
          * 0. name of the portfolio
          * 1. document id
          */
@@ -398,7 +398,7 @@ namespace secw
     {
         /*
          * Parameters for this command:
-         * 
+         *
          * 0. name of the portfolio
          * 1. document id
          */
@@ -424,7 +424,7 @@ namespace secw
     {
         /*
          * Parameters for this command:
-         * 
+         *
          * 0. name of the portfolio
          * 1. document name
          */
@@ -463,7 +463,7 @@ namespace secw
     {
         /*
          * Parameters for this command:
-         * 
+         *
          * 0. name of the portfolio
          * 1. document name
          */
@@ -489,7 +489,7 @@ namespace secw
     {
         /*
          * Parameters for this command:
-         * 
+         *
          * 0. name of the portfolio
          * 1. Usage of documents (optional)
          */
@@ -540,7 +540,7 @@ namespace secw
             if(allowedUsageIds.count(usage) == 0)
             {
                 throw SecwIllegalAccess("You do not have access to this command");
-            } 
+            }
 
             result = serializeListDocumentsPrivate(portfolioName, {usage});
         }
@@ -556,7 +556,7 @@ namespace secw
     {
         /*
          * Parameters for this command:
-         * 
+         *
          * 0. name of the portfolio
          * 1. Usage of documents (optional)
          */
@@ -598,7 +598,7 @@ namespace secw
 
         //check if the usage we specify a usage
         if(!usage.empty())
-        {   
+        {
             result = serializeListDocumentsPublic(portfolioName, {usage});
         }
         else
@@ -681,7 +681,7 @@ namespace secw
     {
         /*
          * Parameters for this command:
-         * 
+         *
          * 0. name of the portfolio
          * 1. Document to be create
          */
@@ -737,7 +737,7 @@ namespace secw
     {
         /*
          * Parameters for this command:
-         * 
+         *
          * 0. name of the portfolio
          * 1. id of Document to be delete
          */
@@ -756,7 +756,7 @@ namespace secw
         if(allowedUsageIds.size() == 0)
         {
             throw SecwIllegalAccess("You do not have access to this command");
-        } 
+        }
 
 
 
@@ -790,7 +790,7 @@ namespace secw
     {
         /*
          * Parameters for this command:
-         * 
+         *
          * 0. name of the portfolio
          * 1. Document to be update
          */
@@ -869,7 +869,7 @@ namespace secw
         {
             if((usages.empty() ) || (hasCommonUsageIds(pDoc->getUsageIds(), usages)))
             {
-                pDoc->fillSerializationInfoWithoutSecret(si.addMember("")); 
+                pDoc->fillSerializationInfoWithoutSecret(si.addMember(""));
             }
         }
 
@@ -890,7 +890,7 @@ namespace secw
         {
             if(hasCommonUsageIds(pDoc->getUsageIds(), usages))
             {
-                pDoc->fillSerializationInfoWithSecret(si.addMember("")); 
+                pDoc->fillSerializationInfoWithSecret(si.addMember(""));
             }
         }
 

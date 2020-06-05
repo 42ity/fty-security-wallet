@@ -31,14 +31,14 @@
 void fty_credential_asset_mapping_mlm_agent (zsock_t *pipe, void *args)
 {
     using Arguments = std::map<std::string, std::string>;
-    
+
     const Arguments & arguments = *static_cast<Arguments*>(args);
-    
+
     //create the server
     cam::CredentialAssetMappingServer server(arguments.at("STORAGE_MAPPING_PATH"));
-    
+
     //launch the agent
-    mlm::MlmBasicMailboxServer agent(  pipe, 
+    mlm::MlmBasicMailboxServer agent(  pipe,
                                        server,
                                        arguments.at("AGENT_NAME"),
                                        arguments.at("ENDPOINT")
@@ -67,7 +67,7 @@ void
 fty_credential_asset_mapping_mlm_agent_test (bool verbose)
 {
     using Arguments = std::map<std::string, std::string>;
-    
+
     printf ("\n ** fty_credential_asset_mapping_mlm_agent: \n");
     assert (SELFTEST_DIR_RO);
     assert (SELFTEST_DIR_RW);
@@ -88,7 +88,7 @@ fty_credential_asset_mapping_mlm_agent_test (bool verbose)
     zstr_sendx (broker, "BIND", endpoint, NULL);
     if (verbose)
         zstr_send (broker, "VERBOSE");
-    
+
     //set configuration parameters
     Arguments paramsCam;
 

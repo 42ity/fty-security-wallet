@@ -29,7 +29,7 @@
 namespace secw
 {
     class Snmpv3;
-    
+
     using Snmpv3Ptr = std::shared_ptr<Snmpv3>;
     /**
      * \brief snmpv3 implementation
@@ -62,7 +62,7 @@ namespace secw
 
     /**
      * Some key definition for serialization
-     * 
+     *
      */
     static constexpr const char* DOC_SNMPV3_SECURITY_LEVEL = "secw_snmpv3_security_level";
     static constexpr const char* DOC_SNMPV3_SECURITY_NAME = "secw_snmpv3_security_name";
@@ -109,7 +109,7 @@ namespace secw
 
          /**
          * \brief try to cast a document to a Snmpv3 shared ptr
-         * 
+         *
          * \return shared ptr on Snmpv3 or null shared ptr in case of error
          */
         static Snmpv3Ptr tryToCast(DocumentPtr doc);

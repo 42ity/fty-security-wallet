@@ -58,7 +58,7 @@ namespace secw
   private:
     fty::SyncClient & m_requestClient;
     fty::StreamSubscriber * const m_ptrStreamClient;
-    
+
     //callbacks
     UpdatedCallback m_updatedCallback;
     CreatedCallback m_createdCallback;
@@ -67,11 +67,11 @@ namespace secw
 
     bool m_isRegistered = false;
     uint32_t m_registrationId = 0;
-    
+
     //function take care about the callback => will called in another thread
     void callbackHandler( const std::vector<std::string> & payload);
     std::mutex m_handlerFunctionLock;
-    
+
     void updateNotificationThread();
 
   };

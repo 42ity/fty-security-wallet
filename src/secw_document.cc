@@ -56,7 +56,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
 
 //Public
     const std::string & Document::getName() const
-    { 
+    {
         return m_name;
     }
 
@@ -79,7 +79,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
     }
 
     std::set<Tag> Document::getTags() const
-    { 
+    {
         return m_tags;
     }
 
@@ -97,7 +97,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
     }
 
     std::set<UsageId> Document::getUsageIds() const
-    { 
+    {
         return m_usages;
     }
 
@@ -120,7 +120,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
         {
             types.push_back(item.first);
         }
-        
+
         return types;
     }
 
@@ -163,13 +163,13 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
 
             si.getMember(DOC_TYPE_ENTRY) >>= type;
             si.getMember(DOC_ID_ENTRY) >>= id;
-            
+
             const cxxtools::SerializationInfo & publicEntry = si.getMember(DOC_PUBLIC_ENTRY);
             const cxxtools::SerializationInfo & privateSection = si.getMember(DOC_PRIVATE_ENTRY);
 
             doc = Document::m_documentFactoryFuntions.at(type)();
             doc->m_id = id;
-            
+
             //log_debug("Create document '%s' matching with '%s'", doc->getType().c_str(), type.c_str());
 
             doc->updateHeaderFromSerializationInfo(si);
@@ -196,7 +196,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
             else
             {
                 throw SecwException("Bad data format");
-            }  
+            }
 
             doc->m_containPrivateData = true;
 
@@ -213,7 +213,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
         return doc;
     }
 
-//Private 
+//Private
     void Document::fillSerializationInfoHeaderDoc(cxxtools::SerializationInfo& si) const
     {
         si.addMember(DOC_ID_ENTRY) <<= getId();
@@ -271,7 +271,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
         {
             Id id = "";
             DocumentType type = "";
-            
+
             bool documentExist = (doc != nullptr);
 
             si.getMember(DOC_TYPE_ENTRY) >>= type;
@@ -279,15 +279,15 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
 
             const cxxtools::SerializationInfo & publicEntry = si.getMember(DOC_PUBLIC_ENTRY);
             const cxxtools::SerializationInfo * privateEntry = si.findMember(DOC_PRIVATE_ENTRY);
-            
-            //if we override and existing document, check that we have the same type and same id 
+
+            //if we override and existing document, check that we have the same type and same id
             if(documentExist)
             {
                if(doc->getType() != type)
                {
                    throw SecwInvalidDocumentFormatException(DOC_TYPE_ENTRY);
                }
-               
+
                if(doc->getId() != id)
                {
                    throw SecwInvalidDocumentFormatException(DOC_ID_ENTRY);
@@ -299,16 +299,16 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
                 doc = Document::m_documentFactoryFuntions.at(type)();
                 doc->m_id = id;
             }
-            
+
             //log_debug("Create document '%s' matching with '%s'", doc->getType().c_str(), type.c_str());
 
             doc->updateHeaderFromSerializationInfo(si);
             doc->updatePublicDocFromSerializationInfo(publicEntry);
-            
+
             if(privateEntry != nullptr)
             {
                 doc->updatePrivateDocFromSerializationInfo(*privateEntry);
-                
+
                 if(!documentExist)
                 {
                     doc->m_containPrivateData = true;
@@ -320,7 +320,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
                 {
                     doc->m_containPrivateData = false;
                 }
-            } 
+            }
 
         }
         catch(const SecwException & e)
