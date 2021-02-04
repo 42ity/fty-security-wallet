@@ -44,7 +44,10 @@ Build-Depends: debhelper (>= 9),
 
 Package: libfty-security-wallet1
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends:
+    ${shlibs:Depends},
+    ${misc:Depends},
+    libfty-common-dto1
 Description: fty-security-wallet shared library
  This package contains shared library for fty-security-wallet:
  security wallet to manage json documents including a public and secret part
