@@ -630,6 +630,14 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       if(g_newDoc->getId() != id) throw std::runtime_error("Wrong id in the new document in the created callback");
       if(g_newDoc->getName() != "Test insert snmpv3") throw std::runtime_error("Wrong name in the new document in the created callback");
 
+      DocumentPtr snmpv3DocClone = snmpv3Doc->clone();
+
+      if(!snmpv3Doc->isNonSecretEquals(snmpv3DocClone)) throw std::runtime_error("Error in the comparaison of non secret of clone");
+      if(!snmpv3Doc->isSecretEquals(snmpv3DocClone)) throw std::runtime_error("Error in the comparaison of secret of clone");
+
+      if(!g_newDoc->isNonSecretEquals(snmpv3Doc)) throw std::runtime_error("Error in the comparaison of non secret of received element");
+      if(g_newDoc->isSecretEquals(snmpv3Doc)) throw std::runtime_error("Error in the comparaison of secret of received element => comparaison resturn true");
+
       printf(" *<=  Test #%s > OK\n", testNumber.c_str());
       testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
     }
