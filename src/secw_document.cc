@@ -266,7 +266,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
         try
         {
             cxxtools::SerializationInfo si;
-            fillSerializationInfoPrivateDoc(si.addMember(DOC_PUBLIC_ENTRY));
+            fillSerializationInfoPrivateDoc(si.addMember(DOC_PRIVATE_ENTRY));
 
             std::stringstream output;
 
@@ -284,7 +284,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
         try
         {
             cxxtools::SerializationInfo si;
-            other->fillSerializationInfoPrivateDoc(si.addMember(DOC_PUBLIC_ENTRY));
+            other->fillSerializationInfoPrivateDoc(si.addMember(DOC_PRIVATE_ENTRY));
 
             std::stringstream output;
 

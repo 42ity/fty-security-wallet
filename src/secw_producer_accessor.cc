@@ -238,6 +238,7 @@ secw::DocumentPtr g_newDoc;
 secw::DocumentPtr g_oldDoc;
 std::string g_portfolio;
 std::string g_action;
+bool g_nonSecretChanged, g_secretChanged;
 
 void callbackCreate(const std::string& portfolio, secw::DocumentPtr newDoc, std::mutex * mut, std::condition_variable * condvar)
 {
@@ -249,12 +250,21 @@ void callbackCreate(const std::string& portfolio, secw::DocumentPtr newDoc, std:
   condvar->notify_all();
 }
 
-void callbackUpdated(const std::string& portfolio, secw::DocumentPtr oldDoc, secw::DocumentPtr newDoc, std::mutex * mut, std::condition_variable * condvar)
+void callbackUpdated(
+  const std::string& portfolio,
+  secw::DocumentPtr oldDoc,
+  secw::DocumentPtr newDoc,
+  bool nonSecretChanged,
+  bool secretChanged,
+  std::mutex * mut,
+  std::condition_variable * condvar)
 {
   log_debug ("callback UPDATED");
   std::unique_lock<std::mutex> lock(*mut);
   g_action = "UPDATED";
   g_portfolio = portfolio;
+  g_nonSecretChanged = nonSecretChanged;
+  g_secretChanged = secretChanged;
   g_newDoc = newDoc->clone();
   g_oldDoc = oldDoc->clone();
   condvar->notify_all();
@@ -696,7 +706,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
     ProducerAccessor producerAccessor(syncClient, streamClient);
 
     //register the callback on update
-    producerAccessor.setCallbackOnUpdate(std::bind(callbackUpdated, _1, _2, _3, &g_lock, &g_condvar));
+    producerAccessor.setCallbackOnUpdate(std::bind(callbackUpdated, _1, _2, _3, _4, _5, &g_lock, &g_condvar));
 
 
     try
@@ -718,6 +728,8 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       g_portfolio = "";
       g_oldDoc = nullptr;
       g_newDoc = nullptr;
+      g_nonSecretChanged = false;
+      g_secretChanged = false;
 
       //update
       producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(snmpv3));
@@ -737,6 +749,9 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       if(g_newDoc == nullptr) throw std::runtime_error("No new data in the updated callback");
       if(g_newDoc->getId() != id) throw std::runtime_error("Wrong id in the new document in the updated callback");
       if(g_newDoc->getName() != "Test update snmpv3") throw std::runtime_error("Wrong name in the new document in the updated callback");
+
+      if(!g_nonSecretChanged) throw std::runtime_error("Wrong value in g_nonSecretChanged, should be true");
+      if(!g_secretChanged) throw std::runtime_error("Wrong value in g_secretChanged, should be true");
 
       printf(" *<=  Test #%s > OK\n", testNumber.c_str());
       testsResults.emplace_back (" Test #"+testNumber+" "+testName,true);
@@ -795,7 +810,7 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
     ProducerAccessor producerAccessor(syncClient, streamClient);
 
     //register the callback on update
-    producerAccessor.setCallbackOnUpdate(std::bind(callbackUpdated, _1, _2, _3, &g_lock, &g_condvar));
+     producerAccessor.setCallbackOnUpdate(std::bind(callbackUpdated, _1, _2, _3, _4, _5, &g_lock, &g_condvar));
 
 
     try
@@ -812,6 +827,9 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       g_action = "";
       g_portfolio = "";
       g_newDoc = nullptr;
+      g_nonSecretChanged = false;
+      g_secretChanged = false;
+
 
       //update
       producerAccessor.updateDocument("default", std::dynamic_pointer_cast<Document>(snmpv3));
@@ -819,6 +837,9 @@ std::vector<std::pair<std::string,bool>> secw_producer_accessor_test(fty::Socket
       if(g_action != "") throw std::runtime_error("Non-empty action");
       if(g_portfolio != "") throw std::runtime_error("Non-empty portfolio");
       if(g_newDoc != nullptr) throw std::runtime_error("Non-empty data");
+
+      if(g_nonSecretChanged) throw std::runtime_error("Wrong value in g_nonSecretChanged, should be false");
+      if(g_secretChanged) throw std::runtime_error("Wrong value in g_secretChanged, should be false");
 
       throw std::runtime_error("Document has been updated");
     }

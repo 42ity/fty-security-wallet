@@ -36,7 +36,7 @@ namespace secw
   using ClientId = std::string;
 
   using CreatedCallback = std::function<void(const std::string&, DocumentPtr)> ;
-  using UpdatedCallback = std::function<void(const std::string&, DocumentPtr, DocumentPtr)> ;
+  using UpdatedCallback = std::function<void(const std::string&, DocumentPtr, DocumentPtr, bool, bool)> ;
   using DeletedCallback = std::function<void(const std::string&, DocumentPtr)> ;
   using StartedCallback = std::function<void()>;
 
