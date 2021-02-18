@@ -218,12 +218,16 @@ namespace secw
               {
                 std::string portfolio;
                 DocumentPtr new_data, old_data;
+                bool non_secret_changed = true;
+                bool secret_changed = true;
 
                 si.getMember ("portfolio") >>= portfolio;
                 si.getMember ("old_data") >>= old_data;
                 si.getMember ("new_data") >>= new_data;
+                si.getMember ("non_secret_changed") >>= non_secret_changed;
+                si.getMember ("secret_changed") >>= secret_changed;
 
-                m_updatedCallback (portfolio, old_data, new_data);
+                m_updatedCallback (portfolio, old_data, new_data, non_secret_changed, secret_changed);
               }
             }
             else if (action == "DELETED")

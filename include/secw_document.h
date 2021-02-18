@@ -124,6 +124,21 @@ namespace secw
      */
     void fillSerializationInfoSRR(cxxtools::SerializationInfo& si, const std::string & encryptionKey) const;
 
+    /**
+     * \brief Compare the non secret part of 2 documents
+     *
+     * \param[in] Other DocumentPtr
+     * \return true if non secret information are the same
+     */
+    bool isNonSecretEquals(const DocumentPtr& other) const;
+
+    /**
+     * \brief Compare the secret part of 2 documents
+     *
+     * \param[in] Other DocumentPtr
+     * \return true if secret information are the same
+     */
+    bool isSecretEquals(const DocumentPtr& other) const;
 
 
   //Classe methods

@@ -53,8 +53,10 @@ namespace secw
      * @param portfolio name
      * @param old document
      * @param new document
+     * @param nonSecretChanged bool
+     * @param secretChanged bool
      */
-  using UpdatedCallback = std::function<void(const std::string&, DocumentPtr, DocumentPtr)> ;
+  using UpdatedCallback = std::function<void(const std::string&, DocumentPtr, DocumentPtr, bool, bool)> ;
     /**
      * @brief Callback for delete notification
      *

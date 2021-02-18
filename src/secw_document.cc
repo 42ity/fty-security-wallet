@@ -213,6 +213,95 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
         return doc;
     }
 
+    bool Document::isNonSecretEquals(const DocumentPtr& other) const
+    {
+        std::string doc1, doc2;
+
+        try
+        {
+            cxxtools::SerializationInfo si;
+            fillSerializationInfoPublicDoc(si.addMember(DOC_PUBLIC_ENTRY));
+
+            std::stringstream output;
+
+            cxxtools::JsonSerializer serializer(output);
+            serializer.beautify(false);
+            serializer.serialize(si);
+
+            doc1 = output.str();
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwException("Error while creating json "+std::string(e.what()));
+        }
+
+        try
+        {
+            cxxtools::SerializationInfo si;
+            other->fillSerializationInfoPublicDoc(si.addMember(DOC_PUBLIC_ENTRY));
+
+            std::stringstream output;
+
+            cxxtools::JsonSerializer serializer(output);
+            serializer.beautify(false);
+            serializer.serialize(si);
+
+            doc2 = output.str();
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwException("Error while creating json "+std::string(e.what()));
+        }
+
+        return (doc1 == doc2);
+    }
+
+    bool Document::isSecretEquals(const DocumentPtr& other) const
+    {
+        if(m_type != other->getType()) return false;
+        if(!m_containPrivateData || !other->isContainingPrivateData()) return false;
+
+        std::string doc1, doc2;
+
+        try
+        {
+            cxxtools::SerializationInfo si;
+            fillSerializationInfoPrivateDoc(si.addMember(DOC_PRIVATE_ENTRY));
+
+            std::stringstream output;
+
+            cxxtools::JsonSerializer serializer(output);
+            serializer.beautify(false);
+            serializer.serialize(si);
+
+            doc1 = output.str();
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwException("Error while creating json "+std::string(e.what()));
+        }
+
+        try
+        {
+            cxxtools::SerializationInfo si;
+            other->fillSerializationInfoPrivateDoc(si.addMember(DOC_PRIVATE_ENTRY));
+
+            std::stringstream output;
+
+            cxxtools::JsonSerializer serializer(output);
+            serializer.beautify(false);
+            serializer.serialize(si);
+
+            doc2 = output.str();
+        }
+        catch(const std::exception& e)
+        {
+            throw SecwException("Error while creating json "+std::string(e.what()));
+        }
+
+        return (doc1 == doc2);
+    }
+
 //Private
     void Document::fillSerializationInfoHeaderDoc(cxxtools::SerializationInfo& si) const
     {

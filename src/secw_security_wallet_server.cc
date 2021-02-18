@@ -666,6 +666,9 @@ namespace secw
             oldDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("old_data"));
             newDocument->fillSerializationInfoWithoutSecret (rootSi.addMember("new_data"));
 
+            rootSi.addMember("non_secret_changed") <<= !newDocument->isNonSecretEquals(oldDocument);
+            rootSi.addMember("secret_changed") <<= !newDocument->isSecretEquals(oldDocument);
+
             m_streamPublisher.publish({serialize(rootSi)});
         }
         catch (const std::exception &e)
