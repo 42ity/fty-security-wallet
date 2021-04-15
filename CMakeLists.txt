@@ -26,7 +26,7 @@ set(AGENT_ETC_FTY_DIR "${CMAKE_INSTALL_FULL_SYSCONFDIR}/fty/${PROJECT_NAME}")
 set(AGENT_SHARE_BIOS_SETUP_DIR "${CMAKE_INSTALL_FULL_DATAROOTDIR}/bios/setup")
 
 set(AGENT_socketSecurityWallet "/run/${PROJECT_NAME}/secw.socket")
-set(AGENT_systemd_service_type "simple")  #ZZZ
+set(AGENT_systemd_service_type "notify")
 
 # var/lib/fty runtime directory
 install(DIRECTORY DESTINATION ${AGENT_VAR_DIR})
