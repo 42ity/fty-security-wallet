@@ -20,10 +20,11 @@
 #  \author  Clement Perrette
 #
 
-SECW_USER="secw-daemon"
-SECW_GROUP="secw-daemon"
+SECW_USER="@AGENT_USER@"
+SECW_GROUP="@AGENT_USER@"
 
-SECW_DIR="/var/lib/fty/fty-security-wallet"
+###SECW_DIR="/var/lib/fty/fty-security-wallet"
+SECW_DIR="@AGENT_VAR_DIR@"
 SECW_DB="database.json"
 
 # Credential asset mapping is included into the security wallet daemon
