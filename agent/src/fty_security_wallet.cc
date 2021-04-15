@@ -26,13 +26,11 @@
 @end
 */
 
-#include "fty_security_wallet_classes.h"
+#include "fty_security_wallet_library.h"
 
-#include "fty_common_mlm_zconfig.h"
-#include "fty_common_mlm_stream_client.h"
-
-#include "fty_common_socket_basic_mailbox_server.h"
-
+#include <fty_log.h>
+#include <fty_common_mlm.h>
+#include <fty_common_socket.h>
 #include <thread>
 
 static void usage()
@@ -187,7 +185,7 @@ int main (int argc, char *argv [])
         log_info ("Cam Interrupted ...");
         zactor_destroy(&cam_server);
 
-        return EXIT_SUCCES;
+        return EXIT_SUCCESS;
     }
     catch(const std::exception & e)
     {
