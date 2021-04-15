@@ -13,8 +13,11 @@ etn_target(static ${PROJECT_NAME}-lib
         *.h
     USES_PRIVATE
         #systemd #optional see HAVE_LIBSYSTEMD
+        pthread
+        ssl #>=1.1
+        crypto
         protobuf
-        zmq
+        czmq
         mlm
         cxxtools
         fty_common_logging
@@ -26,8 +29,8 @@ etn_target(static ${PROJECT_NAME}-lib
     PRIVATE
 )
 
-#see src/fty_security_wallet_classes.h
-target_compile_definitions(${PROJECT_NAME}-lib PRIVATE -DHAVE_LIBSYSTEMD) #undef
+#see src/fty_security_wallet_classes.h (HAVE_LIBSYSTEMD)
+#target_compile_definitions(${PROJECT_NAME}-lib PRIVATE HAVE_LIBSYSTEMD)
 
 if (BUILD_TESTING)
 
@@ -39,17 +42,27 @@ if (BUILD_TESTING)
             include
         PREPROCESSOR -DCATCH_CONFIG_FAST_COMPILE
         USES
-            czmq #zmq_z85 codec
-            zmq
+            #systemd #optional see HAVE_LIBSYSTEMD
+            pthread
+            ssl #>=1.1
+            crypto
+            protobuf
+            czmq
             mlm
             cxxtools
-            fty_proto
-            fty_common
             fty_common_logging
+            fty_common_mlm
+            fty_common_socket
+            fty_common_messagebus
+            fty_common_dto
+            fty_lib_certificate
             Catch2::Catch2
             stdc++fs
             log4cplus
     )
+
+    #see src/fty_security_wallet_classes.h (HAVE_LIBSYSTEMD)
+    #target_compile_definitions(${PROJECT_NAME}-test PRIVATE HAVE_LIBSYSTEMD)
 
     #copy selftest-ro, build selftest-rw for test in/out
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tests/selftest-ro DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

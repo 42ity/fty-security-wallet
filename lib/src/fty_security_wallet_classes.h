@@ -39,6 +39,7 @@
 #if defined (HAVE_LIBSYSTEMD)
 #include <systemd/sd-daemon.h>
 #endif
+#include <openssl/evp.h>
 #include <czmq.h>
 #include <malamute.h>
 #include <cxxtools/allocator.h>

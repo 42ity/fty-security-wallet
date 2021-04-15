@@ -67,8 +67,8 @@ void fty_security_wallet_mlm_agent(zsock_t *pipe, void *args)
 //  Self test
 
 
-#define SELFTEST_DIR_RO "src/selftest-ro"
-#define SELFTEST_DIR_RW "src/selftest-rw"
+#define SELFTEST_DIR_RO "selftest-ro"
+#define SELFTEST_DIR_RW "selftest-rw"
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
