@@ -23,7 +23,6 @@
 SECW_USER="@AGENT_USER@"
 SECW_GROUP="@AGENT_USER@"
 
-###SECW_DIR="/var/lib/fty/fty-security-wallet"
 SECW_DIR="@AGENT_VAR_DIR@"
 SECW_DB="database.json"
 
