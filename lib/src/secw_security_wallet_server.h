@@ -22,15 +22,17 @@
 #ifndef SECW_SECURITY_WALLET_SERVER_H_INCLUDED
 #define SECW_SECURITY_WALLET_SERVER_H_INCLUDED
 
-#include <functional>
 #include "secw_security_wallet.h"
 
-#include "fty_common_client.h"
-#include "fty_common_sync_server.h"
+#include <functional>
+
+#include <fty_common_client.h>
+#include <fty_common_sync_server.h>
 
 #include <cxxtools/serializationinfo.h>
 
-#include "fty_srr_dto.h"
+#include <fty_srr_dto.h>
+
 /**
  * \brief Agent SecurityWalletServer main server actor
  */

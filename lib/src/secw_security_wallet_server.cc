@@ -30,13 +30,12 @@
 
 #include <sstream>
 #include <cxxtools/jsonserializer.h>
+#include <fty_srr_dto.h>
 
 #include "secw_exception.h"
 #include "secw_configuration.h"
 #include "secw_document.h"
-
 #include "secw_helpers.h"
-#include "fty_srr_dto.h"
 
 
 using namespace std::placeholders;

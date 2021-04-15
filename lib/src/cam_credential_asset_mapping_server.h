@@ -22,14 +22,15 @@
 #ifndef CAM_CREDENTIAL_ASSET_MAPPING_SERVER_H_INCLUDED
 #define CAM_CREDENTIAL_ASSET_MAPPING_SERVER_H_INCLUDED
 
-#include <functional>
-
+#include "cam_accessor.h"
 #include "cam_credential_asset_mapping_storage.h"
 
-#include "fty_common_client.h"
-#include "fty_common_sync_server.h"
+#include <fty_common_client.h>
+#include <fty_common_sync_server.h>
 
 #include <cxxtools/serializationinfo.h>
+#include <functional>
+
 /**
  * \brief Agent CredentialAssetMappingServer main server actor
  */

@@ -19,14 +19,11 @@
     =========================================================================
 */
 
+#include "fty_security_wallet_classes.h"
+
 #include "cam_accessor.h"
-
 #include "cam_helpers.h"
-
-#include "fty_common_mlm.h"
-
 #include "cam_credential_asset_mapping_server.h"
-#include "fty_security_wallet.h"
 
 namespace cam
 {

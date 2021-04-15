@@ -19,8 +19,9 @@
     =========================================================================
 */
 
-#include "cam_helpers.h"
+#include "fty_security_wallet_classes.h"
 
+#include "cam_helpers.h"
 #include "cam_exception.h"
 
 #include <sstream>

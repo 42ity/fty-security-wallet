@@ -19,11 +19,13 @@
     =========================================================================
 */
 
+#include "fty_security_wallet_classes.h"
+
+#include "cam_exception.h"
+
 #include <sstream>
 #include <cxxtools/jsondeserializer.h>
 #include <cxxtools/jsonserializer.h>
-
-#include "cam_exception.h"
 
 namespace cam
 {

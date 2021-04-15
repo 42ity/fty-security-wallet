@@ -18,7 +18,11 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
     =========================================================================
 */
+
+#include "fty_security_wallet_classes.h"
+
 #include "cam_credential_asset_mapping_storage.h"
+#include "cam_helpers.h"
 
 #include <fty_log.h>
 
@@ -26,8 +30,6 @@
 #include <iostream>
 #include <cxxtools/jsonserializer.h>
 #include <cxxtools/jsondeserializer.h>
-
-#include "cam_helpers.h"
 
 #include <sys/stat.h>
 #include <unistd.h>

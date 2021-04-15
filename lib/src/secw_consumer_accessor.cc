@@ -31,9 +31,8 @@
 #include "secw_client_accessor.h"
 #include "secw_helpers.h"
 
-
-#include "fty_common_socket_sync_client.h"
-#include "fty_common_mlm_stream_client.h"
+#include <fty_common_socket_sync_client.h>
+#include <fty_common_mlm_stream_client.h>
 
 namespace secw
 {

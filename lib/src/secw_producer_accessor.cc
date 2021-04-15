@@ -25,14 +25,14 @@
 @discuss
 @end
 */
-#include <chrono>
+
 #include "fty_security_wallet_classes.h"
 
+#include <chrono>
 #include <thread>
 
-
-#include "fty_common_socket_sync_client.h"
-#include "fty_common_mlm_stream_client.h"
+#include <fty_common_socket_sync_client.h>
+#include <fty_common_mlm_stream_client.h>
 
 namespace secw
 {

@@ -27,6 +27,7 @@
 */
 
 #include "fty_security_wallet_classes.h"
+
 #include "secw_client_accessor.h"
 
 #include <sys/types.h>
@@ -43,7 +44,6 @@
 #include <sstream>
 
 #include "secw_helpers.h"
-
 
 using namespace std::placeholders;
 

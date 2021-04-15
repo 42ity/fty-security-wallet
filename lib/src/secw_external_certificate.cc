@@ -25,9 +25,10 @@
 @discuss
 @end
 */
+
 #include "fty_security_wallet_classes.h"
 
-#include "libcert_certificate_X509.h"
+#include <libcert_certificate_X509.h>
 
 namespace secw
 {

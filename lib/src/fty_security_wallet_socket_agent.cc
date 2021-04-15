@@ -1,5 +1,5 @@
 /*  =========================================================================
-    fty_security_wallet_mlm_agent - Security Wallet malamute agent
+    fty_security_wallet_socket_agent - Security Wallet malamute agent
 
     Copyright (C) 2019 - 2020 Eaton
 
@@ -19,50 +19,23 @@
     =========================================================================
 */
 
-/*
- * Agents methods
- */
-
 #include "fty_security_wallet_classes.h"
 
 #include "secw_exception.h"
 #include "secw_security_wallet_server.h"
-#include "secw_security_wallet.h"
 #include "secw_helpers.h"
 
-#include "fty_common_mlm_stream_client.h"
-#include "fty_common_mlm_basic_mailbox_server.h"
+#include <fty_common_mlm_stream_client.h>
+#include <fty_common_socket_basic_mailbox_server.h>
+#include <fty_common_socket_sync_client.h>
 
 #include <sstream>
+#include <fstream>
+#include <thread>
+
 #include <cxxtools/jsonserializer.h>
 
-void fty_security_wallet_mlm_agent(zsock_t *pipe, void *args)
-{
-    using Arguments = std::map<std::string, std::string>;
-
-    const Arguments & arguments = *static_cast<Arguments*>(args);
-
-    //create a stream publisher for notification
-    mlm::MlmStreamClient notificationStream(SECURITY_WALLET_AGENT, SECW_NOTIFICATIONS, 1000, arguments.at("ENDPOINT"));
-
-    //create the server
-    secw::SecurityWalletServer server(  arguments.at("STORAGE_CONFIGURATION_PATH"),
-                                        arguments.at("STORAGE_DATABASE_PATH"),
-                                        notificationStream,
-                                        arguments.at("ENDPOINT_SRR"),
-                                        arguments.at("AGENT_NAME_SRR"));
-
-    //launch the agent
-    mlm::MlmBasicMailboxServer agent(  pipe,
-                                       server,
-                                       arguments.at("AGENT_NAME"),
-                                       arguments.at("ENDPOINT")
-                                    );
-    agent.mainloop();
-
-    std::cerr << "Leave the agent" << std::endl;
-}
-
+#include <google/protobuf/util/json_util.h>
 
 //  --------------------------------------------------------------------------
 //  Self test
@@ -79,12 +52,10 @@ void fty_security_wallet_mlm_agent(zsock_t *pipe, void *args)
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
-#include <fstream>
-
 void
-fty_security_wallet_mlm_agent_test (bool verbose)
+fty_security_wallet_socket_agent_test (bool verbose)
 {
-    /*printf ("\n\n ** fty_security_wallet_mlm_agent: \n\n");
+    printf ("\n\n ** fty_security_wallet_mlm_agent: \n\n");
     assert (SELFTEST_DIR_RO);
     assert (SELFTEST_DIR_RW);
 
@@ -126,10 +97,19 @@ fty_security_wallet_mlm_agent_test (bool verbose)
         paramsSecw["AGENT_NAME"] = SECURITY_WALLET_AGENT;
         paramsSecw["ENDPOINT"] = endpoint;
 
-        zactor_t *server = zactor_new (fty_security_wallet_mlm_agent, static_cast<void*>(&paramsSecw));
+        //create a stream publisher for notification
+        mlm::MlmStreamClient notificationStream(SECURITY_WALLET_AGENT, SECW_NOTIFICATIONS, 1000, paramsSecw.at("ENDPOINT"));
+
+        //create the server
+        secw::SecurityWalletServer serverSecw(  paramsSecw.at("STORAGE_CONFIGURATION_PATH"),
+                                        paramsSecw.at("STORAGE_DATABASE_PATH"),
+                                        notificationStream);
+
+        fty::SocketBasicServer agentSecw( serverSecw, "secw-test.socket");
+        std::thread agentSecwThread(&fty::SocketBasicServer::run, &agentSecw);
 
         //create the 2 Clients
-        mlm::MlmSyncClient syncClient("secw-server-test", SECURITY_WALLET_AGENT, 1000, endpoint);
+        fty::SocketSyncClient syncClient("secw-test.socket");
         mlm::MlmStreamClient streamClient("secw-server-test", SECW_NOTIFICATIONS, 1000, endpoint);
 
         //Tests from the lib
@@ -196,11 +176,12 @@ fty_security_wallet_mlm_agent_test (bool verbose)
         }
 
 
-        zstr_sendm (server, "$TERM");
-        sleep(1);
+        agentSecw.requestStop();
+        agentSecwThread.join();
 
-        zactor_destroy (&server);
+        google::protobuf::ShutdownProtobufLibrary();
     }
 
-    zactor_destroy (&broker);*/
+    zactor_destroy (&broker);
 }
+

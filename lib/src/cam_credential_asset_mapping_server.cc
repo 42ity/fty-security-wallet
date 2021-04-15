@@ -34,8 +34,6 @@
 #include "cam_exception.h"
 #include "cam_helpers.h"
 
-#include "fty_security_wallet.h"
-
 #include <sstream>
 #include <cxxtools/jsonserializer.h>
 

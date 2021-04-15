@@ -33,7 +33,6 @@
 #include "secw_user_and_password.h"
 #include "secw_external_certificate.h"
 #include "secw_internal_certificate.h"
-
 #include "secw_helpers.h"
 
 #include <cxxtools/jsonserializer.h>

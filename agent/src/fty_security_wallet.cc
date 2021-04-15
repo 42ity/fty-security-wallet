@@ -35,8 +35,13 @@
 
 #include <thread>
 
-//functions
-void usage();
+static void usage()
+{
+    puts (SECURITY_WALLET_AGENT " [options] ...");
+    puts ("  -v|--verbose        verbose test output");
+    puts ("  -h|--help           this information");
+    puts ("  -c|--config         path to config file");
+}
 
 int main (int argc, char *argv [])
 {
@@ -102,7 +107,7 @@ int main (int argc, char *argv [])
 
         if (verbose)
         {
-            ftylog_setVeboseMode(ftylog_getInstance());
+            ftylog_setVerboseMode(ftylog_getInstance());
             log_trace("Verbose mode OK");
         }
 
@@ -182,9 +187,9 @@ int main (int argc, char *argv [])
         log_info ("Cam Interrupted ...");
         zactor_destroy(&cam_server);
 
-        return 0;
+        return EXIT_SUCCES;
     }
-    catch(std::exception & e)
+    catch(const std::exception & e)
     {
         log_error (SECURITY_WALLET_AGENT ": Error '%s'", e.what());
         exit(EXIT_FAILURE);
@@ -195,13 +200,5 @@ int main (int argc, char *argv [])
         exit(EXIT_FAILURE);
     }
 
-}
-
-void usage()
-{
-    puts (SECURITY_WALLET_AGENT " [options] ...");
-    puts ("  -v|--verbose        verbose test output");
-    puts ("  -h|--help           this information");
-    puts ("  -c|--config         path to config file");
 }
 
