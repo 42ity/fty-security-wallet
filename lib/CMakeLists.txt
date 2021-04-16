@@ -12,7 +12,6 @@ etn_target(static ${PROJECT_NAME}-lib
     PUBLIC
         *.h
     USES_PRIVATE
-        #systemd #optional see HAVE_LIBSYSTEMD
         pthread
         ssl #>=1.1
         crypto
@@ -29,9 +28,6 @@ etn_target(static ${PROJECT_NAME}-lib
     PRIVATE
 )
 
-#see src/fty_security_wallet_classes.h (HAVE_LIBSYSTEMD)
-#target_compile_definitions(${PROJECT_NAME}-lib PRIVATE HAVE_LIBSYSTEMD)
-
 if (BUILD_TESTING)
 
     etn_test(${PROJECT_NAME}-test
@@ -42,7 +38,6 @@ if (BUILD_TESTING)
             include
         PREPROCESSOR -DCATCH_CONFIG_FAST_COMPILE
         USES
-            #systemd #optional see HAVE_LIBSYSTEMD
             pthread
             ssl #>=1.1
             crypto
@@ -60,9 +55,6 @@ if (BUILD_TESTING)
             stdc++fs
             log4cplus
     )
-
-    #see src/fty_security_wallet_classes.h (HAVE_LIBSYSTEMD)
-    #target_compile_definitions(${PROJECT_NAME}-test PRIVATE HAVE_LIBSYSTEMD)
 
     #copy selftest-ro, build selftest-rw for test in/out
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tests/selftest-ro DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

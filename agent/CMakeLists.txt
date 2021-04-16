@@ -8,7 +8,6 @@ etn_target(exe ${PROJECT_NAME}
     SOURCES
         src/fty_security_wallet.cc
     USES
-        #systemd #optional see HAVE_LIBSYSTEMD
         czmq
         mlm
         fty_common_mlm
@@ -18,5 +17,6 @@ etn_target(exe ${PROJECT_NAME}
         ${PROJECT_NAME}-lib
 )
 
-#see src/fty_security_wallet_classes.h (HAVE_LIBSYSTEMD)
-#target_compile_definitions(${PROJECT_NAME}-lib PRIVATE HAVE_LIBSYSTEMD)
+#link with systemd (optional)
+target_link_libraries(${PROJECT_NAME} LINK_PRIVATE systemd)
+target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_LIBSYSTEMD)

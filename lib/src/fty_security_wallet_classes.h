@@ -34,11 +34,6 @@
 #endif
 
 //  External dependencies
-//#undef HAVE_LIBSYSTEMD
-//#define HAVE_LIBSYSTEMD
-#if defined (HAVE_LIBSYSTEMD)
-#include <systemd/sd-daemon.h>
-#endif
 #include <openssl/evp.h>
 #include <czmq.h>
 #include <malamute.h>

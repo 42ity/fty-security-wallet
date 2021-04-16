@@ -26,6 +26,11 @@
 @end
 */
 
+#if defined (HAVE_LIBSYSTEMD)
+#   pragma message "HAVE_LIBSYSTEMD defined"
+#   include <systemd/sd-daemon.h>
+#endif
+
 #include "fty_security_wallet_library.h"
 
 #include <fty_log.h>
@@ -43,12 +48,11 @@ static void usage()
 
 int main (int argc, char *argv [])
 {
-
     using Arguments = std::map<std::string, std::string>;
 
     try
     {
-        ftylog_setInstance(SECURITY_WALLET_AGENT,"");
+        ftylog_setInstance(SECURITY_WALLET_AGENT, FTY_COMMON_LOGGING_DEFAULT_CFG);
         int argn;
         char *config_file = NULL;
         bool verbose = false;
@@ -190,13 +194,12 @@ int main (int argc, char *argv [])
     catch(const std::exception & e)
     {
         log_error (SECURITY_WALLET_AGENT ": Error '%s'", e.what());
-        exit(EXIT_FAILURE);
     }
     catch(...)
     {
         log_error (SECURITY_WALLET_AGENT ": Error unknown");
-        exit(EXIT_FAILURE);
     }
 
+    exit(EXIT_FAILURE);
 }
 
