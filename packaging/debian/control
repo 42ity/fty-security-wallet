@@ -43,6 +43,38 @@ Build-Depends: debhelper (>= 9),
     asciidoc-base | asciidoc, xmlto,
     dh-autoreconf
 
+Package: libfty-security-wallet1
+Architecture: any
+Depends:
+    ${shlibs:Depends},
+    ${misc:Depends},
+    libfty-common-dto1
+Description: fty-security-wallet shared library
+ This package contains shared library for fty-security-wallet:
+ security wallet to manage json documents including a public and secret part
+
+Package: libfty-security-wallet-dev
+Architecture: any
+Section: libdevel
+Depends:
+    ${misc:Depends},
+    libsystemd-dev,
+    libssl-dev,
+    libprotobuf-dev,
+    libczmq-dev (>= 3.0.2),
+    libmlm-dev (>= 1.0.0),
+    libcxxtools-dev,
+    libfty-common-logging-dev,
+    libfty-common-mlm-dev,
+    libfty-common-socket-dev,
+    libfty-common-messagebus-dev,
+    libfty-common-dto-dev,
+    libfty-lib-certificate-dev,
+    libfty-security-wallet1 (= ${binary:Version})
+Description: fty-security-wallet development tools
+ This package contains development files for fty-security-wallet:
+ security wallet to manage json documents including a public and secret part
+
 Package: fty-security-wallet
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}
