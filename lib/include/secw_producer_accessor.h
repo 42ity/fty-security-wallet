@@ -24,7 +24,7 @@
 
 #include "secw_document.h"
 
-#include "fty_common_client.h"
+#include <fty_common_client.h>
 
 namespace mlm
 {
@@ -57,7 +57,7 @@ namespace secw
      * @param secretChanged bool
      */
   using UpdatedCallback = std::function<void(const std::string&, DocumentPtr, DocumentPtr, bool, bool)> ;
-  
+
     /**
      * @brief Callback for delete notification
      *

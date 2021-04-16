@@ -24,8 +24,8 @@
 
 #include "cam_credential_asset_mapping.h"
 
-#include "fty_common_client.h"
-#include "fty_common_mlm_sync_client.h"
+#include <fty_common_client.h>
+#include <fty_common_mlm_sync_client.h>
 #include <memory>
 
 namespace cam

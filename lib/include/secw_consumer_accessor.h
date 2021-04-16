@@ -24,7 +24,7 @@
 
 #include <functional>
 
-#include "fty_common_client.h"
+#include <fty_common_client.h>
 
 namespace mlm
 {

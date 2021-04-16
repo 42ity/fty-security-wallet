@@ -4,14 +4,14 @@ cmake_policy(VERSION 3.13)
 ########################################################################################################################
 
 #Create the target
-etn_target(static ${PROJECT_NAME}-lib
+etn_target(shared ${PROJECT_NAME_UNDERSCORE}
     SOURCES
         src/*.cc
     PUBLIC_INCLUDE_DIR
         include
     PUBLIC
         *.h
-    USES_PRIVATE
+    USES
         pthread
         ssl #>=1.1
         crypto
@@ -25,7 +25,6 @@ etn_target(static ${PROJECT_NAME}-lib
         fty_common_messagebus
         fty_common_dto
         fty_lib_certificate
-    PRIVATE
 )
 
 if (BUILD_TESTING)
@@ -36,6 +35,7 @@ if (BUILD_TESTING)
             src/*.cc
         INCLUDE_DIR
             include
+            src
         PREPROCESSOR -DCATCH_CONFIG_FAST_COMPILE
         USES
             pthread

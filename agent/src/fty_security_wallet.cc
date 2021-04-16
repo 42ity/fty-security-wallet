@@ -31,7 +31,8 @@
 #   include <systemd/sd-daemon.h>
 #endif
 
-#include "fty_security_wallet_library.h"
+#include "fty_security_wallet.h"
+#include "../src/secw_security_wallet_server.h" //private!?
 
 #include <fty_log.h>
 #include <fty_common_mlm.h>

@@ -18,7 +18,7 @@
 #include <catch2/catch.hpp>
 
 #include <filesystem>
-#include "../src/fty_security_wallet_classes.h"
+#include "fty_security_wallet.h"
 
 typedef struct {
     const char *testname;           // test name, can be called from command line this way

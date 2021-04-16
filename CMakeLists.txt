@@ -5,6 +5,9 @@ cmake_policy(VERSION 3.13)
 
 project(fty-security-wallet VERSION 1.0.0)
 
+#WA for library name
+set(PROJECT_NAME_UNDERSCORE fty_security_wallet)
+
 ########################################################################################################################
 
 find_package(fty-cmake PATHS ${CMAKE_BINARY_DIR})
@@ -13,7 +16,6 @@ find_package(fty-cmake PATHS ${CMAKE_BINARY_DIR})
 
 add_subdirectory(lib)
 add_subdirectory(agent)
-
 
 ## agent configuration
 ## https://cmake.org/cmake/help/v3.0/module/GNUInstallDirs.html
