@@ -26,11 +26,6 @@ ExecStartPre=/bin/chown -R @AGENT_USER@:@AGENT_USER@ @AGENT_ETC_DIR@
 ExecStartPre=/bin/chmod 700 @AGENT_ETC_DIR@
 ExecStartPre=/bin/chown -R @AGENT_USER@:@AGENT_USER@ @AGENT_ETC_FTY_DIR@
 ExecStartPre=/bin/chmod 700 @AGENT_ETC_FTY_DIR@
-ExecStartPre=/bin/chown -R @AGENT_USER@:@AGENT_USER@ @AGENT_VAR_DIR@
-ExecStartPre=/bin/chmod 700 @AGENT_VAR_DIR@
-
-ExecStartPre=/bin/chmod 777 @AGENT_socketSecurityWallet@
-ExecStartPre=/bin/chown @AGENT_USER@:@AGENT_USER@ @AGENT_socketSecurityWallet@
 
 # Exec
 ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/@PROJECT_NAME@ -c @AGENT_ETC_DIR@/@PROJECT_NAME@.cfg

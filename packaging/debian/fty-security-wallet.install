@@ -2,5 +2,5 @@ usr/bin/fty-security-wallet
 etc/fty-security-wallet/fty-security-wallet.cfg
 etc/fty/fty-security-wallet/configuration.json
 usr/share/bios/setup/30-secw-update-database-right.sh
-usr/lib/systemd/system/* lib/systemd/system
-var/lib/fty/fty-security-wallet/
+usr/lib/systemd/system/*
+usr/lib/tmpfiles.d/*
