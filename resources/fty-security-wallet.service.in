@@ -20,13 +20,6 @@ EnvironmentFile=-/etc/default/bios__%n.conf
 EnvironmentFile=-/etc/default/fty
 EnvironmentFile=-/etc/default/fty__%n.conf
 
-# Pre exec
-
-ExecStartPre=/bin/chown -R @AGENT_USER@:@AGENT_USER@ @AGENT_ETC_DIR@
-ExecStartPre=/bin/chmod 700 @AGENT_ETC_DIR@
-ExecStartPre=/bin/chown -R @AGENT_USER@:@AGENT_USER@ @AGENT_ETC_FTY_DIR@
-ExecStartPre=/bin/chmod 700 @AGENT_ETC_FTY_DIR@
-
 # Exec
 ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/@PROJECT_NAME@ -c @AGENT_ETC_DIR@/@PROJECT_NAME@.cfg
 
