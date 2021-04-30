@@ -27,7 +27,7 @@ etn_target(shared ${PROJECT_NAME_UNDERSCORE}
         fty_lib_certificate
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
+set_target_properties(${PROJECT_NAME_UNDERSCORE} PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 
 if (BUILD_TESTING)
 
