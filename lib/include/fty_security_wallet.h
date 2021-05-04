@@ -1,5 +1,5 @@
-/*
-    fty-security-wallet - Security Wallet to manage JSON documents including a public and secret part
+/*  =========================================================================
+    fty-security-wallet - Security Wallet to manage JSON document including a public and secret part
 
     Copyright (C) 2019 - 2020 Eaton
 
@@ -16,21 +16,12 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-    NOTE : This Jenkins pipeline script only handles the self-testing of your
-    project. If you also want the successful codebase published or deployed,
-    you can define a helper job - see the reference implementation skeleton at
-    https://github.com/zeromq/zproject/blob/master/Jenkinsfile-deploy.example
-
+    =========================================================================
 */
 
-@Library('etn-ipm2-jenkins') _
+#ifndef FTY_SECURITY_WALLET_H_H_INCLUDED
+#define FTY_SECURITY_WALLET_H_H_INCLUDED
 
-//import params.CmakePipelineParams
-//CmakePipelineParams parameters = new CmakePipelineParams()
-//parameters.debugBuildRunTests = false
-//parameters.debugBuildRunMemcheck = false
-//etn_ipm2_build_and_tests_pipeline_cmake(parameters)
+#include "fty_security_wallet_library.h"
 
-// run with default parameters
-etn_ipm2_build_and_tests_pipeline_cmake()
+#endif

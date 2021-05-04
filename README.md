@@ -12,19 +12,19 @@ fty-security-wallet solve those problems :
 * Document: A payload of the security wallet. It has a public and private part (secret)
 * Portfolio: Pool of documents.
 * Usage: Purpose for which a document can be use.
-* Producer: Client which can create, update and delete Documents. This client can only read the public part. 
+* Producer: Client which can create, update and delete Documents. This client can only read the public part.
 * Consumer: Client which can read documents (public and private part) but which cannot modify any document.
 
 
 ## How to build
 
-To build fty-security-wallet project run:
+To build , run:
 
 ```bash
-./autogen.sh
-./configure
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=usr -DBUILD_TESTING=On ..
 make
-make check # to run self-test
+sudo make install
 ```
 
 ## How to run
@@ -34,7 +34,7 @@ To run fty-security-wallet project:
 * from within the source tree, run:
 
 ```bash
-./src/fty-security-wallet
+./build/agent/fty-security-wallet
 ```
 
 For the other options available, refer to the manual page of fty-security-wallet
@@ -52,7 +52,7 @@ systemctl start fty-security-wallet
 fty-security-wallet is composed of 1 agent and 1 client library :
 
 Server side:
-* SecurityWalletServer registers to malamute broker as security-wallet agent 
+* SecurityWalletServer registers to malamute broker as security-wallet agent
   and handles mailbox requests
 
 Client side:

@@ -1,0 +1,38 @@
+[Unit]
+Description=fty-security-wallet service
+After=network.target malamute.service
+Requires=network.target malamute.service
+PartOf=bios.target
+
+[Service]
+Type=@AGENT_systemd_service_type@
+User=@AGENT_USER@
+Restart=always
+
+Environment='SYSTEMD_UNIT_FULLNAME=%n'
+Environment="prefix=/usr"
+EnvironmentFile=-/usr/share/bios/etc/default/bios
+EnvironmentFile=-/usr/share/bios/etc/default/bios__%n.conf
+EnvironmentFile=-/usr/share/fty/etc/default/fty
+EnvironmentFile=-/usr/share/fty/etc/default/fty__%n.conf
+EnvironmentFile=-/etc/default/bios
+EnvironmentFile=-/etc/default/bios__%n.conf
+EnvironmentFile=-/etc/default/fty
+EnvironmentFile=-/etc/default/fty__%n.conf
+
+# Exec
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/@PROJECT_NAME@ -c @AGENT_ETC_DIR@/@PROJECT_NAME@.cfg
+
+# This service is only active, as far as consumers are concerned,
+# after it listens on the Unix socket used to interact with it.
+ExecStartPost=/bin/dash -c "while sleep 0.1; do test -S \"@AGENT_socketSecurityWallet@\" || continue; PIDS=\"`/bin/fuser \"@AGENT_socketSecurityWallet@\" 2>/dev/null | sed -e 's,^ *,,' -e 's, *$,,'`\" && [ -n \"$PIDS\" ] && { ( for P in $PIDS ; do ls -la /proc/$P/exe ; done | egrep ' /usr/bin/fty-security-wallet$' ) && break ; rePIDS=\"(`echo \"$PIDS\" | sed 's,  *,|,g'`)\" ; ps -ef | grep -v grep | grep -E \"$rePIDS\" && break ; } ; netstat -anp 2>/dev/null | egrep -q '^unix.*LISTEN.* @AGENT_socketSecurityWallet@$' && break ; done; echo 'Socket is being listened'"
+
+# There is also some time for malamute connection that I could not detect easily
+# Perhaps we can query with an MQ client (bmsg?) or even use Type=notify unit
+ExecStartPost=/bin/sleep 3
+
+# Last agent out should shut the door cleanly
+ExecStopPost=/bin/dash -c "if [ -z \"`/bin/fuser \"@AGENT_socketSecurityWallet@\" 2>/dev/null | sed -e 's, *,,g'`\" ] ; then rm -f \"@AGENT_socketSecurityWallet@\" ; fi"
+
+[Install]
+WantedBy=bios.target

@@ -1,0 +1,27 @@
+#   @PROJECT_NAME@ configuration
+
+server
+    timeout = 10000     #   Client connection timeout, msec
+    background = 0      #   Run as background process
+    workdir = .         #   Working directory for daemon
+    verbose = 0         #   Do verbose logging of activity?
+
+secw-malamute
+    endpoint = ipc://@/malamute #   Malamute endpoint
+    address = security-wallet     #   Agent address
+
+secw-socket
+    socket = @AGENT_socketSecurityWallet@ #   Direct socket endpoint
+
+secw-storage
+    database = @AGENT_VAR_DIR@/database.json
+    configuration = @AGENT_ETC_FTY_DIR@/configuration.json
+
+mapping-malamute
+    address = credential-asset-mapping     #   Agent address
+
+mapping-storage
+    database = @AGENT_VAR_DIR@/mapping.json
+
+log
+    config = /etc/fty/ftylog.cfg    # configuration file for fty-common-logging

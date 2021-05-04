@@ -1,3 +1,4 @@
 usr/include/*
 usr/lib/*/libfty_security_wallet.so
-usr/lib/*/pkgconfig/libfty_security_wallet.pc
+usr/share/cmake/*
+usr/lib/*/pkgconfig/*

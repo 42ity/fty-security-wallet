@@ -17,15 +17,18 @@
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-Source:         fty-security-wallet
-Section:        net
-Priority:       optional
-Maintainer:     fty-security-wallet Developers <eatonipcopensource@eaton.com>
+Source: fty-security-wallet
+Section: net
+Priority: optional
+Maintainer:  fty-security-wallet Developers <eatonipcopensource@eaton.com>
 Standards-Version: 4.0.1.0
 Build-Depends: debhelper (>= 9),
+    cmake (>=3.0),
+    fty-cmake-dev,
     pkg-config,
-    libsodium-dev,
-    libzmq3-dev,
+    libsystemd-dev,
+    libssl-dev,
+    libprotobuf-dev,
     libczmq-dev (>= 3.0.2),
     libmlm-dev (>= 1.0.0),
     libcxxtools-dev,
@@ -34,9 +37,7 @@ Build-Depends: debhelper (>= 9),
     libfty-common-socket-dev,
     libfty-common-messagebus-dev,
     libfty-common-dto-dev,
-    libprotobuf-dev,
     libfty-lib-certificate-dev,
-    libsystemd-dev,
     systemd,
     dh-systemd,
     asciidoc-base | asciidoc, xmlto,
@@ -57,8 +58,9 @@ Architecture: any
 Section: libdevel
 Depends:
     ${misc:Depends},
-    libsodium-dev,
-    libzmq3-dev,
+    libsystemd-dev,
+    libssl-dev,
+    libprotobuf-dev,
     libczmq-dev (>= 3.0.2),
     libmlm-dev (>= 1.0.0),
     libcxxtools-dev,
@@ -67,9 +69,7 @@ Depends:
     libfty-common-socket-dev,
     libfty-common-messagebus-dev,
     libfty-common-dto-dev,
-    libprotobuf-dev,
     libfty-lib-certificate-dev,
-    libsystemd-dev,
     libfty-security-wallet1 (= ${binary:Version})
 Description: fty-security-wallet development tools
  This package contains development files for fty-security-wallet:
@@ -77,18 +77,7 @@ Description: fty-security-wallet development tools
 
 Package: fty-security-wallet
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends},
+Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: runnable binaries from fty-security-wallet
  Main package for fty-security-wallet:
  security wallet to manage json documents including a public and secret part
-
-Package: fty-security-wallet-dbg
-Architecture: any
-Section: debug
-Priority: optional
-Depends:
-    fty-security-wallet (= ${binary:Version}),
-    ${misc:Depends}
-Description: fty-security-wallet debugging symbols
- This package contains the debugging symbols for fty-security-wallet:
- security wallet to manage json documents including a public and secret part.
