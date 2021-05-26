@@ -2,6 +2,8 @@
 #include <fty_log.h>
 #include <fty_security_wallet.h>
 #include <catch2/catch.hpp>
+#include <mutex>
+#include <condition_variable>
 
 using namespace std::placeholders;
 
