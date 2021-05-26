@@ -19,62 +19,60 @@
     =========================================================================
 */
 
-#ifndef SECW_PORTFOLIO_H_INCLUDED
-#define SECW_PORTFOLIO_H_INCLUDED
+#pragma once
 
 #include "secw_document.h"
 #include <memory>
 
-/**
- * \brief portfolio wallet
- */
-namespace secw
+/// portfolio wallet
+namespace secw {
+
+/// @brief Class to represent a portfolio of documents
+///
+/// This class contain the interface description use for action in the portfolio.
+/// Portfolio is keeped in memory and it is the responsability of the owner to
+/// save it permanently if needed.
+class Portfolio
 {
-    /**
-     * \brief Class to represent a portfolio of documents
-     *
-     * This class contain the interface description use for action in the portfolio.
-     * Portfolio is keeped in memory and it is the responsability of the owner to
-     * save it permanently if needed.
-     */
-    class Portfolio
+public:
+    explicit Portfolio(const std::string& name = "default");
+
+    const std::string& getName() const
     {
-    public:
-        explicit Portfolio(const std::string & name = "default");
+        return m_name;
+    }
 
-        const std::string & getName() const { return m_name; }
+    Id   add(const DocumentPtr& doc);
+    void remove(const Id& id);
+    void update(const DocumentPtr& doc);
 
-        Id add(const DocumentPtr & doc);
-        void remove(const Id & id);
-        void update(const DocumentPtr & doc);
+    DocumentPtr getDocument(const Id& id) const;
+    DocumentPtr getDocumentByName(const std::string& name) const;
 
-        DocumentPtr getDocument(const Id & id) const;
-        DocumentPtr getDocumentByName(const std::string & name) const;
+    std::vector<DocumentPtr> getListDocuments() const;
 
-        std::vector<DocumentPtr> getListDocuments() const;
+    void loadPortfolio(const cxxtools::SerializationInfo& si);
+    void serializePortfolio(cxxtools::SerializationInfo& si) const;
 
-        void loadPortfolio(const cxxtools::SerializationInfo& si);
-        void serializePortfolio(cxxtools::SerializationInfo& si) const;
+    void loadPortfolioFromSRR(
+        const cxxtools::SerializationInfo& si, const std::string& encryptiondKey, bool isSameInstance = false);
+    void serializePortfolioSRR(cxxtools::SerializationInfo& si, const std::string& encryptiondKey) const;
 
-        void loadPortfolioFromSRR(const cxxtools::SerializationInfo& si, const std::string & encryptiondKey, bool isSameInstance = false);
-        void serializePortfolioSRR(cxxtools::SerializationInfo& si, const std::string & encryptiondKey) const;
+    static constexpr const uint8_t PORTFOLIO_VERSION = 1;
 
-        static constexpr const uint8_t PORTFOLIO_VERSION = 1;
+private:
+    std::string m_name;
 
-    private:
-        std::string m_name;
+    // Map containing all the document of the portfolio
+    std::map<Id, DocumentPtr>          m_documents;
+    std::map<std::string, DocumentPtr> m_mapNameDocuments;
 
-        //Map containing all the document of the portfolio
-        std::map<Id, DocumentPtr > m_documents;
-        std::map<std::string, DocumentPtr > m_mapNameDocuments;
+    void loadPortfolioVersion1(const cxxtools::SerializationInfo& si);
+    void loadPortfolioSRRVersion1(
+        const cxxtools::SerializationInfo& si, const std::string& encryptiondKey, bool isSameInstance);
+};
 
-        void loadPortfolioVersion1(const cxxtools::SerializationInfo& si);
-        void loadPortfolioSRRVersion1(const cxxtools::SerializationInfo& si, const std::string & encryptiondKey, bool isSameInstance);
-    };
+void operator<<=(cxxtools::SerializationInfo& si, const Portfolio& portfolio);
+void operator>>=(const cxxtools::SerializationInfo& si, Portfolio& portfolio);
 
-    void operator<<= (cxxtools::SerializationInfo& si, const Portfolio & portfolio);
-    void operator>>= (const cxxtools::SerializationInfo& si, Portfolio & portfolio);
-
-} // namepsace secw
-
-#endif
+} // namespace secw

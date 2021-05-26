@@ -24,74 +24,67 @@
 
 #include "cam_accessor.h"
 #include "cam_credential_asset_mapping_storage.h"
-
 #include <fty_common_client.h>
 #include <fty_common_sync_server.h>
-
-#include <cxxtools/serializationinfo.h>
 #include <functional>
 
 /**
  * \brief Agent CredentialAssetMappingServer main server actor
  */
 
-namespace cam
+namespace cam {
+using Command = std::string;
+using Sender  = std::string;
+using Subject = std::string;
+
+using FctCommandHandler = std::function<std::string(const Sender&, const std::vector<std::string>&)>;
+
+class CredentialAssetMappingServer final : public fty::SyncServer
 {
-    using Command   = std::string;
-    using Sender    = std::string;
-    using Subject   = std::string;
 
-    using FctCommandHandler = std::function<std::string (const Sender &, const std::vector<std::string> &)>;
+public:
+    explicit CredentialAssetMappingServer(const std::string& storagePath);
 
-    class CredentialAssetMappingServer final : public fty::SyncServer
-    {
+    std::vector<std::string> handleRequest(const Sender& sender, const std::vector<std::string>& payload) override;
 
-    public:
-        explicit CredentialAssetMappingServer(const std::string & storagePath);
+    // List of supported commands with a reference to the handler for this command.
+    std::map<Command, FctCommandHandler> m_supportedCommands;
 
-        std::vector<std::string> handleRequest(const Sender & sender, const std::vector<std::string> & payload) override;
+    CredentialAssetMappingStorage m_activeMapping;
 
-        // List of supported commands with a reference to the handler for this command.
-        std::map<Command, FctCommandHandler> m_supportedCommands;
-
-        CredentialAssetMappingStorage m_activeMapping;
-
-        //Handler for all supported commands
-        std::string handleCreateMapping(const Sender & sender, const std::vector<std::string> & params);
-        std::string handleGetMapping(const Sender & sender, const std::vector<std::string> & params);
-        std::string handleUpdateMapping(const Sender & sender, const std::vector<std::string> & params);
-        std::string handleUpdatePortMapping(const Sender & sender, const std::vector<std::string> & params);
-        std::string handleUpdateCredentialMapping(const Sender & sender, const std::vector<std::string> & params);
-        std::string handleUpdateStatusMapping(const Sender & sender, const std::vector<std::string> & params);
-        std::string handleUpdateInfoMapping(const Sender & sender, const std::vector<std::string> & params);
-        std::string handleRemoveMapping(const Sender & sender, const std::vector<std::string> & params);
-        std::string handleGetAssetMappings(const Sender & sender, const std::vector<std::string> & params);
-        std::string handleGetMappings(const Sender & sender, const std::vector<std::string> & params);
-        std::string handleGetAllMappings(const Sender & sender, const std::vector<std::string> & params);
-        std::string handleGetCredentialMappings(const Sender & sender, const std::vector<std::string> & params);
-        std::string handleCountCredentialMappingsForCredential(const Sender & sender, const std::vector<std::string> & params);
+    // Handler for all supported commands
+    std::string handleCreateMapping(const Sender& sender, const std::vector<std::string>& params);
+    std::string handleGetMapping(const Sender& sender, const std::vector<std::string>& params);
+    std::string handleUpdateMapping(const Sender& sender, const std::vector<std::string>& params);
+    std::string handleUpdatePortMapping(const Sender& sender, const std::vector<std::string>& params);
+    std::string handleUpdateCredentialMapping(const Sender& sender, const std::vector<std::string>& params);
+    std::string handleUpdateStatusMapping(const Sender& sender, const std::vector<std::string>& params);
+    std::string handleUpdateInfoMapping(const Sender& sender, const std::vector<std::string>& params);
+    std::string handleRemoveMapping(const Sender& sender, const std::vector<std::string>& params);
+    std::string handleGetAssetMappings(const Sender& sender, const std::vector<std::string>& params);
+    std::string handleGetMappings(const Sender& sender, const std::vector<std::string>& params);
+    std::string handleGetAllMappings(const Sender& sender, const std::vector<std::string>& params);
+    std::string handleGetCredentialMappings(const Sender& sender, const std::vector<std::string>& params);
+    std::string handleCountCredentialMappingsForCredential(
+        const Sender& sender, const std::vector<std::string>& params);
 
 
-    public:
-        //Command list
-        static constexpr const char* CREATE_MAPPING = "CREATE_MAPPING";
-        static constexpr const char* GET_MAPPING = "GET_MAPPING";
-
-        static constexpr const char* UPDATE_MAPPING = "UPDATE_MAPPING";
-        static constexpr const char* UPDATE_PORT_MAPPING = "UPDATE_PORT_MAPPING";
-        static constexpr const char* UPDATE_CREDENTIAL_MAPPING = "UPDATE_CREDENTIAL_MAPPING";
-        static constexpr const char* UPDATE_STATUS_MAPPING = "UPDATE_STATUS_MAPPING";
-        static constexpr const char* UPDATE_INFO_MAPPING = "UPDATE_INFO_MAPPING";
-        static constexpr const char* REMOVE_MAPPING = "REMOVE_MAPPING";
-
-        static constexpr const char* GET_ASSET_MAPPINGS = "GET_ASSET_MAPPINGS";
-        static constexpr const char* GET_CRED_MAPPINGS = "GET_CRED_MAPPINGS";
-        static constexpr const char* GET_MAPPINGS = "GET_MAPPINGS";
-        static constexpr const char* GET_ALL_MAPPINGS = "GET_ALL_MAPPINGS";
-
-        static constexpr const char* COUNT_CRED_MAPPINGS = "COUNT_CRED_MAPPINGS";
-
-    };
+public:
+    // Command list
+    static constexpr const char* CREATE_MAPPING            = "CREATE_MAPPING";
+    static constexpr const char* GET_MAPPING               = "GET_MAPPING";
+    static constexpr const char* UPDATE_MAPPING            = "UPDATE_MAPPING";
+    static constexpr const char* UPDATE_PORT_MAPPING       = "UPDATE_PORT_MAPPING";
+    static constexpr const char* UPDATE_CREDENTIAL_MAPPING = "UPDATE_CREDENTIAL_MAPPING";
+    static constexpr const char* UPDATE_STATUS_MAPPING     = "UPDATE_STATUS_MAPPING";
+    static constexpr const char* UPDATE_INFO_MAPPING       = "UPDATE_INFO_MAPPING";
+    static constexpr const char* REMOVE_MAPPING            = "REMOVE_MAPPING";
+    static constexpr const char* GET_ASSET_MAPPINGS        = "GET_ASSET_MAPPINGS";
+    static constexpr const char* GET_CRED_MAPPINGS         = "GET_CRED_MAPPINGS";
+    static constexpr const char* GET_MAPPINGS              = "GET_MAPPINGS";
+    static constexpr const char* GET_ALL_MAPPINGS          = "GET_ALL_MAPPINGS";
+    static constexpr const char* COUNT_CRED_MAPPINGS       = "COUNT_CRED_MAPPINGS";
+};
 
 } // namespace cam
 

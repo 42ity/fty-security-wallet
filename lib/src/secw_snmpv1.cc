@@ -26,74 +26,70 @@
 @end
 */
 
-#include "fty_security_wallet_classes.h"
+#include "secw_snmpv1.h"
+#include "secw_exception.h"
+#include <cxxtools/jsonserializer.h>
 
-namespace secw
-{
+namespace secw {
 /*-----------------------------------------------------------------------------*/
 /*   Snmpv1 Document                                                           */
 /*-----------------------------------------------------------------------------*/
-//Public
-    Snmpv1::Snmpv1() :
-        Document(SNMPV1_TYPE)
-    {}
+// Public
+Snmpv1::Snmpv1()
+    : Document(SNMPV1_TYPE)
+{
+}
 
-    Snmpv1::Snmpv1( const std::string & name,
-                const std::string & communityName) :
-        Document(SNMPV1_TYPE),
-        m_communityName(communityName)
-    {
-        m_name=name;
+Snmpv1::Snmpv1(const std::string& name, const std::string& communityName)
+    : Document(SNMPV1_TYPE)
+    , m_communityName(communityName)
+{
+    m_name = name;
+}
+
+DocumentPtr Snmpv1::clone() const
+{
+    return std::dynamic_pointer_cast<Document>(std::make_shared<Snmpv1>(*this));
+}
+
+// Private
+void Snmpv1::fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& /*si*/) const
+{
+}
+
+void Snmpv1::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const
+{
+    si.addMember(DOC_SNMPV1_COMMUNITY_NAME) <<= m_communityName;
+}
+
+void Snmpv1::updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
+{
+    try {
+        si.getMember(DOC_SNMPV1_COMMUNITY_NAME) >>= m_communityName;
+    } catch (const std::exception& e) {
+        throw SecwInvalidDocumentFormatException(DOC_SNMPV1_COMMUNITY_NAME);
+    }
+}
+
+void Snmpv1::updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& /*si*/)
+{
+}
+
+Snmpv1Ptr Snmpv1::tryToCast(DocumentPtr doc)
+{
+    Snmpv1Ptr ptr(nullptr);
+
+    if ((doc != nullptr) && (doc->getType() == SNMPV1_TYPE)) {
+        ptr = std::dynamic_pointer_cast<Snmpv1>(doc);
     }
 
-    DocumentPtr Snmpv1::clone() const
-    {
-        return std::dynamic_pointer_cast<Document>(std::make_shared<Snmpv1>(*this));
-    }
+    return ptr;
+}
 
-//Private
-    void Snmpv1::fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const
-    {
-
-    }
-
-    void Snmpv1::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const
-    {
-        si.addMember(DOC_SNMPV1_COMMUNITY_NAME) <<= m_communityName;
-    }
-
-    void Snmpv1::updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
-    {
-        try
-        {
-            si.getMember(DOC_SNMPV1_COMMUNITY_NAME) >>= m_communityName;
-        }
-        catch(const std::exception& e)
-        {
-            throw SecwInvalidDocumentFormatException(DOC_SNMPV1_COMMUNITY_NAME);
-        }
-    }
-
-    void Snmpv1::updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
-    {
-    }
-
-    Snmpv1Ptr Snmpv1::tryToCast(DocumentPtr doc)
-    {
-        Snmpv1Ptr ptr(nullptr);
-
-        if((doc != nullptr) && (doc->getType() == SNMPV1_TYPE))
-        {
-            ptr = std::dynamic_pointer_cast<Snmpv1>(doc);
-        }
-
-        return ptr;
-    }
-
-    void Snmpv1::validate() const
-    {
-        if(m_communityName.empty()) throw SecwInvalidDocumentFormatException(DOC_SNMPV1_COMMUNITY_NAME);
-    }
+void Snmpv1::validate() const
+{
+    if (m_communityName.empty())
+        throw SecwInvalidDocumentFormatException(DOC_SNMPV1_COMMUNITY_NAME);
+}
 
 } // namespace secw
-

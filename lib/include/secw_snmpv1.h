@@ -19,67 +19,56 @@
     =========================================================================
 */
 
-#ifndef SECW_SNMPV1_H_INCLUDED
-#define SECW_SNMPV1_H_INCLUDED
+#pragma once
 
 #define SNMPV1_TYPE "Snmpv1"
+#include "secw_document.h"
 
-namespace secw
+namespace secw {
+
+class Snmpv1;
+
+using Snmpv1Ptr = std::shared_ptr<Snmpv1>;
+
+/// Some key definition for serialization
+static constexpr const char* DOC_SNMPV1_COMMUNITY_NAME = "secw_snmpv1_community_name";
+
+/// snmpv1 implementation
+class Snmpv1 final : public Document
 {
-    /**
-     * \brief snmpv1 implementation
-     */
-    class Snmpv1;
+public:
+    Snmpv1();
 
-    using Snmpv1Ptr   = std::shared_ptr<Snmpv1>;
+    Snmpv1(const std::string& name, const std::string& communityName = "");
 
-    /**
-     * Some key definition for serialization
-     *
-     */
-    static constexpr const char* DOC_SNMPV1_COMMUNITY_NAME = "secw_snmpv1_community_name";
+    DocumentPtr clone() const override;
 
-    class Snmpv1  final : public Document
+    void validate() const override;
+
+    // Public secw elements
+    const std::string& getCommunityName() const
     {
-    public:
+        return m_communityName;
+    }
 
-        Snmpv1();
+    void setCommunityName(const std::string& community)
+    {
+        m_communityName = community;
+    }
 
-        Snmpv1( const std::string & name,
-                const std::string & communityName = "");
+    ///  try to cast a document to a Snmpv1 shared ptr
+    /// @return shared ptr on snmpv1 or null shared ptr in case of error
+    static Snmpv1Ptr tryToCast(DocumentPtr doc);
 
-        DocumentPtr clone() const override;
+private:
+    // Public secw elements
+    std::string m_communityName = "";
 
-        void validate() const override;
+    void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;
+    void fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const override;
 
-        //Public secw elements
-        const std::string & getCommunityName() const { return m_communityName; }
-        void setCommunityName(const std::string & community) { m_communityName = community; }
+    void updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
+    void updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
+};
 
-        //Private secw elements
-        //no private
-
-        /**
-         * \brief try to cast a document to a Snmpv1 shared ptr
-         *
-         * \return shared ptr on snmpv1 or null shared ptr in case of error
-         */
-        static Snmpv1Ptr tryToCast(DocumentPtr doc);
-
-    private:
-        //Public secw elements
-        std::string m_communityName = "";
-
-        //Private secw elements
-        //no private
-
-        void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;
-        void fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const override;
-
-        void updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
-        void updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
-    };
-
-} // namepsace secw
-
-#endif
+} // namespace secw

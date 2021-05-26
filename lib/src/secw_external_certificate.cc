@@ -26,86 +26,79 @@
 @end
 */
 
-#include "fty_security_wallet_classes.h"
-
+#include "secw_external_certificate.h"
+#include "secw_exception.h"
+#include <cxxtools/jsonserializer.h>
 #include <libcert_certificate_X509.h>
 
-namespace secw
+namespace secw {
+/*-----------------------------------------------------------------------------*/
+/*   ExternalCertificate Document                                              */
+/*-----------------------------------------------------------------------------*/
+// Public
+ExternalCertificate::ExternalCertificate()
+    : Document(EXTERNAL_CERTIFICATE_TYPE)
 {
-/*-----------------------------------------------------------------------------*/
-/*   ExternalCertificate Document                                                           */
-/*-----------------------------------------------------------------------------*/
-//Public
-    ExternalCertificate::ExternalCertificate() :
-        Document(EXTERNAL_CERTIFICATE_TYPE)
-    {}
+}
 
-    ExternalCertificate::ExternalCertificate( const std::string & name,
-                const std::string & pem) :
-        Document(EXTERNAL_CERTIFICATE_TYPE),
-        m_pem(pem)
-    {
-        m_name=name;
+ExternalCertificate::ExternalCertificate(const std::string& name, const std::string& pem)
+    : Document(EXTERNAL_CERTIFICATE_TYPE)
+    , m_pem(pem)
+{
+    m_name = name;
+}
+
+DocumentPtr ExternalCertificate::clone() const
+{
+    return std::dynamic_pointer_cast<Document>(std::make_shared<ExternalCertificate>(*this));
+}
+
+void ExternalCertificate::validate() const
+{
+    // if(m_containPrivateData) throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
+    if (m_pem.empty())
+        throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
+
+    // check the certificate
+    try {
+        fty::CertificateX509 cert(m_pem);
+    } catch (...) {
+        throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
+    }
+}
+
+// Private
+void ExternalCertificate::fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& /*si*/) const
+{
+}
+
+void ExternalCertificate::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const
+{
+    si.addMember(DOC_EXTERNAL_CERTIFICATE_PEM) <<= m_pem;
+}
+
+void ExternalCertificate::updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& /*si*/)
+{
+}
+
+void ExternalCertificate::updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
+{
+    try {
+        si.getMember(DOC_EXTERNAL_CERTIFICATE_PEM) >>= m_pem;
+    } catch (const std::exception& e) {
+        throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
+    }
+}
+
+ExternalCertificatePtr ExternalCertificate::tryToCast(DocumentPtr doc)
+{
+    ExternalCertificatePtr ptr(nullptr);
+
+    if ((doc != nullptr) && (doc->getType() == EXTERNAL_CERTIFICATE_TYPE)) {
+        ptr = std::dynamic_pointer_cast<ExternalCertificate>(doc);
     }
 
-    DocumentPtr ExternalCertificate::clone() const
-    {
-        return std::dynamic_pointer_cast<Document>(std::make_shared<ExternalCertificate>(*this));
-    }
-
-    void ExternalCertificate::validate() const
-    {
-        //if(m_containPrivateData) throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
-        if(m_pem.empty()) throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
-
-        //check the certificate
-        try
-        {
-            fty::CertificateX509 cert(m_pem);
-        }
-        catch(...)
-        {
-            throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
-        }
-
-    }
-
-//Private
-    void ExternalCertificate::fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& /*si*/) const
-    {
-    }
-
-    void ExternalCertificate::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const
-    {
-        si.addMember(DOC_EXTERNAL_CERTIFICATE_PEM) <<= m_pem;
-    }
-
-    void ExternalCertificate::updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& /*si*/)
-    {
-    }
-
-    void ExternalCertificate::updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
-    {
-        try
-        {
-            si.getMember(DOC_EXTERNAL_CERTIFICATE_PEM) >>= m_pem;
-        }
-        catch(const std::exception& e)
-        {
-            throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
-        }
-    }
-
-    ExternalCertificatePtr ExternalCertificate::tryToCast(DocumentPtr doc)
-    {
-        ExternalCertificatePtr ptr(nullptr);
-
-        if((doc != nullptr) && (doc->getType() == EXTERNAL_CERTIFICATE_TYPE))
-        {
-            ptr = std::dynamic_pointer_cast<ExternalCertificate>(doc);
-        }
-
-        return ptr;
-    }
+    return ptr;
+}
 
 } // namespace secw

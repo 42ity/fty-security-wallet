@@ -19,59 +19,45 @@
     =========================================================================
 */
 
-#include "fty_security_wallet_classes.h"
-
 #include "cam_helpers.h"
 #include "cam_exception.h"
-
-#include <sstream>
-#include <iostream>
-
-#include <cxxtools/jsonserializer.h>
 #include <cxxtools/jsondeserializer.h>
+#include <cxxtools/jsonserializer.h>
+#include <iostream>
+#include <sstream>
 
-namespace cam
+namespace cam {
+cxxtools::SerializationInfo deserialize(const std::string& json)
 {
-  cxxtools::SerializationInfo deserialize(const std::string & json)
-  {
     cxxtools::SerializationInfo si;
 
-    try
-    {
-      std::stringstream input;
-      input << json;
-      cxxtools::JsonDeserializer deserializer(input);
-      deserializer.deserialize(si);
-    }
-    catch(const std::exception& e)
-    {
-      throw CamProtocolErrorException("Error in the json from server: "+std::string(e.what()));
+    try {
+        std::stringstream input;
+        input << json;
+        cxxtools::JsonDeserializer deserializer(input);
+        deserializer.deserialize(si);
+    } catch (const std::exception& e) {
+        throw CamProtocolErrorException("Error in the json from server: " + std::string(e.what()));
     }
 
     return si;
+}
 
-  }
-
-  std::string serialize(const cxxtools::SerializationInfo & si)
-  {
+std::string serialize(const cxxtools::SerializationInfo& si)
+{
     std::string returnData("");
 
-    try
-    {
-      std::stringstream output;
-      cxxtools::JsonSerializer serializer(output);
-      serializer.serialize(si);
+    try {
+        std::stringstream        output;
+        cxxtools::JsonSerializer serializer(output);
+        serializer.serialize(si);
 
-      returnData = output.str();
-    }
-    catch(const std::exception& e)
-    {
-      throw CamException("Error while creating json "+std::string(e.what()));
+        returnData = output.str();
+    } catch (const std::exception& e) {
+        throw CamException("Error while creating json " + std::string(e.what()));
     }
 
     return returnData;
-  }
+}
 
-} //namespace cam
-
-
+} // namespace cam
