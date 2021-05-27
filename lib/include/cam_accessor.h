@@ -23,8 +23,11 @@
 
 #include "cam_credential_asset_mapping.h"
 #include <fty_common_client.h>
-#include <fty_common_mlm_sync_client.h>
 #include <memory>
+
+namespace mlm {
+class MlmSyncClient;
+}
 
 namespace cam {
 
@@ -40,8 +43,7 @@ public:
     /// @param clientId
     /// @param timeout
     /// @param endPoint
-    [[deprecated]]
-    Accessor(const ClientId& clientId, uint32_t timeout, const std::string& endPoint);
+    [[deprecated]] Accessor(const ClientId& clientId, uint32_t timeout, const std::string& endPoint);
 
     ~Accessor();
 

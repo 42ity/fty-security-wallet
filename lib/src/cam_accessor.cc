@@ -23,6 +23,7 @@
 #include "cam_credential_asset_mapping_server.h"
 #include "cam_helpers.h"
 #include "fty_security_wallet.h"
+#include <fty_common_mlm_sync_client.h>
 
 namespace cam {
 
