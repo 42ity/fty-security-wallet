@@ -43,7 +43,7 @@ public:
     /// @param clientId
     /// @param timeout
     /// @param endPoint
-    [[deprecated]] Accessor(const ClientId& clientId, uint32_t timeout, const std::string& endPoint);
+    Accessor(const ClientId& clientId, uint32_t timeout, const std::string& endPoint);
 
     ~Accessor();
 
