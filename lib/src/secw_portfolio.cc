@@ -26,295 +26,259 @@
 @end
 */
 
-#include "fty_security_wallet_classes.h"
+#include "secw_portfolio.h"
+#include "secw_exception.h"
+#include <cxxtools/jsonserializer.h>
+#include <fty_common_mlm_guards.h>
+#include <fty_log.h>
 
-namespace secw
-{
+namespace secw {
 
 /*----------------------------------------------------------------------*/
 /*   Portfolio                                                          */
 /*----------------------------------------------------------------------*/
-//Public
-    Portfolio::Portfolio(const std::string & name):
-        m_name(name)
-    {}
+// Public
+Portfolio::Portfolio(const std::string& name)
+    : m_name(name)
+{
+}
 
-    Id Portfolio::add(const DocumentPtr & doc)
-    {
+Id Portfolio::add(const DocumentPtr& doc)
+{
 
-        //Check to ensure that the name do not exist => name unique by portfolio
-        if(m_mapNameDocuments.count(doc->getName()) > 0)
-        {
+    // Check to ensure that the name do not exist => name unique by portfolio
+    if (m_mapNameDocuments.count(doc->getName()) > 0) {
+        throw SecwNameAlreadyExistsException(doc->getName());
+    }
+
+    // create an id
+    Id id;
+    do {
+        ZuuidGuard zuuid(zuuid_new());
+        id = std::string(zuuid_str_canonical(zuuid.get()));
+    } while (m_documents.count(id) != 0); // the id already exist, so we get a new one
+
+    // make a copy using factory
+    DocumentPtr copyDoc = doc->clone();
+
+    copyDoc->m_id = id;
+
+    m_documents[id]                        = copyDoc;
+    m_mapNameDocuments[copyDoc->getName()] = copyDoc;
+
+    return id;
+}
+
+void Portfolio::remove(const Id& id)
+{
+    // Check if document exist
+    if (m_documents.count(id) < 1) {
+        throw SecwDocumentDoNotExistException(id);
+    }
+
+    m_mapNameDocuments.erase(m_documents[id]->getName());
+    m_documents.erase(id);
+}
+
+void Portfolio::update(const DocumentPtr& doc)
+{
+    Id id = doc->getId();
+
+    // Check if document exist
+    if (m_documents.count(id) < 1) {
+        throw SecwDocumentDoNotExistException(id);
+    }
+
+    DocumentPtr oldDoc = m_documents[id];
+
+    // ensure that if the name is modified, the new name do not already exist
+    if (doc->getName() != oldDoc->getName()) {
+        if (m_mapNameDocuments.count(doc->getName()) > 0) {
             throw SecwNameAlreadyExistsException(doc->getName());
         }
 
-        //create an id
-        Id id;
-        do
-        {
-            ZuuidGuard zuuid(zuuid_new ());
-            id = std::string( zuuid_str_canonical(zuuid.get()) );
-        }
-        while(m_documents.count(id) != 0); //the id already exist, so we get a new one
-
-        //make a copy using factory
-        DocumentPtr copyDoc = doc->clone();
-
-        copyDoc->m_id = id;
-
-        m_documents[id] = copyDoc;
-        m_mapNameDocuments[copyDoc->getName()] = copyDoc;
-
-        return id;
+        m_mapNameDocuments.erase(oldDoc->getName());
     }
 
-    void Portfolio::remove(const Id & id)
-    {
-        //Check if document exist
-        if(m_documents.count(id) < 1)
-        {
-            throw SecwDocumentDoNotExistException(id);
-        }
+    DocumentPtr copyDoc = doc->clone();
 
-        m_mapNameDocuments.erase(m_documents[id]->getName());
-        m_documents.erase(id);
+    m_documents[id]                        = copyDoc;
+    m_mapNameDocuments[copyDoc->getName()] = copyDoc;
+}
+
+
+DocumentPtr Portfolio::getDocument(const Id& id) const
+{
+    if (m_documents.count(id) < 1) {
+        throw SecwDocumentDoNotExistException(id);
     }
 
-    void Portfolio::update(const DocumentPtr & doc)
-    {
-        Id id = doc->getId();
+    return m_documents.at(id)->clone();
+}
 
-        //Check if document exist
-        if(m_documents.count(id) < 1)
-        {
-            throw SecwDocumentDoNotExistException(id);
-        }
+DocumentPtr Portfolio::getDocumentByName(const std::string& name) const
+{
+    if (m_mapNameDocuments.count(name) < 1) {
+        throw SecwNameDoesNotExistException(name);
+    }
 
-        DocumentPtr oldDoc = m_documents[id];
+    return m_mapNameDocuments.at(name)->clone();
+}
 
-        //ensure that if the name is modified, the new name do not already exist
-        if(doc->getName() != oldDoc->getName())
-        {
-            if(m_mapNameDocuments.count(doc->getName()) > 0)
-            {
-                throw SecwNameAlreadyExistsException(doc->getName());
+std::vector<DocumentPtr> Portfolio::getListDocuments() const
+{
+    std::vector<DocumentPtr> returnList;
+
+    for (const auto& item : m_documents) {
+        returnList.push_back(item.second);
+    }
+
+    return returnList;
+}
+
+void Portfolio::loadPortfolio(const cxxtools::SerializationInfo& si)
+{
+    uint8_t version = 0;
+
+    try {
+        si.getMember("version") >>= version;
+    } catch (const std::exception& e) {
+        throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data");
+    }
+
+    // remove former content
+    m_documents.clear();
+    m_mapNameDocuments.clear();
+
+    switch (version) {
+        case 1:
+            loadPortfolioVersion1(si);
+            break;
+        default:
+            throw SecwImpossibleToLoadPortfolioException("Version " + std::to_string(version) + " not supported");
+    }
+}
+
+void Portfolio::serializePortfolio(cxxtools::SerializationInfo& si) const
+{
+    si.addMember("version") <<= PORTFOLIO_VERSION;
+    si.addMember("name") <<= m_name;
+    si.addMember("documents") <<= getListDocuments();
+}
+
+void Portfolio::loadPortfolioFromSRR(
+    const cxxtools::SerializationInfo& si, const std::string& encryptiondKey, bool isSameInstance)
+{
+    uint8_t version = 0;
+
+    try {
+        si.getMember("version") >>= version;
+    } catch (const std::exception& e) {
+        throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data");
+    }
+
+    // remove former content
+    m_documents.clear();
+    m_mapNameDocuments.clear();
+
+    switch (version) {
+        case 1:
+            loadPortfolioSRRVersion1(si, encryptiondKey, isSameInstance);
+            break;
+        default:
+            throw SecwImpossibleToLoadPortfolioException("Version " + std::to_string(version) + " not supported");
+    }
+}
+
+void Portfolio::serializePortfolioSRR(cxxtools::SerializationInfo& si, const std::string& encryptiondKey) const
+{
+    si.addMember("version") <<= PORTFOLIO_VERSION;
+    si.addMember("name") <<= m_name;
+    cxxtools::SerializationInfo& siDocuments = si.addMember("documents");
+
+    for (const auto& pDoc : getListDocuments()) {
+
+        pDoc->fillSerializationInfoSRR(siDocuments.addMember(""), encryptiondKey);
+    }
+
+    siDocuments.setCategory(cxxtools::SerializationInfo::Array);
+}
+
+void Portfolio::loadPortfolioVersion1(const cxxtools::SerializationInfo& si)
+{
+    try {
+        si.getMember("name") >>= m_name;
+        const cxxtools::SerializationInfo& documents = si.getMember("documents");
+
+        size_t count = 0;
+
+        for (size_t index = 0; index < documents.memberCount(); index++) {
+            try {
+                DocumentPtr doc;
+                documents.getMember(uint32_t(index)) >>= doc;
+
+                doc->validate();
+
+                m_documents[doc->getId()]          = doc;
+                m_mapNameDocuments[doc->getName()] = doc;
+
+                count++;
+            } catch (const std::exception& e) {
+                log_error("Impossible to load a document from portfolio %s: %s", m_name.c_str(), e.what());
             }
-
-            m_mapNameDocuments.erase(oldDoc->getName());
-
-
         }
 
-        DocumentPtr copyDoc =  doc->clone();
+        log_debug("Portfolio %s loaded with %i documents", m_name.c_str(), count);
 
-        m_documents[id] = copyDoc;
-        m_mapNameDocuments[copyDoc->getName()] = copyDoc;
+    } catch (const std::exception& e) {
+        throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data in portfolio " + m_name);
     }
+}
 
+void Portfolio::loadPortfolioSRRVersion1(
+    const cxxtools::SerializationInfo& si, const std::string& encryptiondKey, bool isSameInstance)
+{
+    try {
+        si.getMember("name") >>= m_name;
+        const cxxtools::SerializationInfo& documents = si.getMember("documents");
 
-    DocumentPtr Portfolio::getDocument(const Id & id) const
-    {
-        if(m_documents.count(id) < 1)
-        {
-            throw SecwDocumentDoNotExistException(id);
-        }
+        size_t count = 0;
 
-        return m_documents.at(id)->clone();
-    }
+        for (size_t index = 0; index < documents.memberCount(); index++) {
+            try {
+                DocumentPtr doc = Document::createFromSRR(documents.getMember(uint32_t(index)), encryptiondKey);
 
-    DocumentPtr Portfolio::getDocumentByName(const std::string & name) const
-    {
-        if(m_mapNameDocuments.count(name) < 1)
-        {
-            throw SecwNameDoesNotExistException(name);
-        }
-
-        return m_mapNameDocuments.at(name)->clone();
-    }
-
-    std::vector<DocumentPtr> Portfolio::getListDocuments() const
-    {
-        std::vector<DocumentPtr> returnList;
-
-        for( const auto & item : m_documents)
-        {
-            returnList.push_back(item.second);
-        }
-
-        return returnList;
-    }
-
-    void Portfolio::loadPortfolio(const cxxtools::SerializationInfo& si)
-    {
-        uint8_t version = 0;
-
-        try
-        {
-            si.getMember("version") >>= version;
-        }
-        catch(const std::exception& e)
-        {
-            throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data");
-        }
-
-        //remove former content
-        m_documents.clear();
-        m_mapNameDocuments.clear();
-
-        switch(version)
-        {
-            case 1: loadPortfolioVersion1(si);
-                    break;
-            default: throw SecwImpossibleToLoadPortfolioException("Version "+std::to_string(version)+" not supported");
-        }
-
-    }
-
-    void Portfolio::serializePortfolio(cxxtools::SerializationInfo& si) const
-    {
-        si.addMember("version") <<= PORTFOLIO_VERSION;
-        si.addMember("name") <<= m_name;
-        si.addMember("documents") <<= getListDocuments();
-    }
-
-    void Portfolio::loadPortfolioFromSRR(const cxxtools::SerializationInfo& si, const std::string & encryptiondKey,  bool isSameInstance)
-    {
-        uint8_t version = 0;
-
-        try
-        {
-            si.getMember("version") >>= version;
-        }
-        catch(const std::exception& e)
-        {
-            throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data");
-        }
-
-        //remove former content
-        m_documents.clear();
-        m_mapNameDocuments.clear();
-
-        switch(version)
-        {
-            case 1: loadPortfolioSRRVersion1(si, encryptiondKey, isSameInstance);
-                    break;
-            default: throw SecwImpossibleToLoadPortfolioException("Version "+std::to_string(version)+" not supported");
-        }
-    }
-
-    void Portfolio::serializePortfolioSRR(cxxtools::SerializationInfo& si, const std::string & encryptiondKey) const
-    {
-        si.addMember("version") <<= PORTFOLIO_VERSION;
-        si.addMember("name") <<= m_name;
-        cxxtools::SerializationInfo & siDocuments = si.addMember("documents");
-
-        for (const auto pDoc : getListDocuments() )
-        {
-
-            pDoc->fillSerializationInfoSRR(siDocuments.addMember(""), encryptiondKey);
-        }
-
-        siDocuments.setCategory(cxxtools::SerializationInfo::Array);
-
-    }
-
-    void Portfolio::loadPortfolioVersion1(const cxxtools::SerializationInfo& si)
-    {
-        try
-        {
-            si.getMember("name") >>= m_name;
-            const cxxtools::SerializationInfo& documents = si.getMember("documents");
-
-            size_t count = 0;
-
-            for(size_t index = 0; index < documents.memberCount(); index++ )
-            {
-                try
-                {
-                    DocumentPtr doc;
-                    documents.getMember(index) >>= doc;
-
+                if ((!isSameInstance) && (doc->getType() == "InternalCertificate")) {
+                    log_info("Skip InternalCertificate because the instance is not the same.");
+                } else {
                     doc->validate();
 
-                    m_documents[doc->getId()] = doc;
+                    m_documents[doc->getId()]          = doc;
                     m_mapNameDocuments[doc->getName()] = doc;
 
                     count++;
                 }
-                catch(const std::exception& e)
-                {
-                    log_error("Impossible to load a document from portfolio %s: %s", m_name.c_str(), e.what());
-                }
 
-
+            } catch (const std::exception& e) {
+                log_error("Impossible to load a document from portfolio %s: %s", m_name.c_str(), e.what());
             }
-
-            log_debug("Portfolio %s loaded with %i documents",m_name.c_str(), count );
-
         }
-        catch(const std::exception& e)
-        {
-            throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data in portfolio " + m_name);
-        }
+
+        log_debug("Portfolio %s loaded with %i documents", m_name.c_str(), count);
+
+    } catch (const std::exception& e) {
+        throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data in portfolio " + m_name);
     }
+}
 
-    void Portfolio::loadPortfolioSRRVersion1(const cxxtools::SerializationInfo& si, const std::string & encryptiondKey, bool isSameInstance)
-    {
-        try
-        {
-            si.getMember("name") >>= m_name;
-            const cxxtools::SerializationInfo& documents = si.getMember("documents");
+void operator<<=(cxxtools::SerializationInfo& si, const Portfolio& portfolio)
+{
+    portfolio.serializePortfolio(si);
+}
 
-            size_t count = 0;
+void operator>>=(const cxxtools::SerializationInfo& si, Portfolio& portfolio)
+{
+    portfolio.loadPortfolio(si);
+}
 
-            for( size_t index = 0; index < documents.memberCount(); index++ )
-            {
-                try
-                {
-                    DocumentPtr doc = Document::createFromSRR(documents.getMember(index), encryptiondKey);
-
-                    if((!isSameInstance) && (doc->getType() == "InternalCertificate") )
-                    {
-                        log_info("Skip InternalCertificate because the instance is not the same.");
-                    }
-                    else
-                    {
-                        doc->validate();
-
-                        m_documents[doc->getId()] = doc;
-                        m_mapNameDocuments[doc->getName()] = doc;
-
-                        count++;
-                    }
-
-                }
-                catch(const std::exception& e)
-                {
-                    log_error("Impossible to load a document from portfolio %s: %s", m_name.c_str(), e.what());
-                }
-
-
-            }
-
-            log_debug("Portfolio %s loaded with %i documents",m_name.c_str(), count );
-
-        }
-        catch(const std::exception& e)
-        {
-            throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data in portfolio " + m_name);
-        }
-    }
-
-    void operator<<= (cxxtools::SerializationInfo& si, const Portfolio & portfolio)
-    {
-        portfolio.serializePortfolio(si);
-    }
-
-    void operator>>= (const cxxtools::SerializationInfo& si, Portfolio & portfolio)
-    {
-        portfolio.loadPortfolio(si);
-    }
-
-} //namepace secw
-
-
+} // namespace secw

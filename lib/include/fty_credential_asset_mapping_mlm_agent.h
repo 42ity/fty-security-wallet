@@ -19,18 +19,8 @@
     =========================================================================
 */
 
-#ifndef FTY_CREDENTIAL_ASSET_MAPPING_MLM_AGENT_H_INCLUDED
-#define FTY_CREDENTIAL_ASSET_MAPPING_MLM_AGENT_H_INCLUDED
-
+#pragma once
+#include <czmq.h>
 //  @interface
 //  Create an fty_credential_asset_mapping_server actor
-void
-    fty_credential_asset_mapping_mlm_agent (zsock_t *pipe, void *args);
-
-//  Self test of this class
-void
-    fty_credential_asset_mapping_mlm_agent_test (bool verbose);
-//  @end
-
-
-#endif
+void fty_credential_asset_mapping_mlm_agent(zsock_t* pipe, void* args);

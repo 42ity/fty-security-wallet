@@ -19,45 +19,42 @@
     =========================================================================
 */
 
-#ifndef SECW_OPENSSL_WRAPPER_H_INCLUDED
-#define SECW_OPENSSL_WRAPPER_H_INCLUDED
+#pragma once
 
 #include <string>
 #include <vector>
 
-namespace secw
-{
-    using Byte = unsigned char;
-    using ByteField = std::vector<Byte>;
+namespace secw {
 
-    static constexpr size_t IV_SIZE = 128;
-    static constexpr size_t IV_BYTE_SIZE = (IV_SIZE + 7) / 8;
-    static constexpr size_t IV_BASE64_SIZE = ((IV_SIZE + 5) / 6 + 3) / 4 * 4; // Base64 digit encodes 6 bits
+using Byte      = unsigned char;
+using ByteField = std::vector<Byte>;
+
+static constexpr size_t IV_SIZE        = 128;
+static constexpr size_t IV_BYTE_SIZE   = (IV_SIZE + 7) / 8;
+static constexpr size_t IV_BASE64_SIZE = ((IV_SIZE + 5) / 6 + 3) / 4 * 4; // Base64 digit encodes 6 bits
 
 
-    // String to byte field conversion
-    ByteField strToBytes(const std::string & str);
-    std::string bytesToStr(const ByteField & data);
+// String to byte field conversion
+ByteField   strToBytes(const std::string& str);
+std::string bytesToStr(const ByteField& data);
 
-    // Security to avoid sensitive data remains in heap after deallocation
-    void clean(ByteField & data);
-    void clean(std::string & str);
+// Security to avoid sensitive data remains in heap after deallocation
+void clean(ByteField& data);
+void clean(std::string& str);
 
-    // Random free-size byte field generation
-    ByteField randomVector(size_t nbBytes);
+// Random free-size byte field generation
+ByteField randomVector(size_t nbBytes);
 
-    //base64 tools
-    std::string base64Encode(const ByteField & data);
-    ByteField base64Decode(const std::string & encodedData, size_t off, size_t count = -1);
+// base64 tools
+std::string base64Encode(const ByteField& data);
+ByteField   base64Decode(const std::string& encodedData, size_t off, size_t count);
 
-    //digests
-    ByteField generateMD5Digest(const ByteField & data);
-    ByteField generateSHA256Digest(const ByteField & data);
+// digests
+ByteField generateMD5Digest(const ByteField& data);
+ByteField generateSHA256Digest(const ByteField& data);
 
-    //AES 256 cbc
-    ByteField Aes256cbcEncrypt(const ByteField & data, const ByteField & key, const ByteField & iv);
-    ByteField Aes256cbcDecrypt(const ByteField & cipherData, const ByteField & key, const ByteField & iv);
+// AES 256 cbc
+ByteField Aes256cbcEncrypt(const ByteField& data, const ByteField& key, const ByteField& iv);
+ByteField Aes256cbcDecrypt(const ByteField& cipherData, const ByteField& key, const ByteField& iv);
 
-} //secw
-
-#endif
+} // namespace secw

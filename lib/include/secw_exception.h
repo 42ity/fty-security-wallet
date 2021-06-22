@@ -19,327 +19,323 @@
     =========================================================================
 */
 
-#ifndef SECW_EXCEPTION_H_INCLUDED
-#define SECW_EXCEPTION_H_INCLUDED
+#pragma once
 
 #include <exception>
 #include <string>
+#include "secw_document.h"
 
-#include <cxxtools/serializationinfo.h>
+namespace cxxtools {
+class SerializationInfo;
+}
 
-namespace secw
+namespace secw {
+
+enum ErrorCode : uint8_t
 {
-    enum ErrorCode : uint8_t
+    GENERIC = 0,
+    UNSUPPORTED_COMMAND,
+    PROTOCOL_ERROR,
+    BAD_COMMAND_ARGUMENT,
+    UNKNOWN_DOCUMENT_TYPE,
+    UNKNOWN_PORTFOLIO,
+    INVALID_DOCUMENT_FORMAT,
+    IMPOSSIBLE_TO_LOAD_PORTFOLIO,
+    UNKNOWN_TAG,
+    DOCUMENT_DO_NOT_EXIST,
+    ILLEGAL_ACCESS,
+    UNKNOWN_USAGE_ID,
+    NAME_ALREADY_EXISTS,
+    NAME_DOES_NOT_EXIST,
+    MLM_CLIENT_IS_NULL,
+    MLM_INTERRUPTED,
+    MLM_FAILED
+};
+
+// =====================================================================================================================
+
+class SecwException : public std::exception
+{
+public:
+    explicit SecwException(const std::string& whatArg, ErrorCode code = ErrorCode::GENERIC);
+
+    virtual ~SecwException()
     {
-        GENERIC = 0,
-        UNSUPPORTED_COMMAND,
-        PROTOCOL_ERROR,
-        BAD_COMMAND_ARGUMENT,
-        UNKNOWN_DOCUMENT_TYPE,
-        UNKNOWN_PORTFOLIO,
-        INVALID_DOCUMENT_FORMAT,
-        IMPOSSIBLE_TO_LOAD_PORTFOLIO,
-        UNKNOWN_TAG,
-        DOCUMENT_DO_NOT_EXIST,
-        ILLEGAL_ACCESS,
-        UNKNOWN_USAGE_ID,
-        NAME_ALREADY_EXISTS,
-        NAME_DOES_NOT_EXIST,
-        MLM_CLIENT_IS_NULL,
-        MLM_INTERRUPTED,
-        MLM_FAILED
-    };
+    }
 
-    class SecwException : public std::exception
+    const char* what() const noexcept override;
+
+    inline ErrorCode getErrorCode() const
     {
-    public:
-        explicit SecwException(const std::string & whatArg, ErrorCode code = ErrorCode::GENERIC);
+        return m_code;
+    }
 
-        virtual ~SecwException(){}
+    // return an error payload from an exception
+    std::string toJson() const;
 
-        const char* what() const noexcept override;
+    friend void operator<<=(cxxtools::SerializationInfo& si, const SecwException& exception);
 
-        inline ErrorCode getErrorCode() const { return m_code; }
+    // throw the good exception base on the error payload
+    static void throwSecwException(const std::string& data);
 
-        //return an error payload from an exception
-        std::string toJson() const;
+protected:
+    virtual void fillSerializationInfo(cxxtools::SerializationInfo& si) const;
 
-        friend void operator<<= (cxxtools::SerializationInfo& si, const SecwException & exception);
+private:
+    ErrorCode   m_code;
+    std::string m_whatArg;
+};
 
-        //throw the good exception base on the error payload
-        static void throwSecwException(const std::string & data);
+void operator<<=(cxxtools::SerializationInfo& si, const SecwException& exception);
 
-    protected:
-        virtual void fillSerializationInfo(cxxtools::SerializationInfo& si) const;
+// =====================================================================================================================
 
-    private:
-        ErrorCode m_code;
-        std::string m_whatArg;
-
-    };
-
-    void operator<<= (cxxtools::SerializationInfo& si, const SecwException & exception);
-
-// Command is not supported
-    class SecwUnsupportedCommandException : public SecwException
+/// Command is not supported
+class SecwUnsupportedCommandException : public SecwException
+{
+public:
+    explicit SecwUnsupportedCommandException(const std::string& whatArg)
+        : SecwException(whatArg, ErrorCode::UNSUPPORTED_COMMAND)
     {
-    public:
-        explicit SecwUnsupportedCommandException(const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::UNSUPPORTED_COMMAND)
-        {}
-    };
+    }
+};
 
-// Wrong message format => the message do not comply to the protocol
-    class SecwProtocolErrorException : public SecwException
+// =====================================================================================================================
+
+/// Wrong message format => the message do not comply to the protocol
+class SecwProtocolErrorException : public SecwException
+{
+public:
+    explicit SecwProtocolErrorException(const std::string& whatArg)
+        : SecwException(whatArg, ErrorCode::PROTOCOL_ERROR)
     {
-    public:
-        explicit SecwProtocolErrorException(const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::PROTOCOL_ERROR)
-        {}
-    };
+    }
+};
 
+// =====================================================================================================================
 
-// Arguments for the command are not good
-    class SecwBadCommandArgumentException : public SecwException
+/// Arguments for the command are not good
+class SecwBadCommandArgumentException : public SecwException
+{
+public:
+    explicit SecwBadCommandArgumentException(const std::string& whatArg)
+        : SecwException(whatArg, ErrorCode::BAD_COMMAND_ARGUMENT)
     {
-    public:
-        explicit SecwBadCommandArgumentException(const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::BAD_COMMAND_ARGUMENT)
-        {}
-    };
+    }
+};
 
-// Type of document is unknown
-    class SecwUnknownDocumentTypeException : public SecwException
+// =====================================================================================================================
+
+/// Type of document is unknown
+class SecwUnknownDocumentTypeException : public SecwException
+{
+private:
+    std::string m_documentType;
+
+    void fillSerializationInfo(cxxtools::SerializationInfo& si) const override;
+
+public:
+    explicit SecwUnknownDocumentTypeException(const std::string& documentType);
+    SecwUnknownDocumentTypeException(const cxxtools::SerializationInfo& extraData, const std::string& whatArg);
+
+    inline std::string getDocumentType() const
     {
-    private:
-        std::string m_documentType;
+        return m_documentType;
+    }
+};
 
-        void fillSerializationInfo(cxxtools::SerializationInfo& si) const override
-        {
-            si.addMember("documentType") <<= m_documentType;
-        }
+// =====================================================================================================================
 
-    public:
-        explicit SecwUnknownDocumentTypeException(const std::string & documentType) :
-            SecwException("Unknown document type '" +documentType+"'", ErrorCode::UNKNOWN_DOCUMENT_TYPE),
-            m_documentType(documentType)
-        {}
+/// Portfolio is unknown
+class SecwUnknownPortfolioException : public SecwException
+{
+private:
+    std::string m_portfolioName;
 
-        SecwUnknownDocumentTypeException(const cxxtools::SerializationInfo &extraData, const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::UNKNOWN_DOCUMENT_TYPE)
-        {
-            extraData.getMember("documentType") >>= m_documentType;
-        }
+    void fillSerializationInfo(cxxtools::SerializationInfo& si) const override;
 
-        inline std::string getDocumentType() const { return m_documentType; }
-    };
+public:
+    explicit SecwUnknownPortfolioException(const std::string& portfolioName);
+    SecwUnknownPortfolioException(const cxxtools::SerializationInfo& extraData, const std::string& whatArg);
 
-// Portfolio is unknown
-    class SecwUnknownPortfolioException : public SecwException
+    inline std::string getPortfolioName() const
     {
-    private:
-        std::string m_portfolioName;
+        return m_portfolioName;
+    }
+};
 
-        void fillSerializationInfo(cxxtools::SerializationInfo& si) const override
-        {
-            si.addMember("portfolioName") <<= m_portfolioName;
-        }
+// =====================================================================================================================
 
-    public:
-        explicit SecwUnknownPortfolioException(const std::string & portfolioName) :
-            SecwException("Unknown portfolio '"+portfolioName+"'", ErrorCode::UNKNOWN_PORTFOLIO),
-            m_portfolioName(portfolioName)
-        {}
+/// Invalid format of document
+class SecwInvalidDocumentFormatException : public SecwException
+{
+private:
+    std::string m_documentField;
 
-        SecwUnknownPortfolioException(const cxxtools::SerializationInfo& extraData, const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::UNKNOWN_PORTFOLIO)
-        {
-            extraData.getMember("portfolioName") >>= m_portfolioName;
-        }
+    void fillSerializationInfo(cxxtools::SerializationInfo& si) const override;
 
-        inline std::string getPortfolioName() const { return m_portfolioName; }
-    };
+public:
+    explicit SecwInvalidDocumentFormatException(const std::string& documentField);
+    SecwInvalidDocumentFormatException(const cxxtools::SerializationInfo& extraData, const std::string& whatArg);
 
-// Invalid format of document
-    class SecwInvalidDocumentFormatException : public SecwException
+    inline std::string getDocumentField() const
     {
-    private:
-        std::string m_documentField;
+        return m_documentField;
+    }
+};
 
-        void fillSerializationInfo(cxxtools::SerializationInfo& si) const override
-        {
-            si.addMember("documentField") <<= m_documentField;
-        }
+// =====================================================================================================================
 
-    public:
-        explicit SecwInvalidDocumentFormatException(const std::string & documentField) :
-            SecwException("Error in field '"+documentField+"'", ErrorCode::INVALID_DOCUMENT_FORMAT),
-            m_documentField(documentField)
-        {}
-
-        SecwInvalidDocumentFormatException(const cxxtools::SerializationInfo &extraData, const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::INVALID_DOCUMENT_FORMAT)
-        {
-            extraData.getMember("documentField") >>= m_documentField;
-        }
-
-        inline std::string getDocumentField() const { return m_documentField; }
-    };
-
-// Impossible to load the portfolio
-    class SecwImpossibleToLoadPortfolioException : public SecwException
+/// Impossible to load the portfolio
+class SecwImpossibleToLoadPortfolioException : public SecwException
+{
+public:
+    explicit SecwImpossibleToLoadPortfolioException(const std::string& whatArg)
+        : SecwException(whatArg, ErrorCode::IMPOSSIBLE_TO_LOAD_PORTFOLIO)
     {
-    public:
-        explicit SecwImpossibleToLoadPortfolioException(const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::IMPOSSIBLE_TO_LOAD_PORTFOLIO)
-        {}
-    };
+    }
+};
 
-// Tag is unknown
-    class SecwUnknownTagException : public SecwException
+// =====================================================================================================================
+
+/// Tag is unknown
+class SecwUnknownTagException : public SecwException
+{
+public:
+    explicit SecwUnknownTagException(const std::string& whatArg)
+        : SecwException(whatArg, ErrorCode::UNKNOWN_TAG)
     {
-    public:
-        explicit SecwUnknownTagException(const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::UNKNOWN_TAG)
-        {}
-    };
+    }
+};
 
-// document do not exist
-    class SecwDocumentDoNotExistException : public SecwException
+// =====================================================================================================================
+
+/// document do not exist
+class SecwDocumentDoNotExistException : public SecwException
+{
+private:
+    Id m_documentId;
+
+    void fillSerializationInfo(cxxtools::SerializationInfo& si) const override;
+
+public:
+    explicit SecwDocumentDoNotExistException(const Id& documentId);
+    SecwDocumentDoNotExistException(const cxxtools::SerializationInfo& extraData, const std::string& whatArg);
+
+    inline Id getDocumentId() const
     {
-    private:
-        Id m_documentId;
+        return m_documentId;
+    }
+};
 
-        void fillSerializationInfo(cxxtools::SerializationInfo &si) const override
-        {
-            si.addMember("documentId") <<= m_documentId;
-        }
-    public:
-        explicit SecwDocumentDoNotExistException(const Id & documentId) :
-            SecwException("Document '"+documentId+"'does not exist", ErrorCode::DOCUMENT_DO_NOT_EXIST),
-            m_documentId(documentId)
-        {}
+// =====================================================================================================================
 
-        SecwDocumentDoNotExistException(const cxxtools::SerializationInfo &extraData, const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::DOCUMENT_DO_NOT_EXIST)
-        {
-            extraData.getMember("documentId") >>= m_documentId;
-        }
-
-        inline Id getDocumentId() const { return m_documentId; }
-    };
-
-// Illegal action by the client
-    class SecwIllegalAccess : public SecwException
+/// Illegal action by the client
+class SecwIllegalAccess : public SecwException
+{
+public:
+    explicit SecwIllegalAccess(const std::string& whatArg)
+        : SecwException(whatArg, ErrorCode::ILLEGAL_ACCESS)
     {
-    public:
-        explicit SecwIllegalAccess(const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::ILLEGAL_ACCESS)
-        {}
-    };
+    }
+};
 
-// Usage ID is unknown
-    class SecwUnknownUsageIDException : public SecwException
+// =====================================================================================================================
+
+/// Usage ID is unknown
+class SecwUnknownUsageIDException : public SecwException
+{
+private:
+    UsageId m_usageId;
+
+    void fillSerializationInfo(cxxtools::SerializationInfo& si) const override;
+
+public:
+    explicit SecwUnknownUsageIDException(const UsageId& usageId);
+    SecwUnknownUsageIDException(const cxxtools::SerializationInfo& extraData, const std::string& whatArg);
+
+    inline UsageId getUsageId() const
     {
-    private:
-        UsageId m_usageId;
+        return m_usageId;
+    }
+};
 
-        void fillSerializationInfo(cxxtools::SerializationInfo &si) const override
-        {
-            si.addMember("usageId") <<= m_usageId;
-        }
-    public:
-        explicit SecwUnknownUsageIDException(const UsageId & usageId) :
-            SecwException("Unknown usage ID '"+usageId+"'", ErrorCode::UNKNOWN_USAGE_ID),
-            m_usageId(usageId)
-        {}
+// =====================================================================================================================
 
-        SecwUnknownUsageIDException(const cxxtools::SerializationInfo &extraData, const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::UNKNOWN_USAGE_ID)
-        {
-            extraData.getMember("usageId") >>= m_usageId;
-        }
+/// Name already exist
+class SecwNameAlreadyExistsException : public SecwException
+{
+private:
+    std::string m_name;
 
-        inline UsageId getUsageId() const { return m_usageId; }
-    };
+    void fillSerializationInfo(cxxtools::SerializationInfo& si) const override;
 
-// Name already exist
-    class SecwNameAlreadyExistsException : public SecwException
+public:
+    explicit SecwNameAlreadyExistsException(const std::string& name);
+    SecwNameAlreadyExistsException(const cxxtools::SerializationInfo& extraData, const std::string& whatArg);
+
+    inline std::string getName() const
     {
-    private:
-        std::string m_name;
+        return m_name;
+    }
+};
 
-        void fillSerializationInfo(cxxtools::SerializationInfo &si) const override
-        {
-            si.addMember("name") <<= m_name;
-        }
-    public:
-        explicit SecwNameAlreadyExistsException(const std::string & name) :
-            SecwException("Document with name '"+name+"' already exists", ErrorCode::NAME_ALREADY_EXISTS),
-            m_name(name)
-        {}
+// =====================================================================================================================
 
-        SecwNameAlreadyExistsException(const cxxtools::SerializationInfo &extraData, const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::NAME_ALREADY_EXISTS)
-        {
-            extraData.getMember("name") >>= m_name;
-        }
+/// Name does not exist
+class SecwNameDoesNotExistException : public SecwException
+{
+private:
+    std::string m_name;
 
-        inline std::string getName() const { return m_name; }
-    };
+    void fillSerializationInfo(cxxtools::SerializationInfo& si) const override;
 
-// Name does not exist
-    class SecwNameDoesNotExistException : public SecwException
+public:
+    explicit SecwNameDoesNotExistException(const std::string& name);
+    SecwNameDoesNotExistException(const cxxtools::SerializationInfo& extraData, const std::string& whatArg);
+
+    inline std::string getName() const
     {
-    private:
-        std::string m_name;
+        return m_name;
+    }
+};
 
-        void fillSerializationInfo(cxxtools::SerializationInfo &si) const override
-        {
-            si.addMember("name") <<= m_name;
-        }
-    public:
-        explicit SecwNameDoesNotExistException(const std::string & name) :
-            SecwException("Document with name '"+name+"' does not exist", ErrorCode::NAME_DOES_NOT_EXIST),
-            m_name(name)
-        {}
+// =====================================================================================================================
 
-        SecwNameDoesNotExistException(const cxxtools::SerializationInfo &extraData, const std::string & whatArg) :
-            SecwException(whatArg, ErrorCode::NAME_DOES_NOT_EXIST)
-        {
-            extraData.getMember("name") >>= m_name;
-        }
-
-        inline std::string getName() const { return m_name; }
-    };
-
-// Malamute client is null
-    class SecwMalamuteClientIsNullException : public SecwException
+/// Malamute client is null
+class SecwMalamuteClientIsNullException : public SecwException
+{
+public:
+    explicit SecwMalamuteClientIsNullException()
+        : SecwException("Malamute client is null", ErrorCode::MLM_CLIENT_IS_NULL)
     {
-    public:
-        explicit SecwMalamuteClientIsNullException() :
-            SecwException("Malamute client is null", ErrorCode::MLM_CLIENT_IS_NULL)
-        {}
-    };
+    }
+};
 
-// Malamute Interrupted
-    class SecwMalamuteInterruptedException : public SecwException
+// =====================================================================================================================
+
+/// Malamute Interrupted
+class SecwMalamuteInterruptedException : public SecwException
+{
+public:
+    explicit SecwMalamuteInterruptedException()
+        : SecwException("Malamute interrupted", ErrorCode::MLM_INTERRUPTED)
     {
-    public:
-        explicit SecwMalamuteInterruptedException() :
-            SecwException("Malamute interrupted", ErrorCode::MLM_INTERRUPTED)
-        {}
-    };
+    }
+};
 
-// Malamute Connection Failed Exception
-    class SecwMalamuteConnectionFailedException : public SecwException
+// =====================================================================================================================
+
+/// Malamute Connection Failed Exception
+class SecwMalamuteConnectionFailedException : public SecwException
+{
+public:
+    explicit SecwMalamuteConnectionFailedException()
+        : SecwException("Malamute Connection Failed", ErrorCode::MLM_FAILED)
     {
-    public:
-        explicit SecwMalamuteConnectionFailedException() :
-            SecwException("Malamute Connection Failed", ErrorCode::MLM_FAILED)
-        {}
-    };
+    }
+};
 
-} // namepsace secw
+// =====================================================================================================================
 
-#endif
+} // namespace secw

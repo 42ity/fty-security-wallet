@@ -19,60 +19,57 @@
     =========================================================================
 */
 
-#ifndef SECW_EXTERNAL_CERTIFICATE_H_INCLUDED
-#define SECW_EXTERNAL_CERTIFICATE_H_INCLUDED
+#pragma once
 
 #define EXTERNAL_CERTIFICATE_TYPE "ExternalCertificate"
+#include "secw_document.h"
 
-namespace secw
+namespace secw {
+class ExternalCertificate;
+
+using ExternalCertificatePtr = std::shared_ptr<ExternalCertificate>;
+
+/**
+ * Some key definition for serialization
+ *
+ */
+static constexpr const char* DOC_EXTERNAL_CERTIFICATE_PEM = "secw_external_certificate_pem";
+
+
+class ExternalCertificate final : public Document
 {
-    class ExternalCertificate;
+public:
+    ExternalCertificate();
 
-    using ExternalCertificatePtr   = std::shared_ptr<ExternalCertificate>;
+    ExternalCertificate(const std::string& name, const std::string& pem = "");
 
-    /**
-     * Some key definition for serialization
-     *
-     */
-    static constexpr const char* DOC_EXTERNAL_CERTIFICATE_PEM = "secw_external_certificate_pem";
+    DocumentPtr clone() const override;
 
+    void validate() const override;
 
-    class ExternalCertificate  final : public Document
+    // Public secw elements
+    const std::string& getPem() const
     {
-    public:
+        return m_pem;
+    }
+    void setPem(const std::string& pem)
+    {
+        m_pem = pem;
+    }
 
-        ExternalCertificate();
+    /// try to cast a document to a UserAndPassword shared ptr
+    /// @return shared ptr on UserAndPassword or null shared ptr in case of error
+    static ExternalCertificatePtr tryToCast(DocumentPtr doc);
 
-        ExternalCertificate( const std::string & name,
-                const std::string & pem = "");
+private:
+    // Public secw elements
+    std::string m_pem;
 
-        DocumentPtr clone() const override;
+    void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;
+    void fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const override;
 
-        void validate() const override;
+    void updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
+    void updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
+};
 
-        //Public secw elements
-        const std::string & getPem() const { return m_pem; }
-        void setPem(const std::string & pem) { m_pem = pem; }
-
-        /**
-         * \brief try to cast a document to a UserAndPassword shared ptr
-         *
-         * \return shared ptr on UserAndPassword or null shared ptr in case of error
-         */
-        static ExternalCertificatePtr tryToCast(DocumentPtr doc);
-
-    private:
-        //Public secw elements
-        std::string m_pem;
-
-        void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;
-        void fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const override;
-
-        void updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
-        void updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
-    };
-
-} // namepsace secw
-
-#endif
-
+} // namespace secw

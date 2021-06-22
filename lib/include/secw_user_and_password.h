@@ -19,68 +19,71 @@
     =========================================================================
 */
 
-#ifndef SECW_USER_AND_PASSWORD_H_INCLUDED
-#define SECW_USER_AND_PASSWORD_H_INCLUDED
+#pragma once
+
 #define USER_AND_PASSWORD_TYPE "UserAndPassword"
+#include "secw_document.h"
 
-namespace secw
+namespace secw {
+
+class UserAndPassword;
+
+using UserAndPasswordPtr = std::shared_ptr<UserAndPassword>;
+
+/// Some key definition for serialization
+static constexpr const char* DOC_USER_AND_PASSWORD_USERNAME = "secw_user_and_password_username";
+static constexpr const char* DOC_USER_AND_PASSWORD_PASSWORD = "secw_user_and_password_password";
+
+
+class UserAndPassword final : public Document
 {
-    class UserAndPassword;
+public:
+    UserAndPassword();
 
-    using UserAndPasswordPtr   = std::shared_ptr<UserAndPassword>;
+    UserAndPassword(const std::string& name, const std::string& username = "", const std::string& password = "");
 
-    /**
-     * Some key definition for serialization
-     *
-     */
-    static constexpr const char* DOC_USER_AND_PASSWORD_USERNAME = "secw_user_and_password_username";
-    static constexpr const char* DOC_USER_AND_PASSWORD_PASSWORD = "secw_user_and_password_password";
+    DocumentPtr clone() const override;
 
+    void validate() const override;
 
-    class UserAndPassword  final : public Document
+    // Public secw elements
+    const std::string& getUsername() const
     {
-    public:
+        return m_username;
+    }
+    void setUsername(const std::string& username)
+    {
+        m_username = username;
+    }
 
-        UserAndPassword();
+    // Private secw elements
+    const std::string& getPassword() const
+    {
+        return m_password;
+    }
+    void setPassword(const std::string& password)
+    {
+        m_password           = password;
+        m_containPrivateData = true;
+    }
 
-        UserAndPassword( const std::string & name,
-                const std::string & username = "",
-                const std::string & password = "");
+    /// try to cast a document to a UserAndPassword shared ptr
+    /// @return shared ptr on UserAndPassword or null shared ptr in case of error
+    static UserAndPasswordPtr tryToCast(DocumentPtr doc);
 
-        DocumentPtr clone() const override;
-
-        void validate() const override;
-
-        //Public secw elements
-        const std::string & getUsername() const { return m_username; }
-        void setUsername(const std::string & username) { m_username = username; }
-
-        //Private secw elements
-        const std::string & getPassword() const { return m_password; }
-        void setPassword(const std::string & password) { m_password = password; m_containPrivateData = true; }
-
-        /**
-         * \brief try to cast a document to a UserAndPassword shared ptr
-         *
-         * \return shared ptr on UserAndPassword or null shared ptr in case of error
-         */
-        static UserAndPasswordPtr tryToCast(DocumentPtr doc);
-
-    private:
-        //Public secw elements
-        std::string m_username = "";
+private:
+    // Public secw elements
+    std::string m_username = "";
 
 
-        //Private secw elements
-        std::string m_password = "";
+    // Private secw elements
+    std::string m_password = "";
 
-        void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;
-        void fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const override;
+    void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;
+    void fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const override;
 
-        void updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
-        void updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
-    };
+    void updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
+    void updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si) override;
+};
 
-} // namepsace secw
-
-#endif
+} // namespace secw

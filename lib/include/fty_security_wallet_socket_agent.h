@@ -19,12 +19,7 @@
     =========================================================================
 */
 
-#ifndef FTY_SECURITY_WALLET_SOCKET_AGENT_H_INCLUDED
-#define FTY_SECURITY_WALLET_SOCKET_AGENT_H_INCLUDED
+#pragma once
 
 //  Self test of this class
-void
-    fty_security_wallet_socket_agent_test (bool verbose);
-
-
-#endif
+void fty_security_wallet_socket_agent_test(bool verbose);

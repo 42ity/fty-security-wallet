@@ -1,59 +1,4 @@
-/*  =========================================================================
-    fty_security_wallet_socket_agent - Security Wallet malamute agent
-
-    Copyright (C) 2019 - 2020 Eaton
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-    =========================================================================
-*/
-
-#include "fty_security_wallet_classes.h"
-
-#include "secw_exception.h"
-#include "secw_security_wallet_server.h"
-#include "secw_helpers.h"
-
-#include <fty_common_mlm_stream_client.h>
-#include <fty_common_socket_basic_mailbox_server.h>
-#include <fty_common_socket_sync_client.h>
-
-#include <sstream>
-#include <fstream>
-#include <thread>
-
-#include <cxxtools/jsonserializer.h>
-
-#include <google/protobuf/util/json_util.h>
-
-//  --------------------------------------------------------------------------
-//  Self test
-
-
-#define SELFTEST_DIR_RO "selftest-ro"
-#define SELFTEST_DIR_RW "selftest-rw"
-
-#define ANSI_COLOR_RED     "\x1b[31m"
-#define ANSI_COLOR_GREEN   "\x1b[32m"
-#define ANSI_COLOR_YELLOW  "\x1b[33m"
-#define ANSI_COLOR_BLUE    "\x1b[34m"
-#define ANSI_COLOR_MAGENTA "\x1b[35m"
-#define ANSI_COLOR_CYAN    "\x1b[36m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
-
-void
-fty_security_wallet_socket_agent_test (bool verbose)
+/*void fty_security_wallet_mlm_agent_test(bool verbose)
 {
     printf ("\n\n ** fty_security_wallet_mlm_agent: \n\n");
     assert (SELFTEST_DIR_RO);
@@ -97,24 +42,16 @@ fty_security_wallet_socket_agent_test (bool verbose)
         paramsSecw["AGENT_NAME"] = SECURITY_WALLET_AGENT;
         paramsSecw["ENDPOINT"] = endpoint;
 
-        //create a stream publisher for notification
-        mlm::MlmStreamClient notificationStream(SECURITY_WALLET_AGENT, SECW_NOTIFICATIONS, 1000, paramsSecw.at("ENDPOINT"));
-
-        //create the server
-        secw::SecurityWalletServer serverSecw(  paramsSecw.at("STORAGE_CONFIGURATION_PATH"),
-                                        paramsSecw.at("STORAGE_DATABASE_PATH"),
-                                        notificationStream);
-
-        fty::SocketBasicServer agentSecw( serverSecw, "secw-test.socket");
-        std::thread agentSecwThread(&fty::SocketBasicServer::run, &agentSecw);
+        zactor_t *server = zactor_new (fty_security_wallet_mlm_agent, static_cast<void*>(&paramsSecw));
 
         //create the 2 Clients
-        fty::SocketSyncClient syncClient("secw-test.socket");
+        mlm::MlmSyncClient syncClient("secw-server-test", SECURITY_WALLET_AGENT, 1000, endpoint);
         mlm::MlmStreamClient streamClient("secw-server-test", SECW_NOTIFICATIONS, 1000, endpoint);
 
         //Tests from the lib
-        std::vector<std::pair<std::string,bool>> testLibConsumerResults = secw_consumer_accessor_test(syncClient, streamClient);
-        std::vector<std::pair<std::string,bool>> testLibProducerResults = secw_producer_accessor_test(syncClient, streamClient);
+        std::vector<std::pair<std::string,bool>> testLibConsumerResults = secw_consumer_accessor_test(syncClient,
+    streamClient); std::vector<std::pair<std::string,bool>> testLibProducerResults =
+    secw_producer_accessor_test(syncClient, streamClient);
 
         printf("\n-----------------------------------------------------------------------\n");
 
@@ -161,7 +98,8 @@ fty_security_wallet_socket_agent_test (bool verbose)
         }
         else
         {
-            printf(ANSI_COLOR_RED"\n!!!!!!!! %i/%i tests did not pass !!!!!!!! \n" ANSI_COLOR_RESET "\n",testsFailed,(testsPassed+testsFailed));
+            printf(ANSI_COLOR_RED"\n!!!!!!!! %i/%i tests did not pass !!!!!!!! \n" ANSI_COLOR_RESET
+    "\n",testsFailed,(testsPassed+testsFailed));
 
             printf("Content of the database at the end of tests: \n");
             printf("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
@@ -176,12 +114,11 @@ fty_security_wallet_socket_agent_test (bool verbose)
         }
 
 
-        agentSecw.requestStop();
-        agentSecwThread.join();
+        zstr_sendm (server, "$TERM");
+        sleep(1);
 
-        google::protobuf::ShutdownProtobufLibrary();
+        zactor_destroy (&server);
     }
 
     zactor_destroy (&broker);
-}
-
+}*/

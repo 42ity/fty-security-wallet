@@ -19,49 +19,45 @@
     =========================================================================
 */
 
-#ifndef CAM_CREDENTIAL_ASSET_MAPPING_STORAGE_H_INCLUDED
-#define CAM_CREDENTIAL_ASSET_MAPPING_STORAGE_H_INCLUDED
-
-#include <memory>
+#pragma once
 
 #include "cam_credential_asset_mapping.h"
+#include <memory>
 
-namespace cam
+namespace cam {
+using Hash = std::string;
+
+class CredentialAssetMappingStorage
 {
-  using Hash = std::string;
-
-  class CredentialAssetMappingStorage
-  {
-  public:
-    explicit CredentialAssetMappingStorage(const std::string & databasePath);
+public:
+    explicit CredentialAssetMappingStorage(const std::string& databasePath);
     void save() const;
 
-    const CredentialAssetMapping & getMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const;
-    void setMapping(const CredentialAssetMapping & mapping);
+    const CredentialAssetMapping& getMapping(
+        const AssetId& assetId, const ServiceId& serviceId, const Protocol& protocol) const;
+    void setMapping(const CredentialAssetMapping& mapping);
 
-    void removeMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol);
+    void removeMapping(const AssetId& assetId, const ServiceId& serviceId, const Protocol& protocol);
 
-    bool isMappingExisting(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const;
+    bool isMappingExisting(const AssetId& assetId, const ServiceId& serviceId, const Protocol& protocol) const;
 
-    std::vector<CredentialAssetMapping> getMappings(const AssetId & assetId, const ServiceId & serviceId) const;
+    std::vector<CredentialAssetMapping> getMappings(const AssetId& assetId, const ServiceId& serviceId) const;
     std::vector<CredentialAssetMapping> getAllMappings() const;
 
-    std::vector<CredentialAssetMapping> getCredentialMappingsForService( const CredentialId & credentialId,
-                                                                        const ServiceId & serviceId) const;
+    std::vector<CredentialAssetMapping> getCredentialMappingsForService(
+        const CredentialId& credentialId, const ServiceId& serviceId) const;
 
-    std::vector<CredentialAssetMapping> getCredentialMappings(const CredentialId & credentialId) const;
+    std::vector<CredentialAssetMapping> getCredentialMappings(const CredentialId& credentialId) const;
 
-    std::vector<CredentialAssetMapping> getAssetMappings(const AssetId & assetId) const;
+    std::vector<CredentialAssetMapping> getAssetMappings(const AssetId& assetId) const;
 
     static constexpr const uint8_t MAPPING_VERSION = 1;
 
-  private:
-    std::string m_pathDatabase;
+private:
+    std::string                            m_pathDatabase;
     std::map<Hash, CredentialAssetMapping> m_mappings;
 
-    static Hash computeHash(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol);
-  };
+    static Hash computeHash(const AssetId& assetId, const ServiceId& serviceId, const Protocol& protocol);
+};
 
-} // namepsace cam
-
-#endif
+} // namespace cam

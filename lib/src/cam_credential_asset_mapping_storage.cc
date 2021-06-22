@@ -19,253 +19,210 @@
     =========================================================================
 */
 
-#include "fty_security_wallet_classes.h"
-
 #include "cam_credential_asset_mapping_storage.h"
 #include "cam_helpers.h"
-
-#include <fty_log.h>
-
-#include <fstream>
-#include <iostream>
-#include <cxxtools/jsonserializer.h>
 #include <cxxtools/jsondeserializer.h>
-
+#include <cxxtools/jsonserializer.h>
+#include <fstream>
+#include <fty_log.h>
+#include <iostream>
 #include <sys/stat.h>
 #include <unistd.h>
 
-namespace cam
+namespace cam {
+
+CredentialAssetMappingStorage::CredentialAssetMappingStorage(const std::string& databasePath)
+    : m_pathDatabase(databasePath)
 {
+    // Load database
+    log_info(" Loading mapping from %s ...", m_pathDatabase.c_str());
+    try {
+        struct stat buffer;
+        bool        fileExist = (stat(m_pathDatabase.c_str(), &buffer) == 0);
 
-    CredentialAssetMappingStorage::CredentialAssetMappingStorage(const std::string & databasePath):
-    m_pathDatabase(databasePath)
-    {
-        //Load database
-        log_info(" Loading mapping from %s ...", m_pathDatabase.c_str());
-        try
-        {
-            struct stat buffer;
-            bool fileExist =  (stat (m_pathDatabase.c_str(), &buffer) == 0);
+        // try to open portfolio if exist
+        if (fileExist) {
+            std::ifstream input;
 
-            //try to open portfolio if exist
-            if(fileExist)
-            {
-                std::ifstream input;
+            input.open(m_pathDatabase);
 
-                input.open(m_pathDatabase);
+            cxxtools::SerializationInfo rootSi;
+            cxxtools::JsonDeserializer  deserializer(input);
+            deserializer.deserialize(rootSi);
 
-                cxxtools::SerializationInfo rootSi;
-                cxxtools::JsonDeserializer deserializer(input);
-                deserializer.deserialize(rootSi);
+            uint8_t version = 0;
+            rootSi.getMember("version") >>= version;
 
-                uint8_t version = 0;
-                rootSi.getMember("version") >>= version;
+            if (version == 1) {
+                std::vector<CredentialAssetMapping> listOfmapping;
+                rootSi.getMember("mappings") >>= listOfmapping;
 
-                if(version == 1)
-                {
-                    std::vector<CredentialAssetMapping> listOfmapping;
-                    rootSi.getMember("mappings") >>= listOfmapping;
-
-                    for( const CredentialAssetMapping &  mapping : listOfmapping)
-                    {
-                        try
-                        {
-                            setMapping(mapping);
-                        }
-                        catch(const std::exception& e) //show must go on
-                        {
-                            log_error("Error on one element: %s",e.what());
-                        }
+                for (const CredentialAssetMapping& mapping : listOfmapping) {
+                    try {
+                        setMapping(mapping);
+                    } catch (const std::exception& e) {
+                        log_error("Error on one element: %s", e.what());
                     }
                 }
-                else
-                {
-                    throw std::runtime_error("Version not supported");
-                }
+            } else {
+                throw std::runtime_error("Version not supported");
             }
-            else
-            {
-                log_info(" No mapping %s. Creating default mapping...", m_pathDatabase.c_str());
-            }
-
-        }
-        catch(const std::exception& e)
-        {
-            log_error("Error while loading mapping file %s\n %s",m_pathDatabase.c_str(), e.what());
-            exit(EXIT_FAILURE);
+        } else {
+            log_info(" No mapping %s. Creating default mapping...", m_pathDatabase.c_str());
         }
 
-        //attempt to save the mapping and ensure that we can write
-        try
-        {
-            save();
-        }
-        catch(const std::exception& e)
-        {
-            log_error("Error while saving into mapping file %s\n %s",m_pathDatabase.c_str(), e.what());
-            exit(EXIT_FAILURE);
-        }
+    } catch (const std::exception& e) {
+        log_error("Error while loading mapping file %s\n %s", m_pathDatabase.c_str(), e.what());
+        exit(EXIT_FAILURE);
     }
 
-    void CredentialAssetMappingStorage::save() const
-    {
-        log_debug("Update mapping database");
+    // attempt to save the mapping and ensure that we can write
+    try {
+        save();
+    } catch (const std::exception& e) {
+        log_error("Error while saving into mapping file %s\n %s", m_pathDatabase.c_str(), e.what());
+        exit(EXIT_FAILURE);
+    }
+}
 
-        //create the file content
-        cxxtools::SerializationInfo rootSi;
+void CredentialAssetMappingStorage::save() const
+{
+    log_debug("Update mapping database");
 
-        rootSi.addMember("version") <<= MAPPING_VERSION;
+    // create the file content
+    cxxtools::SerializationInfo rootSi;
 
-        std::vector<CredentialAssetMapping> list;
+    rootSi.addMember("version") <<= MAPPING_VERSION;
 
-        for( const auto item : m_mappings)
-        {
+    std::vector<CredentialAssetMapping> list;
+
+    for (const auto& item : m_mappings) {
+        list.push_back(item.second);
+    }
+
+    rootSi.addMember("mappings") <<= list;
+
+    // open the file
+    std::ofstream output(m_pathDatabase.c_str());
+
+    cxxtools::JsonSerializer serializer(output);
+    serializer.beautify(true);
+    serializer.serialize(rootSi);
+
+    output.close();
+}
+
+const CredentialAssetMapping& CredentialAssetMappingStorage::getMapping(
+    const AssetId& assetId, const ServiceId& serviceId, const Protocol& protocol) const
+{
+    Hash hash = computeHash(assetId, serviceId, protocol);
+
+    try {
+        return m_mappings.at(hash);
+    } catch (const std::exception& e) {
+        throw CamMappingDoesNotExistException(assetId, serviceId, protocol);
+    }
+}
+
+void CredentialAssetMappingStorage::setMapping(const CredentialAssetMapping& mapping)
+{
+    if (mapping.m_assetId.empty() || mapping.m_serviceId.empty() || mapping.m_protocol.empty()) {
+        throw CamException("Bad format");
+    }
+
+    Hash hash        = computeHash(mapping.m_assetId, mapping.m_serviceId, mapping.m_protocol);
+    m_mappings[hash] = mapping;
+}
+
+void CredentialAssetMappingStorage::removeMapping(
+    const AssetId& assetId, const ServiceId& serviceId, const Protocol& protocol)
+{
+    Hash hash = computeHash(assetId, serviceId, protocol);
+
+    size_t deleted = m_mappings.erase(hash);
+
+    if (deleted == 0) {
+        throw CamMappingDoesNotExistException(assetId, serviceId, protocol);
+    }
+}
+
+bool CredentialAssetMappingStorage::isMappingExisting(
+    const AssetId& assetId, const ServiceId& serviceId, const Protocol& protocol) const
+{
+    Hash hash = computeHash(assetId, serviceId, protocol);
+    return m_mappings.count(hash);
+}
+
+std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getCredentialMappingsForService(
+    const CredentialId& credentialId, const ServiceId& serviceId) const
+{
+    std::vector<CredentialAssetMapping> list;
+
+    for (const auto& item : m_mappings) {
+        if ((item.second.m_serviceId == serviceId) && (item.second.m_credentialId == credentialId)) {
             list.push_back(item.second);
         }
-
-        rootSi.addMember("mappings") <<= list;
-
-        //open the file
-        std::ofstream output(m_pathDatabase.c_str());
-
-        cxxtools::JsonSerializer serializer(output);
-        serializer.beautify(true);
-        serializer.serialize(rootSi);
-
-        output.close();
     }
 
-    const CredentialAssetMapping & CredentialAssetMappingStorage::getMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const
-    {
-        Hash hash = computeHash(assetId, serviceId, protocol);
+    return list;
+}
 
-        try
-        {
-            return m_mappings.at(hash);
-        }
-        catch(const std::exception& e)
-        {
-            throw CamMappingDoesNotExistException(assetId,serviceId, protocol);
-        }
-    }
+std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getCredentialMappings(
+    const CredentialId& credentialId) const
+{
+    std::vector<CredentialAssetMapping> list;
 
-    void CredentialAssetMappingStorage::setMapping(const CredentialAssetMapping & mapping)
-    {
-        if( mapping.m_assetId.empty() || mapping.m_serviceId.empty() || mapping.m_protocol.empty() )
-        {
-            throw CamException("Bad format");
-        }
-
-        Hash hash = computeHash(mapping.m_assetId, mapping.m_serviceId, mapping.m_protocol);
-        m_mappings[hash] = mapping;
-    }
-
-    void CredentialAssetMappingStorage::removeMapping(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol)
-    {
-        Hash hash = computeHash(assetId, serviceId, protocol);
-
-        size_t deleted = m_mappings.erase(hash);
-
-        if(deleted == 0)
-        {
-            throw CamMappingDoesNotExistException(assetId, serviceId, protocol);
-        }
-
-    }
-
-    bool CredentialAssetMappingStorage::isMappingExisting(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol) const
-    {
-        Hash hash = computeHash(assetId, serviceId, protocol);
-
-        bool isMappingExisting = true;
-        try
-        {
-            m_mappings.at(hash);
-        }
-        catch(const std::exception&)
-        {
-            isMappingExisting = false;
-        }
-
-        return isMappingExisting;
-    }
-
-    std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getCredentialMappingsForService( const CredentialId & credentialId,
-                                                                        const ServiceId & serviceId) const
-    {
-        std::vector<CredentialAssetMapping> list;
-
-        for( const auto item : m_mappings)
-        {
-            if( (item.second.m_serviceId == serviceId) && (item.second.m_credentialId == credentialId) )
-            {
-                list.push_back(item.second);
-            }
-        }
-
-        return  list;
-    }
-
-    std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getCredentialMappings(const CredentialId & credentialId) const
-    {
-        std::vector<CredentialAssetMapping> list;
-
-        for( const auto item : m_mappings)
-        {
-            if( item.second.m_credentialId == credentialId )
-            {
-                list.push_back(item.second);
-            }
-        }
-
-        return list;
-    }
-
-    std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getMappings(const AssetId & assetId, const ServiceId & serviceId) const
-    {
-        std::vector<CredentialAssetMapping> list;
-
-        for( const auto item : m_mappings)
-        {
-            if( (item.second.m_assetId == assetId) && (item.second.m_serviceId == serviceId) )
-            {
-                list.push_back(item.second);
-            }
-        }
-
-        return list;
-    }
-
-    std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getAllMappings() const
-    {
-        std::vector<CredentialAssetMapping> list;
-
-        for( const auto item : m_mappings)
-        {
+    for (const auto& item : m_mappings) {
+        if (item.second.m_credentialId == credentialId) {
             list.push_back(item.second);
         }
-
-        return list;
     }
 
-    std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getAssetMappings(const AssetId & assetId) const
-    {
-        std::vector<CredentialAssetMapping> list;
+    return list;
+}
 
-        for( const auto item : m_mappings)
-        {
-            if( item.second.m_assetId == assetId )
-            {
-                list.push_back(item.second);
-            }
+std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getMappings(
+    const AssetId& assetId, const ServiceId& serviceId) const
+{
+    std::vector<CredentialAssetMapping> list;
+
+    for (const auto& item : m_mappings) {
+        if ((item.second.m_assetId == assetId) && (item.second.m_serviceId == serviceId)) {
+            list.push_back(item.second);
         }
-
-        return  list;
     }
 
-    Hash CredentialAssetMappingStorage::computeHash(const AssetId & assetId, const ServiceId & serviceId, const Protocol & protocol)
-    {
-        return "A"+assetId+"|S"+serviceId+"|P:"+protocol;
+    return list;
+}
+
+std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getAllMappings() const
+{
+    std::vector<CredentialAssetMapping> list;
+
+    for (const auto& item : m_mappings) {
+        list.push_back(item.second);
     }
 
-} // namepsace cam
+    return list;
+}
+
+std::vector<CredentialAssetMapping> CredentialAssetMappingStorage::getAssetMappings(const AssetId& assetId) const
+{
+    std::vector<CredentialAssetMapping> list;
+
+    for (const auto& item : m_mappings) {
+        if (item.second.m_assetId == assetId) {
+            list.push_back(item.second);
+        }
+    }
+
+    return list;
+}
+
+Hash CredentialAssetMappingStorage::computeHash(
+    const AssetId& assetId, const ServiceId& serviceId, const Protocol& protocol)
+{
+    return "A" + assetId + "|S" + serviceId + "|P:" + protocol;
+}
+
+} // namespace cam

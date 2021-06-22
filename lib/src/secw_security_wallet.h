@@ -19,43 +19,37 @@
     =========================================================================
 */
 
-#ifndef SECW_SECURITY_WALLET_H_INCLUDED
-#define SECW_SECURITY_WALLET_H_INCLUDED
+#pragma once
 
+#include "secw_configuration.h"
 #include "secw_document.h"
 #include "secw_portfolio.h"
-#include "secw_configuration.h"
-
-#include <cxxtools/serializationinfo.h>
-
 #include <memory>
 
-namespace secw
+namespace secw {
+class SecurityWallet
 {
-    class SecurityWallet
-    {
-    public:
-        explicit SecurityWallet(const std::string & configurationPath, const std::string & databasePath);
-        void save() const;
-        void reload();
-        Portfolio & getPortfolio(const std::string & name);
-        std::vector<std::string> getPortfolioNames() const;
+public:
+    explicit SecurityWallet(const std::string& configurationPath, const std::string& databasePath);
+    void                     save() const;
+    void                     reload();
+    Portfolio&               getPortfolio(const std::string& name);
+    std::vector<std::string> getPortfolioNames() const;
 
-        const PortfolioConfiguration & getConfiguration(const std::string & portfolioName = "default") const;
+    const PortfolioConfiguration& getConfiguration(const std::string& portfolioName = "default") const;
 
-        cxxtools::SerializationInfo getSrrSaveData(const std::string & passphrase);
-        void restoreSRRData(const cxxtools::SerializationInfo & si, const std::string & passphrase, const std::string & version);
+    cxxtools::SerializationInfo getSrrSaveData(const std::string& passphrase);
+    void                        restoreSRRData(
+                               const cxxtools::SerializationInfo& si, const std::string& passphrase, const std::string& version);
 
-        static constexpr const uint8_t SECW_VERSION = 1;
+    static constexpr const uint8_t SECW_VERSION = 1;
 
-    private:
-        std::string m_pathConfiguration;
-        std::string m_pathDatabase;
+private:
+    std::string m_pathConfiguration;
+    std::string m_pathDatabase;
 
-        std::map<std::string, PortfolioConfiguration> m_configurations;
-        std::vector<Portfolio> m_portfolios;
-    };
+    std::map<std::string, PortfolioConfiguration> m_configurations;
+    std::vector<Portfolio>                        m_portfolios;
+};
 
-} // namepsace secw
-
-#endif
+} // namespace secw

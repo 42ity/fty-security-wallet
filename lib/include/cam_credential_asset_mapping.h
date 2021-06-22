@@ -19,56 +19,55 @@
     =========================================================================
 */
 
-#ifndef CAM_CREDENTIAL_ASSET_MAPPING_H_INCLUDED
-#define CAM_CREDENTIAL_ASSET_MAPPING_H_INCLUDED
-
-#include "cxxtools/serializationinfo.h"
-#include <memory>
+#pragma once
+#include "cam_exception.h"
 #include <functional>
 #include <iostream>
+#include <map>
+#include <memory>
 
-#include "cam_exception.h"
+namespace cxxtools {
+class SerializationInfo;
+}
 
-namespace cam
+namespace cam {
+
+/**
+ * Some typedef to make the code more clear
+ */
+
+using CredentialId    = std::string;
+using AssetId         = std::string;
+using ServiceId       = std::string;
+using Protocol        = std::string;
+using Port            = std::string;
+using MapExtendedInfo = std::map<std::string, std::string>;
+
+enum Status : uint8_t
 {
-
-  /**
-   * Some typedef to make the code more clear
-   */
-
-  using CredentialId = std::string;
-  using AssetId = std::string;
-  using ServiceId = std::string;
-  using Protocol = std::string;
-  using Port = std::string;
-  using MapExtendedInfo = std::map<std::string, std::string>;
-
-  enum Status : uint8_t
-  {
     UNKNOWN = 0,
     VALID,
     ERROR
-  };
+};
 
+/**
+ * Some key definition for serialization
+ *
+ */
+static constexpr const char* SERVICE_ID_ENTRY        = "cam_service";
+static constexpr const char* ASSET_ID_ENTRY          = "cam_asset";
+static constexpr const char* PROTOCOL_ENTRY          = "cam_protocol";
+static constexpr const char* PORT_ENTRY              = "cam_port";
+static constexpr const char* CREDENTIAL_ID_ENTRY     = "cam_credential";
+static constexpr const char* CREDENTIAL_STATUS_ENTRY = "cam_status";
+static constexpr const char* EXTENDED_INFO_ENTRY     = "cam_extended_info";
 
-  /**
-   * Some key definition for serialization
-   *
-   */
-  static constexpr const char* SERVICE_ID_ENTRY = "cam_service";
-  static constexpr const char* ASSET_ID_ENTRY = "cam_asset";
-  static constexpr const char* PROTOCOL_ENTRY = "cam_protocol";
-  static constexpr const char* PORT_ENTRY = "cam_port";
-  static constexpr const char* CREDENTIAL_ID_ENTRY = "cam_credential";
-  static constexpr const char* CREDENTIAL_STATUS_ENTRY = "cam_status";
-  static constexpr const char* EXTENDED_INFO_ENTRY = "cam_extended_info";
-
-  /**
-   * \brief CredentialAssetMapping: Public interface
-   */
-  class CredentialAssetMapping
-  {
-  public:
+/**
+ * \brief CredentialAssetMapping: Public interface
+ */
+class CredentialAssetMapping
+{
+public:
     explicit CredentialAssetMapping();
 
     void fillSerializationInfo(cxxtools::SerializationInfo& si) const;
@@ -77,23 +76,20 @@ namespace cam
     std::string toString() const;
 
     // Attributs
-    AssetId m_assetId;
-    ServiceId m_serviceId;
-    Protocol m_protocol;
-    Port m_port;
-    CredentialId m_credentialId;
-    Status m_status;
+    AssetId         m_assetId;
+    ServiceId       m_serviceId;
+    Protocol        m_protocol;
+    Port            m_port;
+    CredentialId    m_credentialId;
+    Status          m_status;
     MapExtendedInfo m_extendedInfo;
+};
 
-  };
+void operator<<=(cxxtools::SerializationInfo& si, const CredentialAssetMapping& mapping);
+void operator>>=(const cxxtools::SerializationInfo& si, CredentialAssetMapping& mapping);
+void operator>>=(const std::string& str, CredentialAssetMapping& mapping);
 
-  void operator<<= (cxxtools::SerializationInfo& si, const CredentialAssetMapping & mapping);
-  void operator>>= (const cxxtools::SerializationInfo& si, CredentialAssetMapping & mapping);
-  void operator>>= (const std::string& str, CredentialAssetMapping & mapping);
+// add a stream operator to display the CredentialAssetMapping in debug for example
+std::ostream& operator<<(std::ostream& os, const CredentialAssetMapping& mapping);
 
-  //add a stream operator to display the CredentialAssetMapping in debug for example
-  std::ostream& operator<< (std::ostream& os, const CredentialAssetMapping & mapping);
-
-} // namepsace cam
-
-#endif
+} // namespace cam

@@ -19,21 +19,10 @@
     =========================================================================
 */
 
-#ifndef FTY_SECURITY_WALLET_MLM_AGENT_H_INCLUDED
-#define FTY_SECURITY_WALLET_MLM_AGENT_H_INCLUDED
+#pragma once
 
 #include "fty_common_mlm_agent.h"
 
 //  @interface
 //  Create an security wallet actor
-void
-    fty_security_wallet_mlm_agent(zsock_t *pipe, void *args);
-
-//  Self test
-void
-    fty_security_wallet_mlm_agent_test (bool verbose);
-
-#endif
-
-
-
+void fty_security_wallet_mlm_agent(zsock_t* pipe, void* args);

@@ -19,8 +19,7 @@
     =========================================================================
 */
 
-#ifndef CAM_HELPERS_H_INCLUDED
-#define CAM_HELPERS_H_INCLUDED
+#pragma once
 
 #include "cxxtools/serializationinfo.h"
 
@@ -31,5 +30,3 @@ namespace cam
   std::string serialize(const cxxtools::SerializationInfo & si);
 
 } //namespace cam
-
-#endif

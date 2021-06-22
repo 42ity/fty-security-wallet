@@ -19,8 +19,13 @@
     =========================================================================
 */
 
-#ifndef SECW_HELPERS_H_INCLUDED
-#define SECW_HELPERS_H_INCLUDED
+#pragma once
+#include <string>
+#include <set>
+
+namespace cxxtools {
+class SerializationInfo;
+}
 
 namespace secw
 {
@@ -34,5 +39,3 @@ namespace secw
   std::string decrypt(const std::string & encryptedData, const std::string & passphrase);
 
 } //namespace secw
-
-#endif

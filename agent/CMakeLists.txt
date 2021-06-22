@@ -7,12 +7,14 @@ cmake_policy(VERSION 3.13)
 etn_target(exe ${PROJECT_NAME}
     SOURCES
         src/fty_security_wallet.cc
+    INCLUDE_DIRS
+        ${CMAKE_CURRENT_SOURCE_DIR}/../lib
     USES
         ${PROJECT_NAME_UNDERSCORE}
         pthread
-        cxxtools
         czmq
         mlm
+        fty_common
         fty_common_mlm
         fty_common_socket
         fty_common_logging
