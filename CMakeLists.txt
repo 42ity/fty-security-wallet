@@ -34,7 +34,7 @@ set(res "resources")
 # 30-secw-update-database-right.sh -> bios/setup
 set(file "30-secw-update-database-right.sh")
 configure_file("${PROJECT_SOURCE_DIR}/${res}/${file}.in" "${PROJECT_BINARY_DIR}/${res}/${file}" @ONLY)
-install(FILES "${PROJECT_BINARY_DIR}/${res}/${file}" DESTINATION ${AGENT_SHARE_BIOS_SETUP_DIR})
+install(PROGRAMS "${PROJECT_BINARY_DIR}/${res}/${file}" DESTINATION ${AGENT_SHARE_BIOS_SETUP_DIR})
 
 # configuration.json -> etc/fty
 set(file "configuration.json")
