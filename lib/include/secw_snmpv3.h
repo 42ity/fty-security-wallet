@@ -42,6 +42,9 @@ enum Snmpv3AuthProtocol : uint8_t
 {
     MD5 = 0,
     SHA,
+    SHA256,
+    SHA384,
+    SHA512,
 
     MAX_AUTH_PROTOCOL // size of the enum
 };
@@ -50,6 +53,8 @@ enum Snmpv3PrivProtocol : uint8_t
 {
     DES = 0,
     AES,
+    AES256,
+    AES192 = 4,
 
     MAX_PRIV_PROTOCOL // size of the enum
 };
