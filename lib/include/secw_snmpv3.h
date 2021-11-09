@@ -53,8 +53,8 @@ enum Snmpv3PrivProtocol : uint8_t
 {
     DES = 0,
     AES,
+    AES192,
     AES256,
-    AES192 = 4,
 
     MAX_PRIV_PROTOCOL // size of the enum
 };
