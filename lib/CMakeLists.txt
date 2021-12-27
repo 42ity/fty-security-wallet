@@ -14,7 +14,7 @@ etn_target(shared ${PROJECT_NAME_UNDERSCORE}
         src/secw_security_wallet.cc
         include/secw_security_wallet.h
         src/secw_security_wallet_server.cc
-        src/secw_security_wallet_server.h
+        include/secw_security_wallet_server.h
         src/fty_security_wallet_mlm_agent.cc
         src/fty_security_wallet_mlm_agent.h
         src/cam_credential_asset_mapping_storage.cc
