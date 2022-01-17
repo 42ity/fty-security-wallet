@@ -104,7 +104,7 @@ etn_test_target(${PROJECT_NAME_UNDERSCORE}
         tests
 )
 
-if (BUILD_TESTING)
+#if (BUILD_TESTING)
     etn_target(shared ${PROJECT_NAME_UNDERSCORE}_server
         SOURCES
             src/secw_openssl_wrapper.cc
@@ -160,4 +160,4 @@ if (BUILD_TESTING)
     )
 
     set_target_properties(${PROJECT_NAME_UNDERSCORE}_server PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
-endif()
+#endif()
