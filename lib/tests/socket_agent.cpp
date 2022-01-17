@@ -6,7 +6,7 @@
 #include <fty_security_wallet.h>
 #include <map>
 #include <mlm_server.h>
-#include <src/secw_security_wallet_server.h>
+#include <secw_security_wallet_server.h>
 #include "consumer_accessor.h"
 #include "producer_accessor.h"
 

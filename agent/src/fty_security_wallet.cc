@@ -36,7 +36,7 @@
 #include <fty_common_socket.h>
 #include <fty_log.h>
 #include <thread>
-#include "src/secw_security_wallet_server.h"
+#include "secw_security_wallet_server.h"
 
 static void usage()
 {
