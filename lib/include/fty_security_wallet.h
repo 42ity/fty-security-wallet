@@ -23,7 +23,7 @@
 #pragma once
 
 // Common defs
-#define ACTIVE_VERSION                     "1.0"
+#define ACTIVE_VERSION                     "1.1"
 #define SECURITY_WALLET_AGENT              "security-wallet"
 #define DEFAULT_STORAGE_DATABASE_PATH      "/var/lib/fty/fty-security-wallet/database.json"
 #define DEFAULT_STORAGE_CONFIGURATION_PATH "/etc/fty/fty-security-wallet/configuration.json"
