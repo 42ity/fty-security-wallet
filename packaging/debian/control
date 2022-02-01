@@ -25,6 +25,7 @@ Standards-Version: 4.0.1.0
 Build-Depends: debhelper (>= 9),
     cmake (>=3.0),
     fty-cmake-dev,
+    fty-utils-dev,
     pkg-config,
     libsystemd-dev,
     libssl-dev,

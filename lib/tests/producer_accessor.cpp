@@ -500,6 +500,177 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
         }
     }
 
+    // test 5.7 => insertNewDocument SNMPV3 - SHA256 / AES256
+    {
+        secw::Id localId;
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+
+        // register the callback on create
+        producerAccessor.setCallbackOnCreate(std::bind(callbackCreate, _1, _2, &g_lock, &g_condvar));
+
+        try {
+            secw::Snmpv3Ptr snmpv3Doc =
+                std::make_shared<secw::Snmpv3>("sha256 encrypted", secw::Snmpv3SecurityLevel::AUTH_PRIV, "test security name",
+                    secw::Snmpv3AuthProtocol::SHA256, "test auth password", secw::Snmpv3PrivProtocol::AES256, "test priv password");
+
+            snmpv3Doc->addUsage("discovery_monitoring");
+
+            // lock to wait for the callback => the callback will notify this thread if called properly
+            std::unique_lock<std::mutex> lock(g_lock);
+            g_action    = "";
+            g_portfolio = "";
+            g_newDoc    = nullptr;
+
+            localId = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<secw::Document>(snmpv3Doc));
+
+            // wait for the callback to finish
+            if (g_condvar.wait_for(lock, std::chrono::seconds(TEST_TIMEOUT)) == std::cv_status::timeout) {
+                throw std::runtime_error("Timed out when waiting for callback to finish");
+            }
+
+            // check that the doc is inserted and the callback called
+            if (g_action != "CREATED")
+                throw std::runtime_error("Wrong action in the callback");
+            if (g_portfolio != "default")
+                throw std::runtime_error("Wrong portfolio in the created callback");
+            if (g_newDoc == nullptr)
+                throw std::runtime_error("No new data in the created callback");
+            if (g_newDoc->getId() != localId)
+                throw std::runtime_error("Wrong id in the new document in the created callback");
+            if (g_newDoc->getName() != "sha256 encrypted")
+                throw std::runtime_error("Wrong name in the new document in the created callback");
+
+            secw::DocumentPtr snmpv3DocClone = snmpv3Doc->clone();
+
+            if (!snmpv3Doc->isNonSecretEquals(snmpv3DocClone))
+                throw std::runtime_error("Error in the comparaison of non secret of clone");
+            if (!snmpv3Doc->isSecretEquals(snmpv3DocClone))
+                throw std::runtime_error("Error in the comparaison of secret of clone");
+
+            if (!g_newDoc->isNonSecretEquals(snmpv3Doc))
+                throw std::runtime_error("Error in the comparaison of non secret of received element");
+            if (g_newDoc->isSecretEquals(snmpv3Doc))
+                throw std::runtime_error(
+                    "Error in the comparaison of secret of received element => comparaison resturn true");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 5.8 => insertNewDocument SNMPV3 - SHA512 / AES192
+    {
+        secw::Id localId;
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+
+        // register the callback on create
+        producerAccessor.setCallbackOnCreate(std::bind(callbackCreate, _1, _2, &g_lock, &g_condvar));
+
+        try {
+            secw::Snmpv3Ptr snmpv3Doc =
+                std::make_shared<secw::Snmpv3>("sha512 encrypted", secw::Snmpv3SecurityLevel::AUTH_PRIV, "test security name",
+                    secw::Snmpv3AuthProtocol::SHA256, "test auth password", secw::Snmpv3PrivProtocol::AES192, "test priv password");
+
+            snmpv3Doc->addUsage("discovery_monitoring");
+
+            // lock to wait for the callback => the callback will notify this thread if called properly
+            std::unique_lock<std::mutex> lock(g_lock);
+            g_action    = "";
+            g_portfolio = "";
+            g_newDoc    = nullptr;
+
+            localId = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<secw::Document>(snmpv3Doc));
+
+            // wait for the callback to finish
+            if (g_condvar.wait_for(lock, std::chrono::seconds(TEST_TIMEOUT)) == std::cv_status::timeout) {
+                throw std::runtime_error("Timed out when waiting for callback to finish");
+            }
+
+            // check that the doc is inserted and the callback called
+            if (g_action != "CREATED")
+                throw std::runtime_error("Wrong action in the callback");
+            if (g_portfolio != "default")
+                throw std::runtime_error("Wrong portfolio in the created callback");
+            if (g_newDoc == nullptr)
+                throw std::runtime_error("No new data in the created callback");
+            if (g_newDoc->getId() != localId)
+                throw std::runtime_error("Wrong id in the new document in the created callback");
+            if (g_newDoc->getName() != "sha512 encrypted")
+                throw std::runtime_error("Wrong name in the new document in the created callback");
+
+            secw::DocumentPtr snmpv3DocClone = snmpv3Doc->clone();
+
+            if (!snmpv3Doc->isNonSecretEquals(snmpv3DocClone))
+                throw std::runtime_error("Error in the comparaison of non secret of clone");
+            if (!snmpv3Doc->isSecretEquals(snmpv3DocClone))
+                throw std::runtime_error("Error in the comparaison of secret of clone");
+
+            if (!g_newDoc->isNonSecretEquals(snmpv3Doc))
+                throw std::runtime_error("Error in the comparaison of non secret of received element");
+            if (g_newDoc->isSecretEquals(snmpv3Doc))
+                throw std::runtime_error(
+                    "Error in the comparaison of secret of received element => comparaison resturn true");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 5.9 => insertNewDocument SNMPV3 - SHA384 / AES256
+    {
+        secw::Id localId;
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+
+        // register the callback on create
+        producerAccessor.setCallbackOnCreate(std::bind(callbackCreate, _1, _2, &g_lock, &g_condvar));
+
+        try {
+            secw::Snmpv3Ptr snmpv3Doc =
+                std::make_shared<secw::Snmpv3>("sha384 encrypted", secw::Snmpv3SecurityLevel::AUTH_PRIV, "test security name",
+                    secw::Snmpv3AuthProtocol::SHA384, "test auth password", secw::Snmpv3PrivProtocol::AES192, "test priv password");
+
+            snmpv3Doc->addUsage("discovery_monitoring");
+
+            // lock to wait for the callback => the callback will notify this thread if called properly
+            std::unique_lock<std::mutex> lock(g_lock);
+            g_action    = "";
+            g_portfolio = "";
+            g_newDoc    = nullptr;
+
+            localId = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<secw::Document>(snmpv3Doc));
+
+            // wait for the callback to finish
+            if (g_condvar.wait_for(lock, std::chrono::seconds(TEST_TIMEOUT)) == std::cv_status::timeout) {
+                throw std::runtime_error("Timed out when waiting for callback to finish");
+            }
+
+            // check that the doc is inserted and the callback called
+            if (g_action != "CREATED")
+                throw std::runtime_error("Wrong action in the callback");
+            if (g_portfolio != "default")
+                throw std::runtime_error("Wrong portfolio in the created callback");
+            if (g_newDoc == nullptr)
+                throw std::runtime_error("No new data in the created callback");
+            if (g_newDoc->getId() != localId)
+                throw std::runtime_error("Wrong id in the new document in the created callback");
+            if (g_newDoc->getName() != "sha384 encrypted")
+                throw std::runtime_error("Wrong name in the new document in the created callback");
+
+            secw::DocumentPtr snmpv3DocClone = snmpv3Doc->clone();
+
+            if (!snmpv3Doc->isNonSecretEquals(snmpv3DocClone))
+                throw std::runtime_error("Error in the comparaison of non secret of clone");
+            if (!snmpv3Doc->isSecretEquals(snmpv3DocClone))
+                throw std::runtime_error("Error in the comparaison of secret of clone");
+
+            if (!g_newDoc->isNonSecretEquals(snmpv3Doc))
+                throw std::runtime_error("Error in the comparaison of non secret of received element");
+            if (g_newDoc->isSecretEquals(snmpv3Doc))
+                throw std::runtime_error(
+                    "Error in the comparaison of secret of received element => comparaison resturn true");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
     // test 6.1 => insertNewDocument User and Password
     {
         secw::ProducerAccessor producerAccessor(syncClient, streamClient);

@@ -26,12 +26,13 @@
 @end
 */
 
-
 #include "secw_security_wallet.h"
+#include "fty_security_wallet.h"
 #include "secw_helpers.h"
 #include <cxxtools/jsondeserializer.h>
 #include <cxxtools/jsonserializer.h>
 #include <fstream>
+#include <fty/convert.h>
 #include <fty_log.h>
 #include <iostream>
 #include <sys/stat.h>
@@ -185,7 +186,7 @@ cxxtools::SerializationInfo SecurityWallet::getSrrSaveData(const std::string& pa
 void SecurityWallet::restoreSRRData(
     const cxxtools::SerializationInfo& si, const std::string& passphrase, const std::string& version)
 {
-    if (version != "1.0") {
+    if (fty::convert<float>(version) > fty::convert<float>(ACTIVE_VERSION)) {
         throw std::runtime_error("Version " + version + " is not supported");
     }
 
