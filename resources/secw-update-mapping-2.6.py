@@ -156,7 +156,7 @@ try:
     if g_debug:
         print("indexToRemoveList: " + str(indexToRemoveList))
 
-    #delete obsolete entries from data mapping
+    #remove obsolete entries from data mapping in **reverse** order
     for index in reversed(indexToRemoveList):
         data['mappings'].pop(index)
 except Exception as e:
