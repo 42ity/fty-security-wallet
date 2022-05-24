@@ -86,6 +86,12 @@ try:
         print("Input mappings (size: " + str(len(data['mappings'])) + "):")
         json.dump(data['mappings'], sys.stdout, indent=4)
         print()
+except FileNotFoundError as e:
+    #FileNotFound, do nothing (this is *not* an error)
+    print(e)
+    if g_verbose:
+        print("Do nothing")
+    sys.exit(0)
 except Exception as e:
     print(e)
     traceback.print_exc()
