@@ -20,6 +20,9 @@ EnvironmentFile=-/etc/default/bios__%n.conf
 EnvironmentFile=-/etc/default/fty
 EnvironmentFile=-/etc/default/fty__%n.conf
 
+# mapping.json 2.6 upgrade
+ExecStartPre=@AGENT_SHARE_BIOS_SCRIPTS_DIR@/secw-update-mapping-2.6.py -i '@AGENT_VAR_DIR@/mapping.json' -o '@AGENT_VAR_DIR@/mapping.json'
+
 # Exec
 ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/@PROJECT_NAME@ -c @AGENT_ETC_DIR@/@PROJECT_NAME@.cfg
 

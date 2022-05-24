@@ -25,16 +25,22 @@ set(AGENT_VAR_DIR "${CMAKE_INSTALL_FULL_LOCALSTATEDIR}/lib/fty/${PROJECT_NAME}")
 set(AGENT_ETC_DIR "${CMAKE_INSTALL_FULL_SYSCONFDIR}/${PROJECT_NAME}")
 set(AGENT_ETC_FTY_DIR "${CMAKE_INSTALL_FULL_SYSCONFDIR}/fty/${PROJECT_NAME}")
 set(AGENT_SHARE_BIOS_SETUP_DIR "${CMAKE_INSTALL_FULL_DATAROOTDIR}/bios/setup")
+set(AGENT_SHARE_BIOS_SCRIPTS_DIR "${CMAKE_INSTALL_FULL_DATAROOTDIR}/bios/scripts")
 
 set(AGENT_socketSecurityWallet "/run/${PROJECT_NAME}/secw.socket")
 set(AGENT_systemd_service_type "notify")
 
 set(res "resources")
 
-# 30-secw-update-database-right.sh -> bios/setup
+# 30-secw-update-database-right.sh -> usr/share/bios/setup
 set(file "30-secw-update-database-right.sh")
 configure_file("${PROJECT_SOURCE_DIR}/${res}/${file}.in" "${PROJECT_BINARY_DIR}/${res}/${file}" @ONLY)
 install(PROGRAMS "${PROJECT_BINARY_DIR}/${res}/${file}" DESTINATION ${AGENT_SHARE_BIOS_SETUP_DIR})
+
+# secw-update-mapping-2.6.py -> usr/share/bios/scripts
+set(file "secw-update-mapping-2.6.py")
+configure_file("${PROJECT_SOURCE_DIR}/${res}/${file}" "${PROJECT_BINARY_DIR}/${res}/${file}" @ONLY)
+install(PROGRAMS "${PROJECT_BINARY_DIR}/${res}/${file}" DESTINATION ${AGENT_SHARE_BIOS_SCRIPTS_DIR})
 
 # configuration.json -> etc/fty
 set(file "configuration.json")

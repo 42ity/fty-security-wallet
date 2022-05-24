@@ -2,5 +2,6 @@ usr/bin/fty-security-wallet
 etc/fty-security-wallet/fty-security-wallet.cfg
 etc/fty/fty-security-wallet/configuration.json
 usr/share/bios/setup/30-secw-update-database-right.sh
+usr/share/bios/scripts/secw-update-mapping-2.6.py
 usr/lib/systemd/system/*
 usr/lib/tmpfiles.d/*
