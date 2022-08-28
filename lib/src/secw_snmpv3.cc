@@ -28,6 +28,7 @@
 
 #include "secw_snmpv3.h"
 #include "secw_exception.h"
+#include "secw_utf8_cxxtools.h"
 #include <cxxtools/jsonserializer.h>
 
 namespace secw {
@@ -99,18 +100,18 @@ void Snmpv3::validate() const
 void Snmpv3::fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const
 {
     if (!m_authPassword.empty()) {
-        si.addMember(DOC_SNMPV3_AUTH_PASSWORD) <<= m_authPassword;
+        si.addMember(DOC_SNMPV3_AUTH_PASSWORD) <<= StdStringToCxxString(m_authPassword);
     }
 
     if (!m_privPassword.empty()) {
-        si.addMember(DOC_SNMPV3_PRIV_PASSWORD) <<= m_privPassword;
+        si.addMember(DOC_SNMPV3_PRIV_PASSWORD) <<= StdStringToCxxString(m_privPassword);
     }
 }
 
 void Snmpv3::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const
 {
     si.addMember(DOC_SNMPV3_SECURITY_LEVEL) <<= uint8_t(m_securityLevel);
-    si.addMember(DOC_SNMPV3_SECURITY_NAME) <<= m_securityName;
+    si.addMember(DOC_SNMPV3_SECURITY_NAME) <<= StdStringToCxxString(m_securityName);
     si.addMember(DOC_SNMPV3_AUTH_PROTOCOL) <<= uint8_t(m_authProtocol);
     si.addMember(DOC_SNMPV3_PRIV_PROTOCOL) <<= uint8_t(m_privProtocol);
 }
@@ -120,17 +121,16 @@ void Snmpv3::updatePrivateDocFromSerializationInfo(const cxxtools::Serialization
     try {
         const cxxtools::SerializationInfo* authPassword = si.findMember(DOC_SNMPV3_AUTH_PASSWORD);
         if (authPassword != nullptr) {
-            *authPassword >>= m_authPassword;
+            m_authPassword = GetSiMemberCxxString(si, DOC_SNMPV3_AUTH_PASSWORD);
         }
     } catch (const std::exception& e) {
         throw SecwInvalidDocumentFormatException(DOC_SNMPV3_AUTH_PASSWORD);
     }
 
-
     try {
         const cxxtools::SerializationInfo* authPriv = si.findMember(DOC_SNMPV3_PRIV_PASSWORD);
         if (authPriv != nullptr) {
-            *authPriv >>= m_privPassword;
+            m_privPassword = GetSiMemberCxxString(si, DOC_SNMPV3_PRIV_PASSWORD);
         }
     } catch (const std::exception& e) {
         throw SecwInvalidDocumentFormatException(DOC_SNMPV3_PRIV_PASSWORD);
@@ -150,7 +150,7 @@ void Snmpv3::updatePublicDocFromSerializationInfo(const cxxtools::SerializationI
     }
 
     try {
-        si.getMember(DOC_SNMPV3_SECURITY_NAME) >>= m_securityName;
+        m_securityName = GetSiMemberCxxString(si, DOC_SNMPV3_SECURITY_NAME);
     } catch (const std::exception& e) {
         throw SecwInvalidDocumentFormatException(DOC_SNMPV3_SECURITY_NAME);
     }
