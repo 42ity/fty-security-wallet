@@ -33,6 +33,7 @@
 #include "secw_snmpv1.h"
 #include "secw_snmpv3.h"
 #include "secw_user_and_password.h"
+#include "secw_utf8_cxxtools.h"
 #include <cxxtools/jsondeserializer.h>
 #include <cxxtools/jsonserializer.h>
 
@@ -290,7 +291,7 @@ bool Document::isSecretEquals(const DocumentPtr& other) const
 void Document::fillSerializationInfoHeaderDoc(cxxtools::SerializationInfo& si) const
 {
     si.addMember(DOC_ID_ENTRY) <<= getId();
-    si.addMember(DOC_NAME_ENTRY) <<= getName();
+    si.addMember(DOC_NAME_ENTRY) <<= StdStringToCxxString(getName());
     si.addMember(DOC_TYPE_ENTRY) <<= getType();
     si.addMember(DOC_TAGS_ENTRY) <<= getTags();
     si.addMember(DOC_USAGES_ENTRY) <<= getUsageIds();
@@ -301,7 +302,9 @@ void Document::updateHeaderFromSerializationInfo(const cxxtools::SerializationIn
     try {
         // We don't read the id because will portfolio insertion process is gonna do it
         // We don't read the type because it is define by the object type
-        si.getMember(DOC_NAME_ENTRY) >>= m_name;
+        cxxtools::String cxxStr;
+        si.getMember(DOC_NAME_ENTRY) >>= cxxStr;
+        m_name = CxxStringToStdString(cxxStr); //utf-8
     } catch (const std::exception& e) {
         throw SecwInvalidDocumentFormatException(DOC_NAME_ENTRY);
     }
