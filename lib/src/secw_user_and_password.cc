@@ -28,6 +28,7 @@
 
 #include "secw_user_and_password.h"
 #include "secw_exception.h"
+#include "secw_utf8_cxxtools.h"
 #include <cxxtools/jsonserializer.h>
 
 namespace secw {
@@ -67,13 +68,13 @@ void UserAndPassword::validate() const
 void UserAndPassword::fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const
 {
     if (!m_password.empty()) {
-        si.addMember(DOC_USER_AND_PASSWORD_PASSWORD) <<= m_password;
+        si.addMember(DOC_USER_AND_PASSWORD_PASSWORD) <<= StdStringToCxxString(m_password);
     }
 }
 
 void UserAndPassword::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const
 {
-    si.addMember(DOC_USER_AND_PASSWORD_USERNAME) <<= m_username;
+    si.addMember(DOC_USER_AND_PASSWORD_USERNAME) <<= StdStringToCxxString(m_username);
 }
 
 void UserAndPassword::updatePrivateDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
@@ -81,7 +82,7 @@ void UserAndPassword::updatePrivateDocFromSerializationInfo(const cxxtools::Seri
     try {
         const cxxtools::SerializationInfo* password = si.findMember(DOC_USER_AND_PASSWORD_PASSWORD);
         if (password != nullptr) {
-            *password >>= m_password;
+            m_password = GetSiMemberCxxString(si, DOC_USER_AND_PASSWORD_PASSWORD);
         }
     } catch (const std::exception& e) {
         throw SecwInvalidDocumentFormatException(DOC_USER_AND_PASSWORD_PASSWORD);
@@ -91,7 +92,7 @@ void UserAndPassword::updatePrivateDocFromSerializationInfo(const cxxtools::Seri
 void UserAndPassword::updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
 {
     try {
-        si.getMember(DOC_USER_AND_PASSWORD_USERNAME) >>= m_username;
+        m_username = GetSiMemberCxxString(si, DOC_USER_AND_PASSWORD_USERNAME);
     } catch (const std::exception& e) {
         throw SecwInvalidDocumentFormatException(DOC_USER_AND_PASSWORD_USERNAME);
     }
