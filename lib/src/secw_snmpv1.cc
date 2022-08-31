@@ -28,6 +28,7 @@
 
 #include "secw_snmpv1.h"
 #include "secw_exception.h"
+#include "secw_utf8_cxxtools.h"
 #include <cxxtools/jsonserializer.h>
 
 namespace secw {
@@ -59,13 +60,13 @@ void Snmpv1::fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& /*si*/
 
 void Snmpv1::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const
 {
-    si.addMember(DOC_SNMPV1_COMMUNITY_NAME) <<= m_communityName;
+    si.addMember(DOC_SNMPV1_COMMUNITY_NAME) <<= StdStringToCxxString(m_communityName);
 }
 
 void Snmpv1::updatePublicDocFromSerializationInfo(const cxxtools::SerializationInfo& si)
 {
     try {
-        si.getMember(DOC_SNMPV1_COMMUNITY_NAME) >>= m_communityName;
+        m_communityName = GetSiMemberCxxString(si, DOC_SNMPV1_COMMUNITY_NAME);
     } catch (const std::exception& e) {
         throw SecwInvalidDocumentFormatException(DOC_SNMPV1_COMMUNITY_NAME);
     }

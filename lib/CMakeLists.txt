@@ -21,6 +21,7 @@ etn_target(shared ${PROJECT_NAME_UNDERSCORE}
         src/cam_credential_asset_mapping_storage.h
         src/secw_helpers.cc
         src/secw_helpers.h
+        src/secw_utf8_cxxtools.h
         src/cam_exception.cc
         src/secw_exception.cc
         src/secw_portfolio.cc
