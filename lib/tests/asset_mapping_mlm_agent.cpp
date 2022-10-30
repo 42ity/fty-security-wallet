@@ -31,6 +31,8 @@ TEST_CASE("credential asset mapping mlm agent test")
     paramsCam["STORAGE_MAPPING_PATH"] = "mapping.json";
     paramsCam["AGENT_NAME"]           = MAPPING_AGENT;
     paramsCam["ENDPOINT"]             = endpoint;
+    paramsCam["AGENT_NAME_SRR"]       = MAPPING_AGENT_SRR;
+    paramsCam["ENDPOINT_SRR"]         = endpoint;
 
     // start broker agent
     zactor_t* server = zactor_new(fty_credential_asset_mapping_mlm_agent, static_cast<void*>(&paramsCam));

@@ -31,7 +31,11 @@ class CredentialAssetMappingStorage
 {
 public:
     explicit CredentialAssetMappingStorage(const std::string& databasePath);
+
+    void serialize(cxxtools::SerializationInfo& si) const;
+    void parse(const cxxtools::SerializationInfo& si);
     void save() const;
+    void read();
 
     const CredentialAssetMapping& getMapping(
         const AssetId& assetId, const ServiceId& serviceId, const Protocol& protocol) const;

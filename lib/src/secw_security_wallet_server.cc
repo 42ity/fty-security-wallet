@@ -41,6 +41,7 @@
 using namespace std::placeholders;
 
 static constexpr auto FEATURE_SRR_SECW = "security-wallet";
+static constexpr auto MSGBUS_SRR_SECW_QUEUE = "ETN.Q.IPMCORE.SECUWALLET";
 
 namespace secw {
 
@@ -85,7 +86,8 @@ SecurityWalletServer::SecurityWalletServer(const std::string& configurationPath,
         m_srrProcessor->restoreHandler = std::bind(&SecurityWalletServer::handleRestore, this, _1);
 
         // Listen all incoming request
-        m_msgBus->receive("ETN.Q.IPMCORE.SECUWALLET", std::bind(&SecurityWalletServer::handleSRRRequest, this, _1));
+        log_debug("SECW SRR listen to %s", MSGBUS_SRR_SECW_QUEUE);
+        m_msgBus->receive(MSGBUS_SRR_SECW_QUEUE, std::bind(&SecurityWalletServer::handleSRRRequest, this, _1));
     }
 }
 
@@ -180,7 +182,6 @@ dto::srr::SaveResponse SecurityWalletServer::handleSave(const dto::srr::SaveQuer
     for (const auto& featureName : query.features()) {
         FeatureAndStatus fs1;
         Feature&         f1 = *(fs1.mutable_feature());
-
 
         if (featureName == FEATURE_SRR_SECW) {
             f1.set_version(ACTIVE_VERSION);

@@ -25,54 +25,85 @@
 #include <cxxtools/jsonserializer.h>
 #include <fstream>
 #include <fty_log.h>
+#include <fty_common_json.h>
 #include <iostream>
 #include <sys/stat.h>
 #include <unistd.h>
 
 namespace cam {
 
+void CredentialAssetMappingStorage::serialize(cxxtools::SerializationInfo& si) const
+{
+    si.clear();
+    si.addMember("version") <<= MAPPING_VERSION;
+    si.addMember("mappings") <<= getAllMappings();
+}
+
+void CredentialAssetMappingStorage::parse(const cxxtools::SerializationInfo& si)
+{
+    auto savedMappings = m_mappings;
+
+    try {
+        m_mappings.clear();
+
+        uint8_t version = 0;
+        si.getMember("version") >>= version;
+
+        if (version == 1) {
+            std::vector<CredentialAssetMapping> listOfmapping;
+            si.getMember("mappings") >>= listOfmapping;
+
+            for (const CredentialAssetMapping& mapping : listOfmapping) {
+                try {
+                    setMapping(mapping);
+                } catch (const std::exception& e) {
+                    log_error("Error on one element: %s", e.what());
+                }
+            }
+        } else {
+            throw std::runtime_error("Version not supported");
+        }
+    } catch (...) {
+        m_mappings = savedMappings; // restored
+        throw;
+    }
+}
+
+void CredentialAssetMappingStorage::read()
+{
+    log_debug("Read mapping database %s", m_pathDatabase.c_str());
+
+    struct stat buffer;
+    bool fileExist = (stat(m_pathDatabase.c_str(), &buffer) == 0);
+
+    // open/read database if exist
+    if (fileExist) {
+        cxxtools::SerializationInfo si;
+        JSON::readFromFile(m_pathDatabase, si);
+        parse(si);
+    } else {
+        log_info("No mapping database %s. Creating default...", m_pathDatabase.c_str());
+        m_mappings.clear();
+    }
+}
+
+void CredentialAssetMappingStorage::save() const
+{
+    log_debug("Save mapping database %s", m_pathDatabase.c_str());
+
+    cxxtools::SerializationInfo si;
+    serialize(si);
+    JSON::writeToFile(m_pathDatabase, si, true);
+}
+
 CredentialAssetMappingStorage::CredentialAssetMappingStorage(const std::string& databasePath)
     : m_pathDatabase(databasePath)
 {
     // Load database
-    log_info(" Loading mapping from %s ...", m_pathDatabase.c_str());
     try {
-        struct stat buffer;
-        bool        fileExist = (stat(m_pathDatabase.c_str(), &buffer) == 0);
-
-        // try to open portfolio if exist
-        if (fileExist) {
-            std::ifstream input;
-
-            input.open(m_pathDatabase);
-
-            cxxtools::SerializationInfo rootSi;
-            cxxtools::JsonDeserializer  deserializer(input);
-            deserializer.deserialize(rootSi);
-
-            uint8_t version = 0;
-            rootSi.getMember("version") >>= version;
-
-            if (version == 1) {
-                std::vector<CredentialAssetMapping> listOfmapping;
-                rootSi.getMember("mappings") >>= listOfmapping;
-
-                for (const CredentialAssetMapping& mapping : listOfmapping) {
-                    try {
-                        setMapping(mapping);
-                    } catch (const std::exception& e) {
-                        log_error("Error on one element: %s", e.what());
-                    }
-                }
-            } else {
-                throw std::runtime_error("Version not supported");
-            }
-        } else {
-            log_info(" No mapping %s. Creating default mapping...", m_pathDatabase.c_str());
-        }
-
+        read();
     } catch (const std::exception& e) {
-        log_error("Error while loading mapping file %s\n %s", m_pathDatabase.c_str(), e.what());
+        log_error("Error while reading mapping file %s\n %s", m_pathDatabase.c_str(), e.what());
         exit(EXIT_FAILURE);
     }
 
@@ -83,33 +114,6 @@ CredentialAssetMappingStorage::CredentialAssetMappingStorage(const std::string& 
         log_error("Error while saving into mapping file %s\n %s", m_pathDatabase.c_str(), e.what());
         exit(EXIT_FAILURE);
     }
-}
-
-void CredentialAssetMappingStorage::save() const
-{
-    log_debug("Update mapping database");
-
-    // create the file content
-    cxxtools::SerializationInfo rootSi;
-
-    rootSi.addMember("version") <<= MAPPING_VERSION;
-
-    std::vector<CredentialAssetMapping> list;
-
-    for (const auto& item : m_mappings) {
-        list.push_back(item.second);
-    }
-
-    rootSi.addMember("mappings") <<= list;
-
-    // open the file
-    std::ofstream output(m_pathDatabase.c_str());
-
-    cxxtools::JsonSerializer serializer(output);
-    serializer.beautify(true);
-    serializer.serialize(rootSi);
-
-    output.close();
 }
 
 const CredentialAssetMapping& CredentialAssetMappingStorage::getMapping(

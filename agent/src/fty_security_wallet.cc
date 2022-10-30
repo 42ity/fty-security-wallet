@@ -81,6 +81,7 @@ int main(int argc, char* argv[])
         std::string storage_access_path(DEFAULT_STORAGE_CONFIGURATION_PATH);
 
         std::string mapping_actor_name(MAPPING_AGENT);
+        std::string mapping_actor_name_srr(MAPPING_AGENT_SRR);
         std::string storage_mapping_path(DEFAULT_STORAGE_MAPPING_PATH);
 
         // char *log_config = NULL;
@@ -96,8 +97,9 @@ int main(int argc, char* argv[])
             storage_database_path = config.getEntry("secw-storage/database", DEFAULT_STORAGE_DATABASE_PATH);
             storage_access_path   = config.getEntry("secw-storage/configuration", DEFAULT_STORAGE_CONFIGURATION_PATH);
 
-            mapping_actor_name   = config.getEntry("mapping-malamute/address", MAPPING_AGENT);
-            storage_mapping_path = config.getEntry("mapping-storage/database", MAPPING_AGENT);
+            mapping_actor_name     = config.getEntry("mapping-malamute/address", MAPPING_AGENT);
+            mapping_actor_name_srr = config.getEntry("mapping-malamute/address_srr", MAPPING_AGENT_SRR);
+            storage_mapping_path   = config.getEntry("mapping-storage/database", MAPPING_AGENT);
         }
 
         log_debug(SECURITY_WALLET_AGENT ": storage_access_path '%s'", storage_access_path.c_str());
@@ -128,23 +130,29 @@ int main(int argc, char* argv[])
             SECURITY_WALLET_AGENT, SECW_NOTIFICATIONS, 1000, paramsSecw.at("ENDPOINT"));
 
         // create the server
-        secw::SecurityWalletServer serverSecw(paramsSecw.at("STORAGE_CONFIGURATION_PATH"),
-            paramsSecw.at("STORAGE_DATABASE_PATH"), notificationStream, paramsSecw.at("ENDPOINT_SRR"),
-            paramsSecw.at("AGENT_NAME_SRR"));
+        secw::SecurityWalletServer serverSecw(
+            paramsSecw.at("STORAGE_CONFIGURATION_PATH"),
+            paramsSecw.at("STORAGE_DATABASE_PATH"),
+            notificationStream,
+            paramsSecw.at("ENDPOINT_SRR"),
+            paramsSecw.at("AGENT_NAME_SRR")
+        );
 
         fty::SocketBasicServer agentSecw(serverSecw, socketPath);
 
         std::thread agentSecwThread(&fty::SocketBasicServer::run, &agentSecw);
 
-        // set configuration parameters for CAM
+        // set configuration parameters for CAM (Creds Asset Mapping)
         Arguments paramsCam;
 
         paramsCam["STORAGE_MAPPING_PATH"] = storage_mapping_path;
         paramsCam["AGENT_NAME"]           = mapping_actor_name;
         paramsCam["ENDPOINT"]             = endpoint;
+        paramsCam["AGENT_NAME_SRR"]       = mapping_actor_name_srr;
+        paramsCam["ENDPOINT_SRR"]         = endpoint;
 
         // start broker agent
-        zactor_t* cam_server = zactor_new(fty_credential_asset_mapping_mlm_agent, static_cast<void*>(&paramsCam));
+        zactor_t* server_cam = zactor_new(fty_credential_asset_mapping_mlm_agent, static_cast<void*>(&paramsCam));
 
 #if defined(HAVE_LIBSYSTEMD)
         // notify systemd that the socket is ready, so that depending units can start
@@ -155,7 +163,7 @@ int main(int argc, char* argv[])
 #endif
 
         while (true) {
-            char* camStr = zstr_recv(cam_server);
+            char* camStr = zstr_recv(server_cam);
             if (camStr) {
                 puts(camStr);
                 zstr_free(&camStr);
@@ -177,7 +185,7 @@ int main(int argc, char* argv[])
         agentSecwThread.join();
 
         log_info("Cam Interrupted ...");
-        zactor_destroy(&cam_server);
+        zactor_destroy(&server_cam);
 
         return EXIT_SUCCESS;
     } catch (const std::exception& e) {

@@ -19,9 +19,7 @@ secw-storage
 
 mapping-malamute
     address = credential-asset-mapping     #   Agent address
+    address_srr = credential-asset-mapping-srr
 
 mapping-storage
     database = @AGENT_VAR_DIR@/mapping.json
-
-log
-    config = /etc/fty/ftylog.cfg    # configuration file for fty-common-logging
