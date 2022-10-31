@@ -53,9 +53,13 @@ class SecurityWalletServer final : public fty::SyncServer
 {
 
 public:
-    explicit SecurityWalletServer(const std::string& configurationPath, const std::string& databasePath,
-        fty::StreamPublisher& streamPublisher, const std::string& srrEndpoint = "",
-        const std::string& srrAgentName = "");
+    explicit SecurityWalletServer(
+        const std::string& configurationPath,
+        const std::string& databasePath,
+        fty::StreamPublisher& streamPublisher,
+        const std::string& srrEndpoint = "",
+        const std::string& srrAgentName = ""
+    );
 
     ~SecurityWalletServer();
 
@@ -90,9 +94,7 @@ private:
     // Notification
     void sendNotificationOnCreate(const std::string& portfolio, const DocumentPtr newDocument);
     void sendNotificationOnDelete(const std::string& portfolio, const DocumentPtr oldDocument);
-    void sendNotificationOnUpdate(
-        const std::string& portfolio, const DocumentPtr oldDocument, const DocumentPtr newDocument);
-
+    void sendNotificationOnUpdate(const std::string& portfolio, const DocumentPtr oldDocument, const DocumentPtr newDocument);
 
     std::string serializeListDocumentsPrivate(const std::string& portfolioName, const std::set<UsageId>& usages);
     std::string serializeListDocumentsPublic(const std::string& portfolioName, const std::set<UsageId>& usages);

@@ -38,8 +38,8 @@
 #include <fty_common.h>
 #include <fty/convert.h>
 
-static constexpr auto MSGBUS_SRR_SECW_CAM_QUEUE = "ETN.Q.IPMCORE.SECUWALLETCAM";
-static constexpr auto FEATURE_SRR_SECW_CAM = "FEATURE_SRR_SECW_CAM";
+static constexpr auto MSGBUS_SRR_SECW_CAM_QUEUE = "ETN.Q.IPMCORE.CREDASSETMAPPING";
+static constexpr auto FEATURE_SRR_SECW_CAM = "credential-asset-mapping";
 static constexpr auto ACTIVE_SRR_SECW_CAM_VERSION = "1.0";
 
 using namespace std::placeholders;
@@ -82,9 +82,8 @@ CredentialAssetMappingServer::CredentialAssetMappingServer(
     m_supportedCommands[COUNT_CRED_MAPPINGS] =
         std::bind(&CredentialAssetMappingServer::handleCountCredentialMappingsForCredential, this, _1, _2);
 
-    log_debug("check SRR <%s> <%s>", srrEndpoint.c_str(), srrAgentName.c_str());
     if ((!srrEndpoint.empty()) && (!srrAgentName.empty())) {
-        log_debug("Connect SRR %s %s", srrEndpoint.c_str(), srrAgentName.c_str());
+        log_debug("CAM SRR connect %s to %s", srrAgentName.c_str(), srrEndpoint.c_str());
         m_msgBus.reset(messagebus::MlmMessageBus(srrEndpoint, srrAgentName));
         m_msgBus->connect();
 
@@ -95,6 +94,15 @@ CredentialAssetMappingServer::CredentialAssetMappingServer(
         log_debug("CAM SRR listen to %s", MSGBUS_SRR_SECW_CAM_QUEUE);
         m_msgBus->receive(MSGBUS_SRR_SECW_CAM_QUEUE, std::bind(&CredentialAssetMappingServer::handleSRRRequest, this, _1));
     }
+    else {
+        log_info("CAM SRR not activated (endpoint: %s, address: %s)", srrEndpoint.c_str(), srrAgentName.c_str());
+    }
+}
+
+CredentialAssetMappingServer::~CredentialAssetMappingServer()
+{
+    // ensure nothing else is on going
+    std::unique_lock<std::mutex> lock(m_lock);
 }
 
 std::vector<std::string> CredentialAssetMappingServer::handleRequest(

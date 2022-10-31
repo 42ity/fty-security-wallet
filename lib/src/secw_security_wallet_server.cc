@@ -75,10 +75,9 @@ SecurityWalletServer::SecurityWalletServer(const std::string& configurationPath,
     m_supportedCommands[DELETE] = std::bind(&SecurityWalletServer::handleDelete, this, _1, _2);
     m_supportedCommands[UPDATE] = std::bind(&SecurityWalletServer::handleUpdate, this, _1, _2);
 
-    log_debug("check SRR <%s> <%s>", srrEndpoint.c_str(), srrAgentName.c_str());
-    // add support for SRR here (need to rework after)
+    // add support for SRR
     if ((!srrEndpoint.empty()) && (!srrAgentName.empty())) {
-        log_debug("Connect SRR %s %s", srrEndpoint.c_str(), srrAgentName.c_str());
+        log_debug("SECW SRR connect %s to %s", srrAgentName.c_str(), srrEndpoint.c_str());
         m_msgBus.reset(messagebus::MlmMessageBus(srrEndpoint, srrAgentName));
         m_msgBus->connect();
 
@@ -88,6 +87,9 @@ SecurityWalletServer::SecurityWalletServer(const std::string& configurationPath,
         // Listen all incoming request
         log_debug("SECW SRR listen to %s", MSGBUS_SRR_SECW_QUEUE);
         m_msgBus->receive(MSGBUS_SRR_SECW_QUEUE, std::bind(&SecurityWalletServer::handleSRRRequest, this, _1));
+    }
+    else {
+        log_info("SECW SRR not activated (endpoint: %s, address: %s)", srrEndpoint.c_str(), srrAgentName.c_str());
     }
 }
 
@@ -147,21 +149,16 @@ static void sendResponse(
 
 void SecurityWalletServer::handleSRRRequest(messagebus::Message msg)
 {
+    log_debug("SECW Configuration handle request");
 
-    using namespace dto;
-    using namespace dto::srr;
-
-    log_debug("Configuration handle request");
     try {
-        UserData response;
-
         // Get request
-        UserData data = msg.userData();
-        Query    query;
+        dto::UserData data = msg.userData();
+        dto::srr::Query query;
         data >> query;
-
+        // Process request
+        dto::UserData response;
         response << (m_srrProcessor->processQuery(query));
-
         // Send response
         sendResponse(m_msgBus, msg, response);
     } catch (std::exception& e) {
@@ -176,12 +173,15 @@ dto::srr::SaveResponse SecurityWalletServer::handleSave(const dto::srr::SaveQuer
     using namespace dto;
     using namespace dto::srr;
 
-    log_debug("Saving configuration");
+    log_debug("Saving SECW configuration");
+
     std::map<FeatureName, FeatureAndStatus> mapFeaturesData;
 
     for (const auto& featureName : query.features()) {
         FeatureAndStatus fs1;
         Feature&         f1 = *(fs1.mutable_feature());
+
+        log_debug("feature: %s", featureName.c_str());
 
         if (featureName == FEATURE_SRR_SECW) {
             f1.set_version(ACTIVE_VERSION);
@@ -190,10 +190,10 @@ dto::srr::SaveResponse SecurityWalletServer::handleSave(const dto::srr::SaveQuer
                 f1.set_data(serialize(m_activeWallet.getSrrSaveData(query.passpharse())));
                 fs1.mutable_status()->set_status(Status::SUCCESS);
             } catch (std::exception& e) {
+                log_debug("Save SECW failed (%s)", e.what());
                 fs1.mutable_status()->set_status(Status::FAILED);
                 fs1.mutable_status()->set_error(e.what());
             }
-
         } else {
             fs1.mutable_status()->set_status(Status::FAILED);
             fs1.mutable_status()->set_error("Feature is not supported!");
@@ -201,7 +201,8 @@ dto::srr::SaveResponse SecurityWalletServer::handleSave(const dto::srr::SaveQuer
 
         mapFeaturesData[featureName] = fs1;
     }
-    log_debug("Save configuration done");
+
+    log_debug("Save SECW configuration done");
 
     return (createSaveResponse(mapFeaturesData, ACTIVE_VERSION)).save();
 }
@@ -211,26 +212,30 @@ dto::srr::RestoreResponse SecurityWalletServer::handleRestore(const dto::srr::Re
     using namespace dto;
     using namespace dto::srr;
 
+    log_debug("Restoring SECW configuration");
+
     std::map<FeatureName, FeatureStatus> mapStatus;
 
     for (const auto& item : query.map_features_data()) {
         const FeatureName& featureName = item.first;
         const Feature&     feature     = item.second;
 
+        log_debug("feature: %s", featureName.c_str());
+
         FeatureStatus featureStatus;
         if (featureName == FEATURE_SRR_SECW) {
             try {
                 std::unique_lock<std::mutex> lock(m_lock);
+                log_debug("Si=\n%s", feature.data().c_str());
 
                 cxxtools::SerializationInfo si = deserialize(feature.data());
-                log_debug("Si=\n%s", feature.data().c_str());
                 m_activeWallet.restoreSRRData(si, query.passpharse(), feature.version());
                 featureStatus.set_status(Status::SUCCESS);
             } catch (std::exception& e) {
+                log_debug("Restore SECW failed (%s)", e.what());
                 featureStatus.set_status(Status::FAILED);
                 featureStatus.set_error(e.what());
             }
-
         } else {
             featureStatus.set_status(Status::FAILED);
             featureStatus.set_error("Feature is not supported!");
@@ -239,7 +244,7 @@ dto::srr::RestoreResponse SecurityWalletServer::handleRestore(const dto::srr::Re
         mapStatus[featureName] = featureStatus;
     }
 
-    log_debug("Restore configuration done");
+    log_debug("Restore SECW configuration done");
 
     return (createRestoreResponse(mapStatus)).restore();
 }

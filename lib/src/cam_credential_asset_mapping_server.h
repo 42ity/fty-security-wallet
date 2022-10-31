@@ -48,9 +48,11 @@ class CredentialAssetMappingServer final : public fty::SyncServer
 public:
     explicit CredentialAssetMappingServer(
         const std::string& storagePath,
-        const std::string& srrEndpoint,
-        const std::string& srrAgentName
+        const std::string& srrEndpoint = "",
+        const std::string& srrAgentName = ""
     );
+
+    ~CredentialAssetMappingServer();
 
     std::vector<std::string> handleRequest(const Sender& sender, const std::vector<std::string>& payload) override;
 
@@ -72,9 +74,7 @@ public:
     std::string handleGetMappings(const Sender& sender, const std::vector<std::string>& params);
     std::string handleGetAllMappings(const Sender& sender, const std::vector<std::string>& params);
     std::string handleGetCredentialMappings(const Sender& sender, const std::vector<std::string>& params);
-    std::string handleCountCredentialMappingsForCredential(
-        const Sender& sender, const std::vector<std::string>& params);
-
+    std::string handleCountCredentialMappingsForCredential(const Sender& sender, const std::vector<std::string>& params);
 
 public:
     // Command list
