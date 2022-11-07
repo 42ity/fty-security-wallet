@@ -19,20 +19,23 @@
     =========================================================================
 */
 
-#ifndef CAM_CREDENTIAL_ASSET_MAPPING_SERVER_H_INCLUDED
-#define CAM_CREDENTIAL_ASSET_MAPPING_SERVER_H_INCLUDED
+#pragma once
 
 #include "cam_accessor.h"
 #include "cam_credential_asset_mapping_storage.h"
 #include <fty_common_client.h>
 #include <fty_common_sync_server.h>
 #include <functional>
+#include <fty_srr_dto.h>
+#include <fty_common_messagebus.h>
+#include <mutex>
 
 /**
  * \brief Agent CredentialAssetMappingServer main server actor
  */
 
 namespace cam {
+
 using Command = std::string;
 using Sender  = std::string;
 using Subject = std::string;
@@ -43,7 +46,13 @@ class CredentialAssetMappingServer final : public fty::SyncServer
 {
 
 public:
-    explicit CredentialAssetMappingServer(const std::string& storagePath);
+    explicit CredentialAssetMappingServer(
+        const std::string& storagePath,
+        const std::string& srrEndpoint = "",
+        const std::string& srrAgentName = ""
+    );
+
+    ~CredentialAssetMappingServer();
 
     std::vector<std::string> handleRequest(const Sender& sender, const std::vector<std::string>& payload) override;
 
@@ -65,9 +74,7 @@ public:
     std::string handleGetMappings(const Sender& sender, const std::vector<std::string>& params);
     std::string handleGetAllMappings(const Sender& sender, const std::vector<std::string>& params);
     std::string handleGetCredentialMappings(const Sender& sender, const std::vector<std::string>& params);
-    std::string handleCountCredentialMappingsForCredential(
-        const Sender& sender, const std::vector<std::string>& params);
-
+    std::string handleCountCredentialMappingsForCredential(const Sender& sender, const std::vector<std::string>& params);
 
 public:
     // Command list
@@ -84,8 +91,16 @@ public:
     static constexpr const char* GET_MAPPINGS              = "GET_MAPPINGS";
     static constexpr const char* GET_ALL_MAPPINGS          = "GET_ALL_MAPPINGS";
     static constexpr const char* COUNT_CRED_MAPPINGS       = "COUNT_CRED_MAPPINGS";
+
+public:
+    // SRR support
+    std::unique_ptr<messagebus::MessageBus>      m_msgBus;
+    std::mutex                                   m_lock;
+    std::unique_ptr<dto::srr::SrrQueryProcessor> m_srrProcessor;
+
+    void                      handleSRRRequest(messagebus::Message msg);
+    dto::srr::SaveResponse    handleSRRSave(const dto::srr::SaveQuery& query);
+    dto::srr::RestoreResponse handleSRRRestore(const dto::srr::RestoreQuery& query);
 };
 
 } // namespace cam
-
-#endif

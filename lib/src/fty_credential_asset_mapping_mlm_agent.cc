@@ -37,7 +37,11 @@ void fty_credential_asset_mapping_mlm_agent(zsock_t* pipe, void* args)
     const Arguments& arguments = *static_cast<Arguments*>(args);
 
     // create the server
-    cam::CredentialAssetMappingServer server(arguments.at("STORAGE_MAPPING_PATH"));
+    cam::CredentialAssetMappingServer server(
+        arguments.at("STORAGE_MAPPING_PATH"),
+        arguments.at("ENDPOINT_SRR"),
+        arguments.at("AGENT_NAME_SRR")
+    );
 
     // launch the agent
     mlm::MlmBasicMailboxServer agent(pipe, server, arguments.at("AGENT_NAME"), arguments.at("ENDPOINT"));

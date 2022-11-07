@@ -35,12 +35,24 @@
 #include <cxxtools/jsonserializer.h>
 #include <sstream>
 #include <fty_log.h>
+#include <fty_common.h>
+#include <fty/convert.h>
+
+static constexpr auto MSGBUS_SRR_SECW_CAM_QUEUE = "ETN.Q.IPMCORE.CREDASSETMAPPING";
+static constexpr auto FEATURE_SRR_SECW_CAM = "credential-asset-mapping";
+static constexpr auto ACTIVE_SRR_SECW_CAM_VERSION = "1.0";
 
 using namespace std::placeholders;
 
 namespace cam {
-CredentialAssetMappingServer::CredentialAssetMappingServer(const std::string& storagePath)
+
+CredentialAssetMappingServer::CredentialAssetMappingServer(
+    const std::string& storagePath,
+    const std::string& srrEndpoint,
+    const std::string& srrAgentName
+)
     : m_activeMapping(storagePath)
+    , m_srrProcessor(new dto::srr::SrrQueryProcessor)
 {
     // initiate the commands handlers
     m_supportedCommands[CREATE_MAPPING] = std::bind(&CredentialAssetMappingServer::handleCreateMapping, this, _1, _2);
@@ -69,6 +81,28 @@ CredentialAssetMappingServer::CredentialAssetMappingServer(const std::string& st
 
     m_supportedCommands[COUNT_CRED_MAPPINGS] =
         std::bind(&CredentialAssetMappingServer::handleCountCredentialMappingsForCredential, this, _1, _2);
+
+    if ((!srrEndpoint.empty()) && (!srrAgentName.empty())) {
+        log_debug("CAM SRR connect %s to %s", srrAgentName.c_str(), srrEndpoint.c_str());
+        m_msgBus.reset(messagebus::MlmMessageBus(srrEndpoint, srrAgentName));
+        m_msgBus->connect();
+
+        m_srrProcessor->saveHandler    = std::bind(&CredentialAssetMappingServer::handleSRRSave, this, _1);
+        m_srrProcessor->restoreHandler = std::bind(&CredentialAssetMappingServer::handleSRRRestore, this, _1);
+
+        // Listen all incoming request
+        log_debug("CAM SRR listen to %s", MSGBUS_SRR_SECW_CAM_QUEUE);
+        m_msgBus->receive(MSGBUS_SRR_SECW_CAM_QUEUE, std::bind(&CredentialAssetMappingServer::handleSRRRequest, this, _1));
+    }
+    else {
+        log_info("CAM SRR not activated (endpoint: %s, address: %s)", srrEndpoint.c_str(), srrAgentName.c_str());
+    }
+}
+
+CredentialAssetMappingServer::~CredentialAssetMappingServer()
+{
+    // ensure nothing else is on going
+    std::unique_lock<std::mutex> lock(m_lock);
 }
 
 std::vector<std::string> CredentialAssetMappingServer::handleRequest(
@@ -472,6 +506,154 @@ std::string CredentialAssetMappingServer::handleCountCredentialMappingsForCreden
     si <<= static_cast<uint32_t>(mappings.size());
 
     return serialize(si);
+}
+
+// SRR
+
+//fwd decl.
+static void sendResponse(
+    std::unique_ptr<messagebus::MessageBus>& msgBus, const messagebus::Message& msg, const dto::UserData& userData);
+
+void CredentialAssetMappingServer::handleSRRRequest(messagebus::Message msg)
+{
+    log_debug("CAM Configuration handle request");
+
+    try {
+        // Get request
+        dto::UserData data = msg.userData();
+        dto::srr::Query query;
+        data >> query;
+        // Process request
+        dto::UserData response;
+        response << (m_srrProcessor->processQuery(query));
+        // Send response
+        sendResponse(m_msgBus, msg, response);
+    } catch (std::exception& e) {
+        log_error("Unexpected error: %s", e.what());
+    } catch (...) {
+        log_error("Unexpected error: unknown");
+    }
+}
+
+dto::srr::SaveResponse CredentialAssetMappingServer::handleSRRSave(const dto::srr::SaveQuery& query)
+{
+    using namespace dto;
+    using namespace dto::srr;
+
+    log_debug("Saving CAM configuration");
+
+    std::map<FeatureName, FeatureAndStatus> mapFeaturesData;
+
+    for (const auto& featureName : query.features()) {
+        FeatureAndStatus fs1;
+        Feature&         f1 = *(fs1.mutable_feature());
+
+        log_debug("feature: %s", featureName.c_str());
+
+        if (featureName == FEATURE_SRR_SECW_CAM) {
+            f1.set_version(ACTIVE_SRR_SECW_CAM_VERSION);
+            try {
+                std::unique_lock<std::mutex> lock(m_lock);
+
+                cxxtools::SerializationInfo si;
+                m_activeMapping.serialize(si);
+                std::string data = JSON::writeToString(si, false);
+                log_debug("Si=\n%s", data.c_str());
+
+                f1.set_data(data);
+                fs1.mutable_status()->set_status(dto::srr::Status::SUCCESS);
+            } catch (std::exception& e) {
+                log_debug("Save CAM failed (%s)", e.what());
+                fs1.mutable_status()->set_status(dto::srr::Status::FAILED);
+                fs1.mutable_status()->set_error(e.what());
+            }
+        } else {
+            fs1.mutable_status()->set_status(dto::srr::Status::FAILED);
+            fs1.mutable_status()->set_error("Feature is not supported!");
+        }
+
+        mapFeaturesData[featureName] = fs1;
+    }
+
+    log_debug("Save CAM configuration done");
+
+    return (createSaveResponse(mapFeaturesData, ACTIVE_SRR_SECW_CAM_VERSION)).save();
+}
+
+dto::srr::RestoreResponse CredentialAssetMappingServer::handleSRRRestore(const dto::srr::RestoreQuery& query)
+{
+    using namespace dto;
+    using namespace dto::srr;
+
+    log_debug("Restoring CAM configuration");
+
+    std::map<FeatureName, FeatureStatus> mapStatus;
+
+    for (const auto& item : query.map_features_data()) {
+        const FeatureName& featureName = item.first;
+        const Feature&     feature     = item.second;
+
+        log_debug("feature: %s", featureName.c_str());
+
+        FeatureStatus featureStatus;
+        if (featureName == FEATURE_SRR_SECW_CAM) {
+            try {
+                std::unique_lock<std::mutex> lock(m_lock);
+                log_debug("Si=\n%s", feature.data().c_str());
+
+                std::string version = feature.version();
+                if (fty::convert<float>(version) > fty::convert<float>(ACTIVE_SRR_SECW_CAM_VERSION)) {
+                    throw std::runtime_error("Version " + version + " is not supported");
+                }
+
+                const cxxtools::SerializationInfo si = deserialize(feature.data());
+                m_activeMapping.parse(si);
+                m_activeMapping.save(); // persist in database
+
+                featureStatus.set_status(dto::srr::Status::SUCCESS);
+            } catch (std::exception& e) {
+                log_debug("Restore CAM failed (%s)", e.what());
+                featureStatus.set_status(dto::srr::Status::FAILED);
+                featureStatus.set_error(e.what());
+            }
+        } else {
+            featureStatus.set_status(dto::srr::Status::FAILED);
+            featureStatus.set_error("Feature is not supported!");
+        }
+
+        mapStatus[featureName] = featureStatus;
+    }
+
+    log_debug("Restore CAM configuration done");
+
+    return (createRestoreResponse(mapStatus)).restore();
+}
+
+
+/**
+ * Send FEATURE_SRR_SECW_CAM response on message bus.
+ * @param msgBus
+ * @param msg : the request
+ * @param userData : the response payload
+ */
+static void sendResponse(
+    std::unique_ptr<messagebus::MessageBus>& msgBus, const messagebus::Message& msg, const dto::UserData& userData)
+{
+    try {
+        messagebus::Message resp;
+        resp.userData() = userData;
+        resp.metaData().emplace(
+            messagebus::Message::SUBJECT, msg.metaData().find(messagebus::Message::SUBJECT)->second);
+        resp.metaData().emplace(messagebus::Message::FROM, FEATURE_SRR_SECW_CAM);
+        resp.metaData().emplace(messagebus::Message::TO, msg.metaData().find(messagebus::Message::FROM)->second);
+        resp.metaData().emplace(
+            messagebus::Message::CORRELATION_ID, msg.metaData().find(messagebus::Message::CORRELATION_ID)->second);
+        msgBus->sendReply(msg.metaData().find(messagebus::Message::REPLY_TO)->second, resp);
+    } catch (messagebus::MessageBusException& ex) {
+        log_error("Message bus error: %s", ex.what());
+    } catch (...) {
+        log_error("Unexpected error: unknown");
+    }
 }
 
 } // namespace cam

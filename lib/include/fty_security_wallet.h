@@ -31,6 +31,7 @@
 #define DEFAULT_SOCKET                     "/tmp/secw.socket"
 #define SECW_NOTIFICATIONS                 "_SECW_NOTIFICATIONS"
 #define MAPPING_AGENT                      "credential-asset-mapping"
+#define MAPPING_AGENT_SRR                  "credential-asset-mapping-srr"
 #define DEFAULT_STORAGE_MAPPING_PATH       "/etc/fty/fty-security-wallet/mapping.json"
 
 //  Public classes
