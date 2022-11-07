@@ -32,6 +32,26 @@
 
 namespace cam {
 
+CredentialAssetMappingStorage::CredentialAssetMappingStorage(const std::string& databasePath)
+    : m_pathDatabase(databasePath)
+{
+    // Load database
+    try {
+        read();
+    } catch (const std::exception& e) {
+        log_error("Error while reading mapping file %s\n %s", m_pathDatabase.c_str(), e.what());
+        exit(EXIT_FAILURE);
+    }
+
+    // attempt to save the mapping and ensure that we can write
+    try {
+        save();
+    } catch (const std::exception& e) {
+        log_error("Error while saving into mapping file %s\n %s", m_pathDatabase.c_str(), e.what());
+        exit(EXIT_FAILURE);
+    }
+}
+
 void CredentialAssetMappingStorage::serialize(cxxtools::SerializationInfo& si) const
 {
     si.clear();
@@ -69,6 +89,15 @@ void CredentialAssetMappingStorage::parse(const cxxtools::SerializationInfo& si)
     }
 }
 
+void CredentialAssetMappingStorage::save() const
+{
+    log_debug("Save mapping database %s", m_pathDatabase.c_str());
+
+    cxxtools::SerializationInfo si;
+    serialize(si);
+    JSON::writeToFile(m_pathDatabase, si, true);
+}
+
 void CredentialAssetMappingStorage::read()
 {
     log_debug("Read mapping database %s", m_pathDatabase.c_str());
@@ -84,35 +113,6 @@ void CredentialAssetMappingStorage::read()
     } else {
         log_info("No mapping database %s. Creating default...", m_pathDatabase.c_str());
         m_mappings.clear();
-    }
-}
-
-void CredentialAssetMappingStorage::save() const
-{
-    log_debug("Save mapping database %s", m_pathDatabase.c_str());
-
-    cxxtools::SerializationInfo si;
-    serialize(si);
-    JSON::writeToFile(m_pathDatabase, si, true);
-}
-
-CredentialAssetMappingStorage::CredentialAssetMappingStorage(const std::string& databasePath)
-    : m_pathDatabase(databasePath)
-{
-    // Load database
-    try {
-        read();
-    } catch (const std::exception& e) {
-        log_error("Error while reading mapping file %s\n %s", m_pathDatabase.c_str(), e.what());
-        exit(EXIT_FAILURE);
-    }
-
-    // attempt to save the mapping and ensure that we can write
-    try {
-        save();
-    } catch (const std::exception& e) {
-        log_error("Error while saving into mapping file %s\n %s", m_pathDatabase.c_str(), e.what());
-        exit(EXIT_FAILURE);
     }
 }
 
