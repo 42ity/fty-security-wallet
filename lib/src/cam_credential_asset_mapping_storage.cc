@@ -124,6 +124,7 @@ const CredentialAssetMapping& CredentialAssetMappingStorage::getMapping(
     try {
         return m_mappings.at(hash);
     } catch (const std::exception& e) {
+        log_debug("getMapping exception: %s", e.what());
         throw CamMappingDoesNotExistException(assetId, serviceId, protocol);
     }
 }

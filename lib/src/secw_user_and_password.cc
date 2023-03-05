@@ -84,7 +84,7 @@ void UserAndPassword::updatePrivateDocFromSerializationInfo(const cxxtools::Seri
         if (password != nullptr) {
             m_password = GetSiMemberCxxString(si, DOC_USER_AND_PASSWORD_PASSWORD);
         }
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_USER_AND_PASSWORD_PASSWORD);
     }
 }
@@ -93,7 +93,7 @@ void UserAndPassword::updatePublicDocFromSerializationInfo(const cxxtools::Seria
 {
     try {
         m_username = GetSiMemberCxxString(si, DOC_USER_AND_PASSWORD_USERNAME);
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_USER_AND_PASSWORD_USERNAME);
     }
 }

@@ -123,7 +123,7 @@ void Snmpv3::updatePrivateDocFromSerializationInfo(const cxxtools::Serialization
         if (authPassword != nullptr) {
             m_authPassword = GetSiMemberCxxString(si, DOC_SNMPV3_AUTH_PASSWORD);
         }
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_SNMPV3_AUTH_PASSWORD);
     }
 
@@ -132,7 +132,7 @@ void Snmpv3::updatePrivateDocFromSerializationInfo(const cxxtools::Serialization
         if (authPriv != nullptr) {
             m_privPassword = GetSiMemberCxxString(si, DOC_SNMPV3_PRIV_PASSWORD);
         }
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_SNMPV3_PRIV_PASSWORD);
     }
 }
@@ -145,13 +145,13 @@ void Snmpv3::updatePublicDocFromSerializationInfo(const cxxtools::SerializationI
         if (tmp >= MAX_SECURITY_LEVEL)
             throw SecwInvalidDocumentFormatException(DOC_SNMPV3_SECURITY_LEVEL);
         m_securityLevel = static_cast<Snmpv3SecurityLevel>(tmp);
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_SNMPV3_SECURITY_LEVEL);
     }
 
     try {
         m_securityName = GetSiMemberCxxString(si, DOC_SNMPV3_SECURITY_NAME);
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_SNMPV3_SECURITY_NAME);
     }
 
@@ -161,7 +161,7 @@ void Snmpv3::updatePublicDocFromSerializationInfo(const cxxtools::SerializationI
         if (tmp >= MAX_AUTH_PROTOCOL)
             throw SecwInvalidDocumentFormatException(DOC_SNMPV3_AUTH_PROTOCOL);
         m_authProtocol = static_cast<Snmpv3AuthProtocol>(tmp);
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_SNMPV3_AUTH_PROTOCOL);
     }
 
@@ -171,7 +171,7 @@ void Snmpv3::updatePublicDocFromSerializationInfo(const cxxtools::SerializationI
         if (tmp >= MAX_PRIV_PROTOCOL)
             throw SecwInvalidDocumentFormatException(DOC_SNMPV3_PRIV_PROTOCOL);
         m_privProtocol = static_cast<Snmpv3PrivProtocol>(tmp);
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_SNMPV3_PRIV_PROTOCOL);
     }
 }

@@ -85,7 +85,7 @@ void ExternalCertificate::updatePublicDocFromSerializationInfo(const cxxtools::S
 {
     try {
         si.getMember(DOC_EXTERNAL_CERTIFICATE_PEM) >>= m_pem;
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_EXTERNAL_CERTIFICATE_PEM);
     }
 }

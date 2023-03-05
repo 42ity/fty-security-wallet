@@ -82,7 +82,7 @@ protected:
     virtual void fillSerializationInfo(cxxtools::SerializationInfo& si) const;
 
 private:
-    ErrorCode   m_code;
+    ErrorCode   m_code{ErrorCode::GENERIC};
     std::string m_whatArg;
 };
 

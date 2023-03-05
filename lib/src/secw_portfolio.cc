@@ -142,7 +142,7 @@ void Portfolio::loadPortfolio(const cxxtools::SerializationInfo& si)
 
     try {
         si.getMember("version") >>= version;
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data");
     }
 
@@ -173,7 +173,7 @@ void Portfolio::loadPortfolioFromSRR(
 
     try {
         si.getMember("version") >>= version;
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data");
     }
 
@@ -230,7 +230,7 @@ void Portfolio::loadPortfolioVersion1(const cxxtools::SerializationInfo& si)
 
         log_debug("Portfolio %s loaded with %i documents", m_name.c_str(), count);
 
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data in portfolio " + m_name);
     }
 }
@@ -266,7 +266,7 @@ void Portfolio::loadPortfolioSRRVersion1(
 
         log_debug("Portfolio %s loaded with %i documents", m_name.c_str(), count);
 
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwImpossibleToLoadPortfolioException("Bad format of the serialization data in portfolio " + m_name);
     }
 }

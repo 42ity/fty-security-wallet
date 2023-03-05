@@ -97,7 +97,7 @@ void InternalCertificate::updatePrivateDocFromSerializationInfo(const cxxtools::
         if (privateKey != nullptr) {
             *privateKey >>= m_privateKeyPem;
         }
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_INTERNAL_CERTIFICATE_PRIVATE_KEY_PEM);
     }
 }
@@ -106,7 +106,7 @@ void InternalCertificate::updatePublicDocFromSerializationInfo(const cxxtools::S
 {
     try {
         si.getMember(DOC_INTERNAL_CERTIFICATE_PEM) >>= m_pem;
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_INTERNAL_CERTIFICATE_PEM);
     }
 }

@@ -120,9 +120,9 @@ public:
     static constexpr const char* UPDATE                     = "UPDATE";
 
     // SRR
-    std::unique_ptr<messagebus::MessageBus>      m_msgBus;
+    std::unique_ptr<messagebus::MessageBus>      m_msgBus{nullptr};
     std::mutex                                   m_lock;
-    std::unique_ptr<dto::srr::SrrQueryProcessor> m_srrProcessor;
+    std::unique_ptr<dto::srr::SrrQueryProcessor> m_srrProcessor{nullptr};
 };
 
 } // namespace secw

@@ -67,7 +67,7 @@ void Snmpv1::updatePublicDocFromSerializationInfo(const cxxtools::SerializationI
 {
     try {
         m_communityName = GetSiMemberCxxString(si, DOC_SNMPV1_COMMUNITY_NAME);
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_SNMPV1_COMMUNITY_NAME);
     }
 }
