@@ -49,4 +49,4 @@
 #include "secw_snmpv1.h"
 #include "secw_snmpv3.h"
 #include "secw_user_and_password.h"
-#include "secw_login_and_token.h"
+#include "secw_token_and_login.h"

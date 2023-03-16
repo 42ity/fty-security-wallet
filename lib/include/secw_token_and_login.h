@@ -1,5 +1,5 @@
 /*  =========================================================================
-    secw_login_and_token - Document parsers for LoginAndToken document
+    secw_login_and_token - Document parsers for TokenAndLogin document
     Copyright (C) 2019 - 2023 Eaton
 
     This program is free software; you can redistribute it and/or modify
@@ -20,26 +20,26 @@
 
 #pragma once
 
-#define LOGIN_AND_TOKEN_TYPE "LoginAndToken"
+#define TOKEN_AND_LOGIN_TYPE "TokenAndLogin"
 #include "secw_document.h"
 
 namespace secw {
  
-class LoginAndToken;
+class TokenAndLogin;
 
-using LoginAndTokenPtr = std::shared_ptr<LoginAndToken>;
+using TokenAndLoginPtr = std::shared_ptr<TokenAndLogin>;
 
 /// Some key definition for serialization
-static constexpr const char* DOC_LOGIN_AND_TOKEN_TOKEN = "secw_login_and_token_token";
-static constexpr const char* DOC_LOGIN_AND_TOKEN_LOGIN = "secw_login_and_token_login";
+static constexpr const char* DOC_TOKEN_AND_LOGIN_TOKEN = "secw_token_and_login_token";
+static constexpr const char* DOC_TOKEN_AND_LOGIN_LOGIN = "secw_token_and_login_login";
 
 
-class LoginAndToken final : public Document
+class TokenAndLogin final : public Document
 {
 public:
-    LoginAndToken();
+    TokenAndLogin();
 
-    LoginAndToken(const std::string& name, const std::string& login = "", const std::string& token = "");
+    TokenAndLogin(const std::string& name, const std::string& login = "", const std::string& token = "");
 
     DocumentPtr clone() const override;
 
@@ -66,9 +66,9 @@ public:
         m_containPrivateData = true;
     }
 
-    /// try to cast a document to a LoginAndToken shared ptr
-    /// @return shared ptr on LoginAndToken or null shared ptr in case of error
-    static LoginAndTokenPtr tryToCast(DocumentPtr doc);
+    /// try to cast a document to a TokenAndLogin shared ptr
+    /// @return shared ptr on TokenAndLogin or null shared ptr in case of error
+    static TokenAndLoginPtr tryToCast(DocumentPtr doc);
 
 private:
     // Public secw elements
