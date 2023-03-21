@@ -1527,7 +1527,7 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
     {
         secw::ProducerAccessor producerAccessor(syncClient, streamClient);
         try {
-            secw::TokenAndLoginPtr doc = std::make_shared<secw::TokenAndLogin>("insert test login token", "Login", "Token");
+            secw::TokenAndLoginPtr doc = std::make_shared<secw::TokenAndLogin>("insert test login token", "Token", "Login");
 
             doc->addUsage("discovery_monitoring");
 
@@ -1567,7 +1567,7 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
     {
         secw::ProducerAccessor producerAccessor(syncClient, streamClient);
         try {
-            secw::TokenAndLoginPtr doc = std::make_shared<secw::TokenAndLogin>("insert test login token", "Login", "Token");
+            secw::TokenAndLoginPtr doc = std::make_shared<secw::TokenAndLogin>("insert test login token", "Token", "Login");
 
             doc->addUsage("discovery_monitoring");
 
@@ -1731,7 +1731,7 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
     {
         secw::ProducerAccessor producerAccessor(syncClient, streamClient);
         try {
-            secw::TokenAndLoginPtr doc = std::make_shared<secw::TokenAndLogin>("insert Token without login", "", "Token");
+            secw::TokenAndLoginPtr doc = std::make_shared<secw::TokenAndLogin>("insert Token without login", "Token", "");
 
             doc->addUsage("discovery_monitoring");
 

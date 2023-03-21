@@ -1,5 +1,5 @@
 /*  =========================================================================
-    secw_login_and_token - Document parsers for TokenAndLogin document
+    secw_token_and_login - Document parsers for TokenAndLogin document
     Copyright (C) 2019 - 2023 Eaton
 
     This program is free software; you can redistribute it and/or modify
@@ -39,7 +39,7 @@ class TokenAndLogin final : public Document
 public:
     TokenAndLogin();
 
-    TokenAndLogin(const std::string& name, const std::string& login = "", const std::string& token = "");
+    TokenAndLogin(const std::string& name, const std::string& token = "", const std::string& login = "");
 
     DocumentPtr clone() const override;
 
@@ -71,12 +71,11 @@ public:
     static TokenAndLoginPtr tryToCast(DocumentPtr doc);
 
 private:
-    // Public secw elements
-    std::string m_login;
-
-
     // Private secw elements
     std::string m_token;
+
+    // Public secw elements
+    std::string m_login;
 
     void fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const override;
     void fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const override;

@@ -8,8 +8,8 @@
 					"Snmpv3",
 					"Snmpv1",
 					"UserAndPassword",
-					"ExternalCertificate",
-					"TokenAndLogin"
+					"TokenAndLogin",
+					"ExternalCertificate"
 				]
 			},
 			{

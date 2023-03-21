@@ -1,5 +1,5 @@
 /*  =========================================================================
-    secw_login_and_token - Document parsers for TokenAndLogin document
+    secw_token_and_login - Document parsers for TokenAndLogin document
 
     Copyright (C) 2019 - 2020 Eaton
 
@@ -33,7 +33,7 @@
 
 namespace secw {
 /*-----------------------------------------------------------------------------*/
-/*   TokenAndLogin Document                                                              */
+/*   TokenAndLogin Document                                                    */
 /*-----------------------------------------------------------------------------*/
 // Public
 TokenAndLogin::TokenAndLogin()
@@ -41,10 +41,10 @@ TokenAndLogin::TokenAndLogin()
 {
 }
 
-TokenAndLogin::TokenAndLogin(const std::string& name, const std::string& login, const std::string& token)
+TokenAndLogin::TokenAndLogin(const std::string& name, const std::string& token, const std::string& login)
     : Document(TOKEN_AND_LOGIN_TYPE)
-    , m_login(login)
     , m_token(token)
+    , m_login(login)
 {
     m_name = name;
 }
@@ -56,23 +56,25 @@ DocumentPtr TokenAndLogin::clone() const
 
 void TokenAndLogin::validate() const
 {
-    if (!m_containPrivateData)
+    if (!m_containPrivateData) {
         throw SecwInvalidDocumentFormatException(DOC_TOKEN_AND_LOGIN_TOKEN);
-    if (m_token.empty())
+    }
+    if ( m_token.empty() ) {
         throw SecwInvalidDocumentFormatException(DOC_TOKEN_AND_LOGIN_TOKEN);
+    }
 }
 
 // Private
 void TokenAndLogin::fillSerializationInfoPrivateDoc(cxxtools::SerializationInfo& si) const
 {  
-    if (!m_token.empty()) {
+    if ( !m_token.empty() ) {
         si.addMember(DOC_TOKEN_AND_LOGIN_TOKEN) <<= StdStringToCxxString(m_token);
     }
 }
 
 void TokenAndLogin::fillSerializationInfoPublicDoc(cxxtools::SerializationInfo& si) const
 {
-    if(!m_login.empty()) {
+    if( !m_login.empty() ) {
         si.addMember(DOC_TOKEN_AND_LOGIN_LOGIN) <<= StdStringToCxxString(m_login);
     }
 }
@@ -84,7 +86,7 @@ void TokenAndLogin::updatePrivateDocFromSerializationInfo(const cxxtools::Serial
         if (token != nullptr) {
             m_token = GetSiMemberCxxString(si, DOC_TOKEN_AND_LOGIN_TOKEN);
         }
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_TOKEN_AND_LOGIN_TOKEN);
     }
 }
@@ -96,7 +98,7 @@ void TokenAndLogin::updatePublicDocFromSerializationInfo(const cxxtools::Seriali
         if (login != nullptr) {
             m_login = GetSiMemberCxxString(si, DOC_TOKEN_AND_LOGIN_LOGIN);
         }
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_TOKEN_AND_LOGIN_LOGIN);
     }
 }
