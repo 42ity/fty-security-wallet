@@ -1522,4 +1522,245 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
             FAIL(e.what());
         }
     }
+
+    // test 11.1 => insertNewDocument Login and Token
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::TokenAndLoginPtr doc = std::make_shared<secw::TokenAndLogin>("insert test login token", "Token", "Login");
+
+            doc->addUsage("discovery_monitoring");
+
+            id = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<secw::Document>(doc));
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 11.2 => insertNewDocument -> retrieve data
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+            secw::TokenAndLoginPtr doc = secw::TokenAndLogin::tryToCast(insertedDoc);
+
+            if (doc == nullptr)
+                throw std::runtime_error("No document retrieved");
+
+            if (doc->getUsageIds().count("discovery_monitoring") == 0)
+                throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
+            if (doc->getUsageIds().size() != 1)
+                throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
+
+            if (doc->getName() != "insert test login token")
+                throw std::runtime_error("Bad document retrieved: name do not match");
+
+            if (doc->getLogin() != "Login")
+                throw std::runtime_error("Bad document retrieved: Login do not match");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 11.3 => insertNewDocument Login and Token => SecwNameAlreadyExistsException
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::TokenAndLoginPtr doc = std::make_shared<secw::TokenAndLogin>("insert test login token", "Token", "Login");
+
+            doc->addUsage("discovery_monitoring");
+
+            id = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<secw::Document>(doc));
+
+            throw std::runtime_error("Document has been added");
+        } catch (const secw::SecwNameAlreadyExistsException& e) {
+            CHECK(e.getName() == "insert test login token");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 11.4 => updateDocument Login and Token
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+            secw::TokenAndLoginPtr doc = secw::TokenAndLogin::tryToCast(insertedDoc);
+
+            if (doc == nullptr)
+                throw std::runtime_error("No document retrieved");
+
+            // update security name and priv password
+            doc->setName("Test update login and token");
+            doc->setLogin("new_login");
+            doc->setToken("new_token");
+
+            // update
+            producerAccessor.updateDocument("default", std::dynamic_pointer_cast<secw::Document>(doc));
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 11.5 => updateDocument Login and Token -> retrieve data
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+            secw::TokenAndLoginPtr doc = secw::TokenAndLogin::tryToCast(insertedDoc);
+
+            if (doc == nullptr)
+                throw std::runtime_error("No document retrieved");
+
+            if (doc->getUsageIds().count("discovery_monitoring") == 0)
+                throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
+            if (doc->getUsageIds().size() != 1)
+                throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
+
+
+            if (doc->getName() != "Test update login and token")
+                throw std::runtime_error("Bad document retrieved: name do not match");
+            if (doc->getLogin() != "new_login")
+                throw std::runtime_error("Bad document retrieved: login do not match");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 11.6 => updateDocument Login and Token -> retrieve data getDocumentWithoutPrivateDataByName
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::DocumentPtr insertedDoc =
+                producerAccessor.getDocumentWithoutPrivateDataByName("default", "Test update login and token");
+
+            secw::TokenAndLoginPtr doc = secw::TokenAndLogin::tryToCast(insertedDoc);
+
+            if (doc == nullptr)
+                throw std::runtime_error("No document retrieved");
+
+            if (doc->getUsageIds().count("discovery_monitoring") == 0)
+                throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
+            if (doc->getUsageIds().size() != 1)
+                throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
+
+
+            if (doc->getId() != id)
+                throw std::runtime_error("Bad document retrieved: id do not match");
+            if (doc->getLogin() != "new_login")
+                throw std::runtime_error("Bad document retrieved: login do not match");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 11.7 => updateDocument Login and Token -> getDocumentWithoutPrivateDataByName =>
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            producerAccessor.getDocumentWithoutPrivateDataByName("default", "insert test login token");
+
+            throw std::runtime_error("Document is return");
+        } catch (const secw::SecwNameDoesNotExistException&) {
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 11.8 => updateDocument Login and Token => SecwNameAlreadyExistsException
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+            secw::TokenAndLoginPtr doc = secw::TokenAndLogin::tryToCast(insertedDoc);
+
+            if (doc == nullptr)
+                throw std::runtime_error("No document retrieved");
+
+            // update name
+            doc->setName("myFirstDoc");
+
+            // update
+            producerAccessor.updateDocument("default", std::dynamic_pointer_cast<secw::Document>(doc));
+
+            throw std::runtime_error("Document has been updated");
+        } catch (const secw::SecwNameAlreadyExistsException& e) {
+            CHECK(e.getName() == "myFirstDoc");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 11.9 => deleteDocument Login and Token
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            producerAccessor.deleteDocument("default", id);
+
+            // check that the document is removed
+            std::vector<secw::Id> ids = {id};
+            if (producerAccessor.getListDocumentsWithoutPrivateData("default", ids).size() != 0) {
+                throw std::runtime_error("Document is not removed");
+            }
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 11.10 add illegal Login and Token doc 
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::TokenAndLoginPtr doc = std::make_shared<secw::TokenAndLogin>("insert illegal Token", "Login", "");
+
+            doc->addUsage("discovery_monitoring");
+
+            id = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<secw::Document>(doc));
+        } catch (const secw::SecwInvalidDocumentFormatException& e) {
+            CHECK(e.getDocumentField() == "secw_token_and_login_token");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 11.11 add Login and Token doc without login 
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::TokenAndLoginPtr doc = std::make_shared<secw::TokenAndLogin>("insert Token without login", "Token", "");
+
+            doc->addUsage("discovery_monitoring");
+
+            id = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<secw::Document>(doc));
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+
+        // validate doc is created
+        try {
+            secw::DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+            secw::TokenAndLoginPtr doc = secw::TokenAndLogin::tryToCast(insertedDoc);
+
+            if (doc == nullptr)
+                throw std::runtime_error("No document retrieved");
+
+            if (doc->getUsageIds().count("discovery_monitoring") == 0)
+                throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
+            if (doc->getUsageIds().size() != 1)
+                throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
+
+            if (doc->getName() != "insert Token without login")
+                throw std::runtime_error("Bad document retrieved: name do not match");
+
+            if (!doc->getLogin().empty())
+                throw std::runtime_error("Bad document retrieved: Login do not match");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
 }
