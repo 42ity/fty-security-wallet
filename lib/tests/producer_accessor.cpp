@@ -1763,4 +1763,245 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
             FAIL(e.what());
         }
     }
+
+    // test 12.1 => insertNewDocument ssh key and login
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::SshKeyAndLoginPtr doc = std::make_shared<secw::SshKeyAndLogin>("insert test sshkey login", "Key", "Login");
+
+            doc->addUsage("discovery_monitoring");
+
+            id = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<secw::Document>(doc));
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 12.2 => insertNewDocument -> retrieve data
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+            secw::SshKeyAndLoginPtr doc = secw::SshKeyAndLogin::tryToCast(insertedDoc);
+
+            if (doc == nullptr)
+                throw std::runtime_error("No document retrieved");
+
+            if (doc->getUsageIds().count("discovery_monitoring") == 0)
+                throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
+            if (doc->getUsageIds().size() != 1)
+                throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
+
+            if (doc->getName() != "insert test sshkey login")
+                throw std::runtime_error("Bad document retrieved: name do not match");
+
+            if (doc->getLogin() != "Login")
+                throw std::runtime_error("Bad document retrieved: Login do not match");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 12.3 => insertNewDocument ssh key and Login => SecwNameAlreadyExistsException
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::SshKeyAndLoginPtr doc = std::make_shared<secw::SshKeyAndLogin>("insert test sshkey login", "Key", "Login");
+
+            doc->addUsage("discovery_monitoring");
+
+            id = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<secw::Document>(doc));
+
+            throw std::runtime_error("Document has been added");
+        } catch (const secw::SecwNameAlreadyExistsException& e) {
+            CHECK(e.getName() == "insert test sshkey login");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 12.4 => updateDocument ssh key and Login
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+            secw::SshKeyAndLoginPtr doc = secw::SshKeyAndLogin::tryToCast(insertedDoc);
+
+            if (doc == nullptr)
+                throw std::runtime_error("No document retrieved");
+
+            // update security name and priv password
+            doc->setName("Test update sshkey and login");
+            doc->setLogin("new_login");
+            doc->setSsshKey("new_key");
+
+            // update
+            producerAccessor.updateDocument("default", std::dynamic_pointer_cast<secw::Document>(doc));
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 12.5 => updateDocument ssh key and Login -> retrieve data
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+            secw::SshKeyAndLoginPtr doc = secw::SshKeyAndLogin::tryToCast(insertedDoc);
+
+            if (doc == nullptr)
+                throw std::runtime_error("No document retrieved");
+
+            if (doc->getUsageIds().count("discovery_monitoring") == 0)
+                throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
+            if (doc->getUsageIds().size() != 1)
+                throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
+
+
+            if (doc->getName() != "Test update sshkey and login")
+                throw std::runtime_error("Bad document retrieved: name do not match");
+            if (doc->getLogin() != "new_login")
+                throw std::runtime_error("Bad document retrieved: login do not match");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 12.6 => updateDocument ssh key and Login -> retrieve data getDocumentWithoutPrivateDataByName
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::DocumentPtr insertedDoc =
+                producerAccessor.getDocumentWithoutPrivateDataByName("default", "Test update sshkey and login");
+
+            secw::SshKeyAndLoginPtr doc = secw::SshKeyAndLogin::tryToCast(insertedDoc);
+
+            if (doc == nullptr)
+                throw std::runtime_error("No document retrieved");
+
+            if (doc->getUsageIds().count("discovery_monitoring") == 0)
+                throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
+            if (doc->getUsageIds().size() != 1)
+                throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
+
+
+            if (doc->getId() != id)
+                throw std::runtime_error("Bad document retrieved: id do not match");
+            if (doc->getLogin() != "new_login")
+                throw std::runtime_error("Bad document retrieved: login do not match");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 12.7 => updateDocument ssh key and Login -> getDocumentWithoutPrivateDataByName =>
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            producerAccessor.getDocumentWithoutPrivateDataByName("default", "insert test sshkey login");
+
+            throw std::runtime_error("Document is return");
+        } catch (const secw::SecwNameDoesNotExistException&) {
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 12.8 => updateDocument ssh key and login => SecwNameAlreadyExistsException
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+            secw::SshKeyAndLoginPtr doc = secw::SshKeyAndLogin::tryToCast(insertedDoc);
+
+            if (doc == nullptr)
+                throw std::runtime_error("No document retrieved");
+
+            // update name
+            doc->setName("myFirstDoc");
+
+            // update
+            producerAccessor.updateDocument("default", std::dynamic_pointer_cast<secw::Document>(doc));
+
+            throw std::runtime_error("Document has been updated");
+        } catch (const secw::SecwNameAlreadyExistsException& e) {
+            CHECK(e.getName() == "myFirstDoc");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 12.9 => deleteDocument ssh key and login
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            producerAccessor.deleteDocument("default", id);
+
+            // check that the document is removed
+            std::vector<secw::Id> ids = {id};
+            if (producerAccessor.getListDocumentsWithoutPrivateData("default", ids).size() != 0) {
+                throw std::runtime_error("Document is not removed");
+            }
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 12.10 add illegal ssh key and login doc 
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::SshKeyAndLoginPtr doc = std::make_shared<secw::SshKeyAndLogin>("insert illegal key", "", "login");
+
+            doc->addUsage("discovery_monitoring");
+
+            id = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<secw::Document>(doc));
+        } catch (const secw::SecwInvalidDocumentFormatException& e) {
+            CHECK(e.getDocumentField() == "secw_sshkey_and_login_sshkey");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
+
+    // test 12.11 add ssh key and login doc without login
+    {
+        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        try {
+            secw::SshKeyAndLoginPtr doc = std::make_shared<secw::SshKeyAndLogin>("insert Key without login", "Key", "");
+
+            doc->addUsage("discovery_monitoring");
+
+            id = producerAccessor.insertNewDocument("default", std::dynamic_pointer_cast<secw::Document>(doc));
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+
+        // validate doc is created
+        try {
+            secw::DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
+
+            secw::SshKeyAndLoginPtr doc = secw::SshKeyAndLogin::tryToCast(insertedDoc);
+
+            if (doc == nullptr)
+                throw std::runtime_error("No document retrieved");
+
+            if (doc->getUsageIds().count("discovery_monitoring") == 0)
+                throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
+            if (doc->getUsageIds().size() != 1)
+                throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
+
+            if (doc->getName() != "insert Key without login")
+                throw std::runtime_error("Bad document retrieved: name do not match");
+
+            if (!doc->getLogin().empty())
+                throw std::runtime_error("Bad document retrieved: Login do not match");
+        } catch (const std::exception& e) {
+            FAIL(e.what());
+        }
+    }
 }

@@ -8,7 +8,8 @@
 					"Snmpv3",
 					"Snmpv1",
 					"UserAndPassword",
-					"TokenAndLogin"
+					"TokenAndLogin",
+					"SshKeyAndLogin"
 				]
 			},
 			{
@@ -17,7 +18,8 @@
 					"Snmpv3",
 					"Snmpv1",
 					"UserAndPassword",
-					"TokenAndLogin"
+					"TokenAndLogin",
+					"SshKeyAndLogin"
 				]
 			},
 			{
