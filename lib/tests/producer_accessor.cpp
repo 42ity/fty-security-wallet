@@ -270,7 +270,6 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
                 throw std::runtime_error("Error in the comparaison of non secret of clone");
             if (!snmpv3Doc->isSecretEquals(snmpv3DocClone))
                 throw std::runtime_error("Error in the comparaison of secret of clone");
-
             if (!g_newDoc->isNonSecretEquals(snmpv3Doc))
                 throw std::runtime_error("Error in the comparaison of non secret of received element");
             if (g_newDoc->isSecretEquals(snmpv3Doc))
@@ -291,15 +290,12 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (snmpv3 == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (snmpv3->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (snmpv3->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
             if (snmpv3->getName() != "Test insert snmpv3")
                 throw std::runtime_error("Bad document retrieved: name do not match");
-
             if (snmpv3->getSecurityName() != "test security name")
                 throw std::runtime_error("Bad document retrieved: security name do not match");
             if (snmpv3->getSecurityLevel() != secw::Snmpv3SecurityLevel::AUTH_PRIV)
@@ -308,6 +304,10 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
                 throw std::runtime_error("Bad document retrieved: auth protocol do not match");
             if (snmpv3->getPrivProtocol() != secw::Snmpv3PrivProtocol::AES)
                 throw std::runtime_error("Bad document retrieved: priv protocol do not match");
+            if (snmpv3->getPrivPassword() != "")
+                throw std::runtime_error("Bad document retrieved: priv password is not empty");
+            if (snmpv3->getAuthPassword() != "")
+                throw std::runtime_error("Bad document retrieved: auth password is not empty");
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -392,10 +392,8 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (snmpv3->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
             if (snmpv3->getName() != "Test update snmpv3")
                 throw std::runtime_error("Bad document retrieved: name do not match: " + snmpv3->getName());
-
             if (snmpv3->getSecurityName() != "test update security snmpv3")
                 throw std::runtime_error("Bad document retrieved: security name do not match");
             if (snmpv3->getSecurityLevel() != secw::Snmpv3SecurityLevel::AUTH_PRIV)
@@ -404,6 +402,10 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
                 throw std::runtime_error("Bad document retrieved: auth protocol do not match");
             if (snmpv3->getPrivProtocol() != secw::Snmpv3PrivProtocol::AES)
                 throw std::runtime_error("Bad document retrieved: priv protocol do not match");
+            if (snmpv3->getPrivPassword() != "")
+                throw std::runtime_error("Bad document retrieved: priv password is not empty");
+            if (snmpv3->getAuthPassword() != "")
+                throw std::runtime_error("Bad document retrieved: auth password is not empty");
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -767,12 +769,12 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
-
             if (doc->getName() != "Test update username")
                 throw std::runtime_error("Bad document retrieved: name do not match");
             if (doc->getUsername() != "new_username")
                 throw std::runtime_error("Bad document retrieved: username do not match");
+            if (doc->getPassword() != "")
+                throw std::runtime_error("Bad document retrieved: password is not empty");
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -789,17 +791,16 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
-
             if (doc->getId() != id)
                 throw std::runtime_error("Bad document retrieved: id do not match");
             if (doc->getUsername() != "new_username")
                 throw std::runtime_error("Bad document retrieved: username do not match");
+            if (doc->getPassword() != "")
+                throw std::runtime_error("Bad document retrieved: password is not empty");
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -907,15 +908,12 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
             if (doc->getName() != "Test insert snmpv1")
                 throw std::runtime_error("Bad document retrieved: name do not match");
-
             if (doc->getCommunityName() != "community")
                 throw std::runtime_error("Bad document retrieved: community do not match");
         } catch (const std::exception& e) {
@@ -1118,17 +1116,15 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
             if (doc->getName() != "Test insert external certificate")
                 throw std::runtime_error("Bad document retrieved: name do not match");
-
             if (doc->getPem() != cert1)
                 throw std::runtime_error("Bad document retrieved: pem do not match");
+            
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -1185,13 +1181,10 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
-
             if (doc->getName() != "Test update external certificate")
                 throw std::runtime_error("Bad document retrieved: name do not match");
             if (doc->getPem() != cert2)
@@ -1212,13 +1205,10 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
-
             if (doc->getId() != id)
                 throw std::runtime_error("Bad document retrieved: id do not match");
             if (doc->getPem() != cert2)
@@ -1332,17 +1322,16 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
             if (doc->getName() != "Test insert Internal Certificate")
                 throw std::runtime_error("Bad document retrieved: name do not match");
-
             if (doc->getPem() != cert1)
                 throw std::runtime_error("Bad document retrieved: pem do not match");
+            if (doc->getPrivateKeyPem() != "")
+                throw std::runtime_error("Bad document retrieved: priv pem is not empty");
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -1400,17 +1389,16 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
-
             if (doc->getName() != "Test update Internal Certificate")
                 throw std::runtime_error("Bad document retrieved: name do not match");
             if (doc->getPem() != cert2)
                 throw std::runtime_error("Bad document retrieved: pem do not match");
+            if (doc->getPrivateKeyPem() != "")
+                throw std::runtime_error("Bad document retrieved: priv pem is not empty");
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -1427,17 +1415,16 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
-
             if (doc->getId() != id)
                 throw std::runtime_error("Bad document retrieved: id do not match");
             if (doc->getPem() != cert2)
                 throw std::runtime_error("Bad document retrieved: pem do not match");
+            if (doc->getPrivateKeyPem() != "")
+                throw std::runtime_error("Bad document retrieved: priv pem is not empty");
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -1547,17 +1534,16 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
             if (doc->getName() != "insert test login token")
                 throw std::runtime_error("Bad document retrieved: name do not match");
-
             if (doc->getLogin() != "Login")
                 throw std::runtime_error("Bad document retrieved: Login do not match");
+            if (doc->getToken() != "")
+                throw std::runtime_error("Bad document retrieved: Token is not empty");
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -1614,17 +1600,16 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
-
             if (doc->getName() != "Test update login and token")
                 throw std::runtime_error("Bad document retrieved: name do not match");
             if (doc->getLogin() != "new_login")
                 throw std::runtime_error("Bad document retrieved: login do not match");
+            if (doc->getToken() != "")
+                throw std::runtime_error("Bad document retrieved: Token is not empty");
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -1641,17 +1626,16 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
-
             if (doc->getId() != id)
                 throw std::runtime_error("Bad document retrieved: id do not match");
             if (doc->getLogin() != "new_login")
                 throw std::runtime_error("Bad document retrieved: login do not match");
+            if (doc->getToken() != "")
+                throw std::runtime_error("Bad document retrieved: Token is not empty");
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -1748,17 +1732,16 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
             if (doc->getName() != "insert Token without login")
                 throw std::runtime_error("Bad document retrieved: name do not match");
-
             if (!doc->getLogin().empty())
                 throw std::runtime_error("Bad document retrieved: Login do not match");
+            if (doc->getToken() != "")
+                throw std::runtime_error("Bad document retrieved: Token is not empty");
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -1788,17 +1771,16 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
             if (doc->getName() != "insert test sshkey login")
                 throw std::runtime_error("Bad document retrieved: name do not match");
-
             if (doc->getLogin() != "Login")
                 throw std::runtime_error("Bad document retrieved: Login do not match");
+            if (doc->getSshKey() != "")
+                throw std::runtime_error("Bad document retrieved: Ssh key is not empty");
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -1836,7 +1818,7 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
             // update security name and priv password
             doc->setName("Test update sshkey and login");
             doc->setLogin("new_login");
-            doc->setSsshKey("new_key");
+            doc->setSshKey("new_key");
 
             // update
             producerAccessor.updateDocument("default", std::dynamic_pointer_cast<secw::Document>(doc));
@@ -1855,17 +1837,16 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
-
             if (doc->getName() != "Test update sshkey and login")
                 throw std::runtime_error("Bad document retrieved: name do not match");
             if (doc->getLogin() != "new_login")
                 throw std::runtime_error("Bad document retrieved: login do not match");
+            if (doc->getSshKey() != "")
+                throw std::runtime_error("Bad document retrieved: Ssh key is not empty");
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -1882,17 +1863,16 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
-
             if (doc->getId() != id)
                 throw std::runtime_error("Bad document retrieved: id do not match");
             if (doc->getLogin() != "new_login")
                 throw std::runtime_error("Bad document retrieved: login do not match");
+            if (doc->getSshKey() != "")
+                throw std::runtime_error("Bad document retrieved: Ssh key is not empty");
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -1970,9 +1950,11 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
     // test 12.11 add ssh key and login doc without login
     {
-        secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+        const std::string testKey = "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDtpApUo/nS6KzN\nKY8CHcnsUbH2+kqx5LBiYoa/bv32JRqRs8p11jj/BNQYl45qXYbFEBHFGeY9Ck8W\nC99yaI/dS+M65GqMm83rux4q5i1rz6E5exif1g1QyDVKcbuJeqqp3Bj4QsOoPDHA\nPm5a6PAF0jrrvBwWZ2DHAEzyO11o8EvidzzIfkbNms+3Tebsa97q4+1vGrLSV5b9\nv09mc3hWBDlUngLtNdgZDc255PNLC+GzrSI2+aLEMAu9mQ1Qqe+WGzrb5OUd30ec\nqBUFSXn7Ht8mqRk/G5u0G1F8zfDFNoDIj8/qmxXKrhl2CykO6k0++gbCc+/TEh4C\nw+hptGNxAgMBAAECggEAQp1ANBe/GQsWHXCv4NT+3FrOO0BQHevQMdQSl6kCUbR2\n7S7r6vpBAeOVnMsnJdPPyn/Fq22mJ6gzISf02/pJkawLJ2AOKhomsBTE0Ruy0czj\nEdzauztigimNHrAg9NnI61KCQV1dwVQWUiBuCNfRKKCU2a3iZblW3JHN//z6I0bm\ng6+OmJ8s2UIlhYJbJpaeVmy/lml+53ndwpQX996XZTQwsfFK/UDbXp7FdyNY4gaq\ntmd5yUF8ZxM4mAirpIYcvVceLBPWzoZ1wLkxPrk36H5adGvGkiTUHTIqZUmJJWGS\nSaxgq6iIdmldwXIHp0j7HvZIqBTLyMF82ceik3wPXQKBgQD55NaeMbG/BYed8/xJ\nE4uM3+3Ri/0iQ7JAJ8zHyl29ClMKcGhBItx2Ga/4dpCTjmawk6NsNG1vBWDmrnue\n4PqkwJZRb152HpCeB+dZo8hftkjAlQcjdG2dVRQC65Wn1OEEIPUdhD+k/kwNAEoy\nvoPzcraV+HVvV5k/cz023QBnywKBgQDzco4Yj0b4gnvOu07SBUbB+2wxqlRE4/kc\n+KzqsChNpNqkJxWRbafXlqEKV7uo8jtNrU7zjPlmzzAjE6PhfrI3CkBRCrqmUG7j\n5YHJuJ6YHrTimINqKgDjr3GNlsfoMHBbtXz7juCaExsFBXRcLLCB2RBm52647OKn\nzmh2rCxiMwKBgAqARUyMhg2i69oFYLqpaZnX5ySBH3gLJDhx87cJl/rTrj2oD5l9\nH4qO9cgZI2Yv+7y714g6g8bAkRvghS1eAupddXOinHOWQTmC14P6z/bFsDT3jj89\nK0YLRzYANF/DIFmOEP7Wid4jGYsKUhPj0aOvVGDk+fpd0gDKlO3zR4sVAoGAXOGb\n7Src/PtrmRhFnkN9F42BXgGKXS5NYQxPjMrg1Z7L/E0dIXsgylQh5PxMEM06awxw\nTuO+U8dAqmFX6TSZcf5rQ4BAbivJ4xExT3EssQUmJj3iBaM466WIQWkBpEi21YaM\nxL1iW+ZmLKhEGNbEEQZsB5bM26klYLiTipNt65kCgYAsFWPqNi9Y/BlJ5kKqZoVs\np+xZaGajjzE/FX92NQKC1VjLzvSWNrE+g14Duo90l4+w6C1AOSIPPX1Ks+oInxZI\npdVaW6jAtxoFtIStY57WI64TlNCmKkq0diUjjwkpymw/Gr06tPBP5+XGyDszRWZJ\ni74FgpjFjhJiI5HFuDKXCw==\n-----END PRIVATE KEY-----";
+        
         try {
-            secw::SshKeyAndLoginPtr doc = std::make_shared<secw::SshKeyAndLogin>("insert Key without login", "Key", "");
+            secw::ProducerAccessor producerAccessor(syncClient, streamClient);
+            secw::SshKeyAndLoginPtr doc = std::make_shared<secw::SshKeyAndLogin>("insert Key without login", testKey, "");
 
             doc->addUsage("discovery_monitoring");
 
@@ -1983,23 +1965,22 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
 
         // validate doc is created
         try {
-            secw::DocumentPtr insertedDoc = producerAccessor.getDocumentWithoutPrivateData("default", id);
-
+            secw::ConsumerAccessor consumerAccessor(syncClient, streamClient);
+            secw::DocumentPtr insertedDoc = consumerAccessor.getDocumentWithPrivateData("default", id);
             secw::SshKeyAndLoginPtr doc = secw::SshKeyAndLogin::tryToCast(insertedDoc);
 
             if (doc == nullptr)
                 throw std::runtime_error("No document retrieved");
-
             if (doc->getUsageIds().count("discovery_monitoring") == 0)
                 throw std::runtime_error("Bad document retrieved: bad usage, discovery_monitoring is missing");
             if (doc->getUsageIds().size() != 1)
                 throw std::runtime_error("Bad document retrieved: bad usage, bad number of usages id");
-
             if (doc->getName() != "insert Key without login")
                 throw std::runtime_error("Bad document retrieved: name do not match");
-
             if (!doc->getLogin().empty())
                 throw std::runtime_error("Bad document retrieved: Login do not match");
+            if(doc->getSshKey() != testKey)
+                throw std::runtime_error(("Bad dcoument retrieved : Key do not match"));
         } catch (const std::exception& e) {
             FAIL(e.what());
         }

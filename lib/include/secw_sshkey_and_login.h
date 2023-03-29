@@ -1,6 +1,6 @@
 /*  =========================================================================
     secw_sshkey_and_login - Document parsers for SshKeyAndLogin document
-    Copyright (C) 2019 - 2023 Eaton
+    Copyright (C) 2023 Eaton
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ public:
     {
         return m_sshKey;
     }
-    void setSsshKey(const std::string& sshKey)
+    void setSshKey(const std::string& sshKey)
     {
         m_sshKey           = sshKey;
         m_containPrivateData = true;
