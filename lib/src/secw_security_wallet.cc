@@ -50,7 +50,7 @@ SecurityWallet::SecurityWallet(const std::string& configurationPath, const std::
 {
     try {
         reload();
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         exit(EXIT_FAILURE);
     }
 

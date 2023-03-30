@@ -85,7 +85,7 @@ public:
 
 private:
     // for backward compatibility
-    std::shared_ptr<mlm::MlmSyncClient> m_mlmClient;
+    std::shared_ptr<mlm::MlmSyncClient> m_mlmClient{nullptr};
 
     fty::SyncClient& m_requestClient;
 

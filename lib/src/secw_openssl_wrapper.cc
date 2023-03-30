@@ -88,7 +88,7 @@ std::string base64Encode(const ByteField& data)
     (void)BIO_flush(b64);
 
     // get a pointer to mem's data
-    BUF_MEM* bptr;
+    BUF_MEM* bptr{nullptr};
     BIO_get_mem_ptr(b64, &bptr);
 
     // Convert to string
@@ -101,7 +101,7 @@ std::string base64Encode(const ByteField& data)
 
 ByteField base64Decode(const std::string& encodedData, const size_t off, const size_t count)
 {
-    BIO *b64, *bmem;
+    BIO *b64{nullptr}, *bmem{nullptr};
 
     ByteField base64(encodedData.length());
 
@@ -157,8 +157,8 @@ ByteField Aes256cbcEncrypt(const ByteField& data, const ByteField& key, const By
 
     /* Create and initialise the context */
     EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
-    int             len;
-    size_t          cipherDataLen;
+    int             len{0};
+    size_t          cipherDataLen{0};
 
     ByteField cipherData(data.size() + 64);
     /* Initialise the encryption operation. IMPORTANT - ensure you use a key
@@ -183,7 +183,6 @@ ByteField Aes256cbcEncrypt(const ByteField& data, const ByteField& key, const By
     /* Clean up */
     EVP_CIPHER_CTX_free(ctx);
 
-
     cipherData.resize(cipherDataLen);
     return cipherData;
 }
@@ -205,8 +204,8 @@ ByteField Aes256cbcDecrypt(const ByteField& cipherData, const ByteField& key, co
     /* Create and initialise the context */
     EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
 
-    int    len;
-    size_t plainDataLen;
+    int    len{0};
+    size_t plainDataLen{0};
 
     /* Initialise the decryption operation. IMPORTANT - ensure you use a key
      * and IV size appropriate for your cipher

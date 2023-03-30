@@ -81,7 +81,7 @@ public:
     Protocol        m_protocol;
     Port            m_port;
     CredentialId    m_credentialId;
-    Status          m_status;
+    Status          m_status{Status::UNKNOWN};
     MapExtendedInfo m_extendedInfo;
 };
 

@@ -199,7 +199,7 @@ DocumentPtr Document::createFromSRR(const cxxtools::SerializationInfo& si, const
 
         doc->m_containPrivateData = true;
 
-    } catch (const SecwException& e) {
+    } catch (const SecwException& /*e*/) {
         throw;
     } catch (const std::exception& e) {
         throw SecwException(e.what());
@@ -310,7 +310,7 @@ void Document::updateHeaderFromSerializationInfo(const cxxtools::SerializationIn
         // We don't read the id because will portfolio insertion process is gonna do it
         // We don't read the type because it is define by the object type
         m_name = GetSiMemberCxxString(si, DOC_NAME_ENTRY); //utf-8
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_NAME_ENTRY);
     }
 
@@ -326,13 +326,13 @@ void Document::updateHeaderFromSerializationInfo(const cxxtools::SerializationIn
                 m_tags.insert(tag);
             }
         }
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_TAGS_ENTRY);
     }
 
     try {
         si.getMember(DOC_USAGES_ENTRY) >>= m_usages;
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         throw SecwInvalidDocumentFormatException(DOC_USAGES_ENTRY);
     }
 }
@@ -393,7 +393,7 @@ void operator>>=(const cxxtools::SerializationInfo& si, DocumentPtr& doc)
             }
         }
 
-    } catch (const SecwException& e) {
+    } catch (const SecwException& /*e*/) {
         throw;
     } catch (const std::exception& e) {
         throw SecwException(e.what());

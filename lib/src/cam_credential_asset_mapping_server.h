@@ -94,9 +94,9 @@ public:
 
 public:
     // SRR support
-    std::unique_ptr<messagebus::MessageBus>      m_msgBus;
+    std::unique_ptr<messagebus::MessageBus>      m_msgBus{nullptr};
     std::mutex                                   m_lock;
-    std::unique_ptr<dto::srr::SrrQueryProcessor> m_srrProcessor;
+    std::unique_ptr<dto::srr::SrrQueryProcessor> m_srrProcessor{nullptr};
 
     void                      handleSRRRequest(messagebus::Message msg);
     dto::srr::SaveResponse    handleSRRSave(const dto::srr::SaveQuery& query);

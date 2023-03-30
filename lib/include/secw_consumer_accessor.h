@@ -133,7 +133,7 @@ public:
 
 
 private:
-    std::shared_ptr<ClientAccessor> m_clientAccessor;
+    std::shared_ptr<ClientAccessor> m_clientAccessor{nullptr};
 };
 
 } // namespace secw
