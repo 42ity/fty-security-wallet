@@ -50,3 +50,4 @@
 #include "secw_snmpv3.h"
 #include "secw_user_and_password.h"
 #include "secw_token_and_login.h"
+#include "secw_sshkey_and_login.h"

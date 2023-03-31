@@ -34,6 +34,7 @@
 #include "secw_snmpv3.h"
 #include "secw_user_and_password.h"
 #include "secw_token_and_login.h"
+#include "secw_sshkey_and_login.h"
 #include "secw_utf8_cxxtools.h"
 #include <cxxtools/jsondeserializer.h>
 #include <cxxtools/jsonserializer.h>
@@ -50,6 +51,7 @@ std::map<DocumentType, FctDocumentFactory> Document::m_documentFactoryFuntions =
     { SNMPV1_TYPE, []() { return DocumentPtr(new Snmpv1()); }},
     { USER_AND_PASSWORD_TYPE, []() { return DocumentPtr(new UserAndPassword()); }},
     { TOKEN_AND_LOGIN_TYPE, []() { return DocumentPtr(new TokenAndLogin()); }},
+    { SSHKEY_AND_LOGIN_TYPE, []() { return DocumentPtr(new SshKeyAndLogin()); }},
     { EXTERNAL_CERTIFICATE_TYPE, []() { return DocumentPtr(new ExternalCertificate()); }},
     { INTERNAL_CERTIFICATE_TYPE, []() { return DocumentPtr(new InternalCertificate()); }}
 };
