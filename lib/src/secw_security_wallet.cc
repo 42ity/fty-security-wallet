@@ -29,8 +29,8 @@
 #include "secw_security_wallet.h"
 #include "fty_security_wallet.h"
 #include "secw_helpers.h"
-#include <cxxtools/jsondeserializer.h>
-#include <cxxtools/jsonserializer.h>
+#include "cxxtools/serializationinfo.h"
+#include <fty_common_json.h>
 #include <fstream>
 #include <fty/convert.h>
 #include <fty_log.h>
@@ -80,13 +80,8 @@ void SecurityWallet::reload()
             throw std::runtime_error("File does not exist!");
         }
 
-        std::ifstream input;
-
-        input.open(m_pathConfiguration);
-
         cxxtools::SerializationInfo rootSi;
-        cxxtools::JsonDeserializer  deserializer(input);
-        deserializer.deserialize(rootSi);
+        JSON::readFromFile(m_pathConfiguration, rootSi);
 
         // it's an array
         for (size_t index = 0; index < rootSi.memberCount(); index++) {
@@ -118,13 +113,8 @@ void SecurityWallet::reload()
 
         // try to open portfolio if exist
         if (fileExist) {
-            std::ifstream input;
-
-            input.open(m_pathDatabase);
-
             cxxtools::SerializationInfo rootSi;
-            cxxtools::JsonDeserializer  deserializer(input);
-            deserializer.deserialize(rootSi);
+            JSON::readFromFile(m_pathDatabase, rootSi);
 
             uint8_t version = 0;
             rootSi.getMember("version") >>= version;
@@ -233,12 +223,7 @@ void SecurityWallet::save() const
     rootSi.addMember("version") <<= SECW_VERSION;
     rootSi.addMember("portfolios") <<= m_portfolios;
 
-    // open the file
-    std::ofstream output(m_pathDatabase.c_str());
-
-    cxxtools::JsonSerializer serializer(output);
-    serializer.beautify(true);
-    serializer.serialize(rootSi);
+    JSON::writeToFile(m_pathDatabase, rootSi, true);
 }
 
 std::vector<std::string> SecurityWallet::getPortfolioNames() const
@@ -274,11 +259,9 @@ Portfolio& SecurityWallet::getPortfolio(const std::string& name)
 
 static std::string getHardwareUuid()
 {
-    std::ifstream releaseDetails("/etc/release-details.json");
-
     cxxtools::SerializationInfo si;
-    cxxtools::JsonDeserializer  deserializer(releaseDetails);
-    deserializer.deserialize(si);
+
+    JSON::readFromFile("/etc/release-details.json", si);
 
     std::string uuid;
 

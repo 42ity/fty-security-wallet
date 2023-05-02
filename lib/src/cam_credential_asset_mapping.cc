@@ -20,8 +20,8 @@
 */
 
 #include "cam_credential_asset_mapping.h"
-#include <cxxtools/jsondeserializer.h>
-#include <cxxtools/jsonserializer.h>
+#include <cxxtools/serializationinfo.h>
+#include <fty_common_json.h>
 #include <iostream>
 
 namespace cam {
@@ -78,11 +78,7 @@ std::string CredentialAssetMapping::toString() const
         cxxtools::SerializationInfo si;
         fillSerializationInfo(si);
 
-        std::stringstream        output;
-        cxxtools::JsonSerializer serializer(output);
-        serializer.serialize(si);
-
-        returnData = output.str();
+        returnData = JSON::writeToString(si, false);
     }
     /*catch(const std::exception& e)
     {
@@ -97,10 +93,7 @@ void operator>>=(const std::string& str, CredentialAssetMapping& mapping)
     cxxtools::SerializationInfo si;
 
     try {
-        std::stringstream input;
-        input << str;
-        cxxtools::JsonDeserializer deserializer(input);
-        deserializer.deserialize(si);
+        JSON::readFromString(str, si);
     } catch (const std::exception& e) {
         throw CamProtocolErrorException("Error in json: " + std::string(e.what()));
     }

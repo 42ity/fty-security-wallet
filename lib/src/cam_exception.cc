@@ -20,8 +20,8 @@
 */
 
 #include "cam_exception.h"
-#include <cxxtools/jsondeserializer.h>
-#include <cxxtools/jsonserializer.h>
+#include "cxxtools/serializationinfo.h"
+#include <fty_common_json.h>
 #include <sstream>
 
 namespace cam {
@@ -32,12 +32,9 @@ namespace cam {
 void CamException::throwCamException(const std::string& data)
 {
     // get the serializationInfo
-    std::stringstream input;
-    input << data;
-
     cxxtools::SerializationInfo si;
-    cxxtools::JsonDeserializer  deserializer(input);
-    deserializer.deserialize(si);
+
+    JSON::readFromString(data, si);
 
     // extract the error code, the message and the extra data
     uint8_t                     errorCode = 0;
@@ -89,15 +86,11 @@ const char* CamException::what() const noexcept
 
 std::string CamException::toJson() const
 {
-    std::stringstream        output;
-    cxxtools::JsonSerializer serializer(output);
-    serializer.beautify(true);
-
     cxxtools::SerializationInfo si;
-    si <<= *(this);
-    serializer.serialize(si);
 
-    return output.str();
+    si <<= *(this);
+
+    return JSON::writeToString(si);
 }
 
 void operator<<=(cxxtools::SerializationInfo& si, const CamException& exception)

@@ -28,8 +28,8 @@
 
 #include "secw_exception.h"
 #include "secw_openssl_wrapper.h"
-#include <cxxtools/jsondeserializer.h>
-#include <cxxtools/jsonserializer.h>
+#include "cxxtools/serializationinfo.h"
+#include <fty_common_json.h>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -40,10 +40,7 @@ cxxtools::SerializationInfo deserialize(const std::string& json)
     cxxtools::SerializationInfo si;
 
     try {
-        std::stringstream input;
-        input << json;
-        cxxtools::JsonDeserializer deserializer(input);
-        deserializer.deserialize(si);
+        JSON::readFromString(json, si);
     } catch (const std::exception& e) {
         throw SecwProtocolErrorException("Error in the json from server: " + std::string(e.what()));
     }
@@ -56,11 +53,8 @@ std::string serialize(const cxxtools::SerializationInfo& si)
     std::string returnData("");
 
     try {
-        std::stringstream        output;
-        cxxtools::JsonSerializer serializer(output);
-        serializer.serialize(si);
-
-        returnData = output.str();
+        cxxtools::SerializationInfo tmpCpy(si);
+        returnData = JSON::writeToString(tmpCpy, false);
     } catch (const std::exception& e) {
         throw SecwException("Error while creating json " + std::string(e.what()));
     }
