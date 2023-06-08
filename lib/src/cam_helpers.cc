@@ -41,16 +41,12 @@ cxxtools::SerializationInfo deserialize(const std::string& json)
 
 std::string serialize(const cxxtools::SerializationInfo& si)
 {
-    std::string returnData("");
-
     try {
-        returnData = JSON::writeToString(si, false);
-
+        cxxtools::SerializationInfo si2{si}; //deconst
+        return JSON::writeToString(si2, false);
     } catch (const std::exception& e) {
         throw CamException("Error while creating json " + std::string(e.what()));
     }
-
-    return returnData;
 }
 
 } // namespace cam
