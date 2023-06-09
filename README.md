@@ -1,6 +1,6 @@
 # fty-security-wallet
 
-fty-security-wallet solve those problems :
+fty-security-wallet solve those problems : test
 
 * To store common configuration payload (let’s call it Wallet Document) including sensitive data
 * To exchange sensitive data in a secure way
