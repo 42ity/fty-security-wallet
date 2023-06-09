@@ -281,6 +281,7 @@ std::vector<std::string> Accessor::sendCommand(const std::string& command, const
     }
 
     return receivedFrames;
+    
 }
 
 } // namespace cam
