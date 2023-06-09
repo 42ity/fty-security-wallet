@@ -4,6 +4,32 @@
 
 void camAccessorTest(mlm::MlmSyncClient& syncClient)
 {
+    // test 0.X
+    {   
+        //test 0.1
+        {
+            try {
+                cam::Accessor accessor(syncClient);
+
+                cam::AssetId   assetId("asset-1");
+                cam::ServiceId serviceId("test-usage");
+                cam::Protocol  protocol("http");
+
+                const cam::CredentialAssetMapping mapping1 = accessor.getMapping(assetId, serviceId, protocol);
+
+                cam::CredentialAssetMapping mapping2;
+                std::string mapJson = "{\"cam_service\":\"test-usage\",\"cam_asset\":\"asset-1\",\"cam_protocol\":\"http\",\"cam_port\":\"80\",\"cam_credential\":\"cred-1\",\"cam_status\":0,\"cam_extended_info\":[{\"first\":\"port\",\"second\":\"80\"}]}";
+                mapJson >>= mapping2;
+
+                if(mapping1.toString() != mapping2.toString()) {
+                    throw std::runtime_error("Wrong mapping returned");
+                }
+            } catch (const std::exception& e) {
+                FAIL(e.what());
+            }
+        }
+    }
+
     // test 1.X
     {
         // test 1.1 => test retrieve a mapping

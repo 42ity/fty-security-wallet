@@ -34,8 +34,8 @@
 #include "secw_snmpv3.h"
 #include "secw_user_and_password.h"
 #include "secw_utf8_cxxtools.h"
-#include <cxxtools/jsondeserializer.h>
-#include <cxxtools/jsonserializer.h>
+#include <fty_common_json.h>
+#include <cxxtools/serializationinfo.h>
 
 namespace secw {
 /*-----------------------------------------------------------------------------*/
@@ -215,14 +215,7 @@ bool Document::isNonSecretEquals(const DocumentPtr& other) const
     try {
         cxxtools::SerializationInfo si;
         fillSerializationInfoPublicDoc(si.addMember(DOC_PUBLIC_ENTRY));
-
-        std::stringstream output;
-
-        cxxtools::JsonSerializer serializer(output);
-        serializer.beautify(false);
-        serializer.serialize(si);
-
-        doc1 = output.str();
+        doc1 = JSON::writeToString(si, false);
     } catch (const std::exception& e) {
         throw SecwException("Error while creating json " + std::string(e.what()));
     }
@@ -230,14 +223,7 @@ bool Document::isNonSecretEquals(const DocumentPtr& other) const
     try {
         cxxtools::SerializationInfo si;
         other->fillSerializationInfoPublicDoc(si.addMember(DOC_PUBLIC_ENTRY));
-
-        std::stringstream output;
-
-        cxxtools::JsonSerializer serializer(output);
-        serializer.beautify(false);
-        serializer.serialize(si);
-
-        doc2 = output.str();
+        doc2 = JSON::writeToString(si, false);
     } catch (const std::exception& e) {
         throw SecwException("Error while creating json " + std::string(e.what()));
     }
@@ -257,14 +243,7 @@ bool Document::isSecretEquals(const DocumentPtr& other) const
     try {
         cxxtools::SerializationInfo si;
         fillSerializationInfoPrivateDoc(si.addMember(DOC_PRIVATE_ENTRY));
-
-        std::stringstream output;
-
-        cxxtools::JsonSerializer serializer(output);
-        serializer.beautify(false);
-        serializer.serialize(si);
-
-        doc1 = output.str();
+        doc1 = JSON::writeToString(si, false);
     } catch (const std::exception& e) {
         throw SecwException("Error while creating json " + std::string(e.what()));
     }
@@ -272,14 +251,7 @@ bool Document::isSecretEquals(const DocumentPtr& other) const
     try {
         cxxtools::SerializationInfo si;
         other->fillSerializationInfoPrivateDoc(si.addMember(DOC_PRIVATE_ENTRY));
-
-        std::stringstream output;
-
-        cxxtools::JsonSerializer serializer(output);
-        serializer.beautify(false);
-        serializer.serialize(si);
-
-        doc2 = output.str();
+        doc2 = JSON::writeToString(si, false);
     } catch (const std::exception& e) {
         throw SecwException("Error while creating json " + std::string(e.what()));
     }
@@ -406,13 +378,7 @@ void operator<<=(std::string& str, const Document& doc)
     si <<= doc;
 
     try {
-        std::stringstream output;
-
-        cxxtools::JsonSerializer serializer(output);
-        serializer.beautify(true);
-        serializer.serialize(si);
-
-        str = output.str();
+        str = JSON::writeToString(si, true);
     } catch (const std::exception& e) {
         throw SecwException("Error while creating json " + std::string(e.what()));
     }
@@ -428,10 +394,7 @@ void operator>>=(const std::string& str, DocumentPtr& doc)
     cxxtools::SerializationInfo si;
 
     try {
-        std::stringstream input;
-        input << str;
-        cxxtools::JsonDeserializer deserializer(input);
-        deserializer.deserialize(si);
+        JSON::readFromString(str, si);
     } catch (const std::exception& e) {
         throw SecwProtocolErrorException("Error in json: " + std::string(e.what()));
     }
@@ -445,13 +408,7 @@ void operator<<=(std::string& str, const std::vector<DocumentPtr>& docs)
     si <<= docs;
 
     try {
-        std::stringstream output;
-
-        cxxtools::JsonSerializer serializer(output);
-        serializer.beautify(true);
-        serializer.serialize(si);
-
-        str = output.str();
+        str = JSON::writeToString(si, true);
     } catch (const std::exception& e) {
         throw SecwException("Error while creating json " + std::string(e.what()));
     }

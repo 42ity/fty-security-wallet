@@ -21,8 +21,7 @@
 
 #include "cam_credential_asset_mapping_storage.h"
 #include "cam_helpers.h"
-#include <cxxtools/jsondeserializer.h>
-#include <cxxtools/jsonserializer.h>
+#include <cxxtools/serializationinfo.h>
 #include <fstream>
 #include <fty_log.h>
 #include <fty_common_json.h>
