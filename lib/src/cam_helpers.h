@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "cxxtools/serializationinfo.h"
+#include <cxxtools/serializationinfo.h>
 
 namespace cam
 {

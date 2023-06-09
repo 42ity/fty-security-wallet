@@ -29,7 +29,7 @@
 #include "secw_security_wallet.h"
 #include "fty_security_wallet.h"
 #include "secw_helpers.h"
-#include "cxxtools/serializationinfo.h"
+#include <cxxtools/serializationinfo.h>
 #include <fty_common_json.h>
 #include <fstream>
 #include <fty/convert.h>

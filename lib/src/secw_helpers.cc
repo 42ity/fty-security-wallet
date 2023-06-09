@@ -28,7 +28,7 @@
 
 #include "secw_exception.h"
 #include "secw_openssl_wrapper.h"
-#include "cxxtools/serializationinfo.h"
+#include <cxxtools/serializationinfo.h>
 #include <fty_common_json.h>
 #include <iostream>
 #include <memory>

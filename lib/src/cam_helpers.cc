@@ -22,6 +22,7 @@
 #include "cam_helpers.h"
 #include "cam_exception.h"
 #include <fty_common_json.h>
+#include <cxxtools/serializationinfo.h>
 #include <iostream>
 #include <sstream>
 

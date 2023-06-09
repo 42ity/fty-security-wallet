@@ -20,7 +20,7 @@
 */
 
 #include "cam_exception.h"
-#include "cxxtools/serializationinfo.h"
+#include <cxxtools/serializationinfo.h>
 #include <fty_common_json.h>
 #include <sstream>
 
@@ -90,7 +90,7 @@ std::string CamException::toJson() const
 
     si <<= *(this);
 
-    return JSON::writeToString(si);
+    return JSON::writeToString(si, true);
 }
 
 void operator<<=(cxxtools::SerializationInfo& si, const CamException& exception)

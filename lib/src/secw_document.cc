@@ -35,6 +35,7 @@
 #include "secw_user_and_password.h"
 #include "secw_utf8_cxxtools.h"
 #include <fty_common_json.h>
+#include <cxxtools/serializationinfo.h>
 
 namespace secw {
 /*-----------------------------------------------------------------------------*/

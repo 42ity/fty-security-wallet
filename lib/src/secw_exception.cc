@@ -27,7 +27,7 @@
 */
 
 #include "secw_exception.h"
-#include "cxxtools/serializationinfo.h"
+#include <cxxtools/serializationinfo.h>
 #include <fty_common_json.h>
 #include <sstream>
 
