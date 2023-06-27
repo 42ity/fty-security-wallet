@@ -7,7 +7,9 @@
 				"supported_types": [
 					"Snmpv3",
 					"Snmpv1",
-					"UserAndPassword"
+					"UserAndPassword",
+					"TokenAndLogin",
+					"SshKeyAndLogin"
 				]
 			},
 			{
@@ -15,7 +17,9 @@
 				"supported_types": [
 					"Snmpv3",
 					"Snmpv1",
-					"UserAndPassword"
+					"UserAndPassword",
+					"TokenAndLogin",
+					"SshKeyAndLogin"
 				]
 			},
 			{

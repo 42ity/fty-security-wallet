@@ -42,6 +42,8 @@ etn_target(shared ${PROJECT_NAME_UNDERSCORE}
         src/secw_external_certificate.cc
         src/secw_openssl_wrapper.h
         src/secw_user_and_password.cc
+        src/secw_token_and_login.cc
+        src/secw_sshkey_and_login.cc
     PUBLIC_INCLUDE_DIR
         include
     PUBLIC
@@ -60,6 +62,8 @@ etn_target(shared ${PROJECT_NAME_UNDERSCORE}
         secw_snmpv1.h
         secw_snmpv3.h
         secw_user_and_password.h
+        secw_token_and_login.h
+        secw_sshkey_and_login.h
     USES
         pthread
         ssl #>=1.1

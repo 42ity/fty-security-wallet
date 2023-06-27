@@ -8,19 +8,25 @@
 					"Snmpv3",
 					"Snmpv1",
 					"UserAndPassword",
+					"TokenAndLogin",
+					"SshKeyAndLogin",
 					"ExternalCertificate"
 				]
 			},
 			{
 				"usage_id": "mass_device_management",
 				"supported_types": [
-					"UserAndPassword"
+					"UserAndPassword",
+					"TokenAndLogin",
+					"SshKeyAndLogin"
 				]
 			},
 			{
 				"usage_id": "user_script",
 				"supported_types": [
-					"UserAndPassword"
+					"UserAndPassword",
+					"TokenAndLogin",
+					"SshKeyAndLogin"
 				]
 			}
 		],
