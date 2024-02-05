@@ -27,7 +27,7 @@
 #include <string>
 #include <sstream>
 
-// encode std::string (utf-8) to cxxtools::String
+// decode cxxtools::String to std::string (utf-8)
 inline std::string CxxStringToStdString(const cxxtools::String& value)
 {
     std::ostringstream oss;
@@ -35,7 +35,7 @@ inline std::string CxxStringToStdString(const cxxtools::String& value)
     return oss.str();
 }
 
-// decode cxxtools::String to std::string (utf-8)
+// encode std::string (utf-8) to cxxtools::String
 inline cxxtools::String StdStringToCxxString(const std::string& value)
 {
     cxxtools::String cxxStr = cxxtools::Utf8Codec::decode(value);
