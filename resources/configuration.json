@@ -1,106 +1,106 @@
 [
-	{
-		"portfolio_name": "default",
-		"usages": [
-			{
-				"usage_id": "discovery_monitoring",
-				"supported_types": [
-					"Snmpv3",
-					"Snmpv1",
-					"UserAndPassword",
-					"TokenAndLogin",
-					"SshKeyAndLogin",
-					"ExternalCertificate"
-				]
-			},
-			{
-				"usage_id": "mass_device_management",
-				"supported_types": [
-					"UserAndPassword",
-					"TokenAndLogin",
-					"SshKeyAndLogin"
-				]
-			},
-			{
-				"usage_id": "user_script",
-				"supported_types": [
-					"UserAndPassword",
-					"TokenAndLogin",
-					"SshKeyAndLogin"
-				]
-			}
-		],
-		"consumers": [
-			{
-				"client_regex": ".*",
-				"usages": [
-					"discovery_monitoring",
-					"mass_device_management"
-				]
-			},
-			{
-				"client_regex": "_bios-script",
-				"usages": [
-					"user_script"
-				]
-			},
+    {
+        "portfolio_name": "default",
+        "usages": [
+            {
+                "usage_id": "discovery_monitoring",
+                "supported_types": [
+                    "Snmpv3",
+                    "Snmpv1",
+                    "UserAndPassword",
+                    "TokenAndLogin",
+                    "SshKeyAndLogin",
+                    "ExternalCertificate"
+                ]
+            },
+            {
+                "usage_id": "mass_device_management",
+                "supported_types": [
+                    "UserAndPassword",
+                    "TokenAndLogin",
+                    "SshKeyAndLogin"
+                ]
+            },
+            {
+                "usage_id": "user_script",
+                "supported_types": [
+                    "UserAndPassword",
+                    "TokenAndLogin",
+                    "SshKeyAndLogin"
+                ]
+            }
+        ],
+        "consumers": [
+            {
+                "client_regex": ".*",
+                "usages": [
+                    "discovery_monitoring",
+                    "mass_device_management"
+                ]
+            },
+            {
+                "client_regex": "_bios-script",
+                "usages": [
+                    "user_script"
+                ]
+            },
             {
                 "client_regex": "mass-management-daemon",
-				"usages": [
-					"mass_device_management"
-				]
+                "usages": [
+                    "mass_device_management"
+                ]
             },
-			{
-				"client_regex": "discovery-monitoring-daemon",
-				"usages": [
-					"discovery_monitoring"
-				]
-			},
-			{
-				"client_regex": "root",
-				"usages": [
-					"user_script",
-					"discovery_monitoring",
-					"mass_device_management"
-				]
-			}
-		],
-		"producers": [
-			{
-				"client_regex": "(www-data)|(root)",
-				"usages": [
-					"discovery_monitoring",
-					"mass_device_management",
-					"user_script"
-				]
-			}
-		]
-	},
+            {
+                "client_regex": "discovery-monitoring-daemon",
+                "usages": [
+                    "discovery_monitoring"
+                ]
+            },
+            {
+                "client_regex": "root",
+                "usages": [
+                    "user_script",
+                    "discovery_monitoring",
+                    "mass_device_management"
+                ]
+            }
+        ],
+        "producers": [
+            {
+                "client_regex": "(www-data)|(root)",
+                "usages": [
+                    "discovery_monitoring",
+                    "mass_device_management",
+                    "user_script"
+                ]
+            }
+        ]
+    },
     {
-		"portfolio_name": "internal",
-		"usages": [
-			{
-				"usage_id": "webserver",
-				"supported_types": [
-					"InternalCertificate"
-				]
-			}
-		],
-		"consumers": [
-						{
-				"client_regex": "(www-data)|(root)",
-				"usages": [
-					"webserver"
-				]
-			}
-		],
-		"producers": [
-			{
-				"client_regex": "(certificate-generator-daemon)|(root)",
-				"usages": [
-					"webserver"
-				]
-			}
-		]
-	}
+        "portfolio_name": "internal",
+        "usages": [
+            {
+                "usage_id": "webserver",
+                "supported_types": [
+                    "InternalCertificate"
+                ]
+            }
+        ],
+        "consumers": [
+            {
+                "client_regex": "(www-data)|(root)",
+                "usages": [
+                    "webserver"
+                ]
+            }
+        ],
+        "producers": [
+            {
+                "client_regex": "(certificate-generator-daemon)|(root)",
+                "usages": [
+                    "webserver"
+                ]
+            }
+        ]
+    }
 ]
