@@ -6,15 +6,15 @@ fty-security-wallet solve those problems :
 * To exchange sensitive data in a secure way
 * To be notified when configuration are updated
 * Have a different level of access (ACL)
-* SNMPv3, SNMPv1 are some of the potential kind of configuration  we would support
+* SNMPv3, SNMPv1 are some of the potential kind of configuration we would support
 
 ## Naming
-* Document: A payload of the security wallet. It has a public and private part (secret)
+
+* Document: A payload of the security wallet. It has a public and private (secret) part
 * Portfolio: Pool of documents.
 * Usage: Purpose for which a document can be use.
-* Producer: Client which can create, update and delete Documents. This client can only read the public part.
+* Producer: Client which can create, update and delete documents. This client can only read the public part.
 * Consumer: Client which can read documents (public and private part) but which cannot modify any document.
-
 
 ## How to build
 
@@ -49,13 +49,15 @@ systemctl start fty-security-wallet
 
 ### Overview
 
-fty-security-wallet is composed of 1 agent and 1 client library :
+fty-security-wallet is composed of 1 agent and 1 client library.
 
-Server side:
+#### Server side
+
 * SecurityWalletServer registers to malamute broker as security-wallet agent
   and handles mailbox requests
 
-Client side:
+#### Client side
+
 * ConsumerAccessor registers to malamute broker using a client id (agent name) and then
   can execute Consumer requests to the SecurityWalletServer
 
@@ -69,28 +71,29 @@ Client side:
 
 ### Data structure organization
 
-The Security wallet is use to store "Document".
+The Security wallet is used to store "Document".
+
 A document has:
 * 1 header (id, type, name, list of usage and list of tag)
 * 1 public part
 * 1 private part (secret)
 
 A document has a list of "Usage"
-A document has a list of "Tag" which are just a way to organize document
+A document has a list of "Tag" which are just a way to organize documents
 
 Each document are stored in a "Portfolio".
 
 The SecurityWalletServer has a list of portfolio available.
 
 ### Access control
+
 In progress: Will be done using the notion of "Usage" of document
 
-### Available Api
+### Available API
 
-Api is available for producer and consumer. See secw_producer_accessor.h and secw_consumer_accessor.h
-
+An API is available for producer and consumer.\
+See secw_producer_accessor.h and secw_consumer_accessor.h
 
 ### Published Document modification
 
 To be Defined
-

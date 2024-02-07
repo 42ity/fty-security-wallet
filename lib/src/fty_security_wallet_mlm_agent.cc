@@ -24,10 +24,7 @@
  */
 
 #include "fty_security_wallet.h"
-#include "secw_exception.h"
-#include "secw_helpers.h"
 #include "secw_security_wallet_server.h"
-#include <cxxtools/jsonserializer.h>
 #include <fty_common_mlm_basic_mailbox_server.h>
 #include <fty_common_mlm_stream_client.h>
 #include <sstream>
