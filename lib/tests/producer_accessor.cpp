@@ -1,9 +1,11 @@
-#define TEST_TIMEOUT 5
+#include <catch2/catch.hpp>
 #include <fty_log.h>
 #include <fty_security_wallet.h>
-#include <catch2/catch.hpp>
 #include <mutex>
 #include <condition_variable>
+#include "producer_accessor.h"
+
+#define TEST_TIMEOUT 5 //sec
 
 using namespace std::placeholders;
 
@@ -1124,7 +1126,7 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
                 throw std::runtime_error("Bad document retrieved: name do not match");
             if (doc->getPem() != cert1)
                 throw std::runtime_error("Bad document retrieved: pem do not match");
-            
+
         } catch (const std::exception& e) {
             FAIL(e.what());
         }
@@ -1695,7 +1697,7 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
         }
     }
 
-    // test 11.10 add illegal Login and Token doc 
+    // test 11.10 add illegal Login and Token doc
     {
         secw::ProducerAccessor producerAccessor(syncClient, streamClient);
         try {
@@ -1711,7 +1713,7 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
         }
     }
 
-    // test 11.11 add Login and Token doc without login 
+    // test 11.11 add Login and Token doc without login
     {
         secw::ProducerAccessor producerAccessor(syncClient, streamClient);
         try {
@@ -1932,7 +1934,7 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
         }
     }
 
-    // test 12.10 add illegal ssh key and login doc 
+    // test 12.10 add illegal ssh key and login doc
     {
         secw::ProducerAccessor producerAccessor(syncClient, streamClient);
         try {
@@ -1951,7 +1953,7 @@ void secwProducerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamC
     // test 12.11 add ssh key and login doc without login
     {
         const std::string testKey = "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDtpApUo/nS6KzN\nKY8CHcnsUbH2+kqx5LBiYoa/bv32JRqRs8p11jj/BNQYl45qXYbFEBHFGeY9Ck8W\nC99yaI/dS+M65GqMm83rux4q5i1rz6E5exif1g1QyDVKcbuJeqqp3Bj4QsOoPDHA\nPm5a6PAF0jrrvBwWZ2DHAEzyO11o8EvidzzIfkbNms+3Tebsa97q4+1vGrLSV5b9\nv09mc3hWBDlUngLtNdgZDc255PNLC+GzrSI2+aLEMAu9mQ1Qqe+WGzrb5OUd30ec\nqBUFSXn7Ht8mqRk/G5u0G1F8zfDFNoDIj8/qmxXKrhl2CykO6k0++gbCc+/TEh4C\nw+hptGNxAgMBAAECggEAQp1ANBe/GQsWHXCv4NT+3FrOO0BQHevQMdQSl6kCUbR2\n7S7r6vpBAeOVnMsnJdPPyn/Fq22mJ6gzISf02/pJkawLJ2AOKhomsBTE0Ruy0czj\nEdzauztigimNHrAg9NnI61KCQV1dwVQWUiBuCNfRKKCU2a3iZblW3JHN//z6I0bm\ng6+OmJ8s2UIlhYJbJpaeVmy/lml+53ndwpQX996XZTQwsfFK/UDbXp7FdyNY4gaq\ntmd5yUF8ZxM4mAirpIYcvVceLBPWzoZ1wLkxPrk36H5adGvGkiTUHTIqZUmJJWGS\nSaxgq6iIdmldwXIHp0j7HvZIqBTLyMF82ceik3wPXQKBgQD55NaeMbG/BYed8/xJ\nE4uM3+3Ri/0iQ7JAJ8zHyl29ClMKcGhBItx2Ga/4dpCTjmawk6NsNG1vBWDmrnue\n4PqkwJZRb152HpCeB+dZo8hftkjAlQcjdG2dVRQC65Wn1OEEIPUdhD+k/kwNAEoy\nvoPzcraV+HVvV5k/cz023QBnywKBgQDzco4Yj0b4gnvOu07SBUbB+2wxqlRE4/kc\n+KzqsChNpNqkJxWRbafXlqEKV7uo8jtNrU7zjPlmzzAjE6PhfrI3CkBRCrqmUG7j\n5YHJuJ6YHrTimINqKgDjr3GNlsfoMHBbtXz7juCaExsFBXRcLLCB2RBm52647OKn\nzmh2rCxiMwKBgAqARUyMhg2i69oFYLqpaZnX5ySBH3gLJDhx87cJl/rTrj2oD5l9\nH4qO9cgZI2Yv+7y714g6g8bAkRvghS1eAupddXOinHOWQTmC14P6z/bFsDT3jj89\nK0YLRzYANF/DIFmOEP7Wid4jGYsKUhPj0aOvVGDk+fpd0gDKlO3zR4sVAoGAXOGb\n7Src/PtrmRhFnkN9F42BXgGKXS5NYQxPjMrg1Z7L/E0dIXsgylQh5PxMEM06awxw\nTuO+U8dAqmFX6TSZcf5rQ4BAbivJ4xExT3EssQUmJj3iBaM466WIQWkBpEi21YaM\nxL1iW+ZmLKhEGNbEEQZsB5bM26klYLiTipNt65kCgYAsFWPqNi9Y/BlJ5kKqZoVs\np+xZaGajjzE/FX92NQKC1VjLzvSWNrE+g14Duo90l4+w6C1AOSIPPX1Ks+oInxZI\npdVaW6jAtxoFtIStY57WI64TlNCmKkq0diUjjwkpymw/Gr06tPBP5+XGyDszRWZJ\ni74FgpjFjhJiI5HFuDKXCw==\n-----END PRIVATE KEY-----";
-        
+
         try {
             secw::ProducerAccessor producerAccessor(syncClient, streamClient);
             secw::SshKeyAndLoginPtr doc = std::make_shared<secw::SshKeyAndLogin>("insert Key without login", testKey, "");

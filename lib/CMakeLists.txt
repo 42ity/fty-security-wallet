@@ -90,15 +90,11 @@ etn_test_target(${PROJECT_NAME_UNDERSCORE}
         tests/selftest-ro/mapping.json
     SOURCES
         tests/main.cc
-        tests/cam_accessor.cpp
-        tests/cam_accessor.h
-        tests/asset_mapping_mlm_agent.cpp
-        tests/wallet_mlm_agent.cpp
         tests/socket_agent.cpp
-        tests/consumer_accessor.cpp
-        tests/consumer_accessor.h
-        tests/producer_accessor.cpp
-        tests/producer_accessor.h
+        tests/asset_mapping_mlm_agent.cpp
+
+        tests/consumer_accessor.*
+        tests/producer_accessor.*
     INCLUDE_DIR
         include
         src
@@ -108,4 +104,3 @@ etn_test_target(${PROJECT_NAME_UNDERSCORE}
     SUBDIR
         tests
 )
-
