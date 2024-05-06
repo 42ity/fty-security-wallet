@@ -52,7 +52,6 @@ etn_target(shared ${PROJECT_NAME_UNDERSCORE}
         cam_exception.h
         fty_credential_asset_mapping_mlm_agent.h
         fty_security_wallet.h
-        fty_security_wallet_socket_agent.h
         secw_consumer_accessor.h
         secw_document.h
         secw_exception.h
