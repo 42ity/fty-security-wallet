@@ -1,7 +1,7 @@
+#include <catch2/catch.hpp>
 #include "secw_consumer_accessor.h"
 #include "secw_exception.h"
 #include "consumer_accessor.h"
-#include <catch2/catch.hpp>
 
 void secwConsumerAccessorTest(fty::SocketSyncClient& syncClient, mlm::MlmStreamClient& streamClient)
 {

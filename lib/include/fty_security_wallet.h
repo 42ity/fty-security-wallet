@@ -39,7 +39,6 @@
 #include "cam_credential_asset_mapping.h"
 #include "cam_exception.h"
 #include "fty_credential_asset_mapping_mlm_agent.h"
-#include "fty_security_wallet_socket_agent.h"
 #include "secw_consumer_accessor.h"
 #include "secw_document.h"
 #include "secw_exception.h"

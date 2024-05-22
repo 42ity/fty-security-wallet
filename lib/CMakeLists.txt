@@ -52,7 +52,6 @@ etn_target(shared ${PROJECT_NAME_UNDERSCORE}
         cam_exception.h
         fty_credential_asset_mapping_mlm_agent.h
         fty_security_wallet.h
-        fty_security_wallet_socket_agent.h
         secw_consumer_accessor.h
         secw_document.h
         secw_exception.h
@@ -91,15 +90,11 @@ etn_test_target(${PROJECT_NAME_UNDERSCORE}
         tests/selftest-ro/mapping.json
     SOURCES
         tests/main.cc
-        tests/cam_accessor.cpp
-        tests/cam_accessor.h
-        tests/asset_mapping_mlm_agent.cpp
-        tests/wallet_mlm_agent.cpp
         tests/socket_agent.cpp
-        tests/consumer_accessor.cpp
-        tests/consumer_accessor.h
-        tests/producer_accessor.cpp
-        tests/producer_accessor.h
+        tests/asset_mapping_mlm_agent.cpp
+
+        tests/consumer_accessor.*
+        tests/producer_accessor.*
     INCLUDE_DIR
         include
         src
@@ -109,4 +104,3 @@ etn_test_target(${PROJECT_NAME_UNDERSCORE}
     SUBDIR
         tests
 )
-

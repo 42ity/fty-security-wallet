@@ -1,14 +1,14 @@
 #include <catch2/catch.hpp>
-#include <czmq.h>
-#include <fstream>
+#include "src/secw_security_wallet_server.h"
 #include <fty_common_mlm.h>
 #include <fty_common_socket.h>
 #include <fty_security_wallet.h>
-#include <map>
-#include <mlm_server.h>
-#include <src/secw_security_wallet_server.h>
 #include "consumer_accessor.h"
 #include "producer_accessor.h"
+#include <czmq.h>
+#include <mlm_server.h>
+#include <fstream>
+#include <map>
 
 TEST_CASE("Security wallet socket agent test")
 {
