@@ -139,7 +139,7 @@ std::vector<std::string> CredentialAssetMappingServer::handleRequest(
     } catch (std::exception& e) {
         log_error("Unexpected error: %s", e.what());
         return {"ERROR", ""};
-    } catch (...) // show must go one => Log and ignore the unknown error
+    } catch (...) // unknown error
     {
         log_error("Unexpected error: unknown");
         return {"ERROR", ""};
