@@ -26,7 +26,6 @@ Build-Depends: debhelper (>= 9),
     cmake (>=3.0),
     fty-cmake-dev,
     fty-utils-dev,
-    pkg-config,
     libsystemd-dev,
     libssl-dev,
     libprotobuf-dev,
@@ -39,10 +38,7 @@ Build-Depends: debhelper (>= 9),
     libfty-common-socket-dev,
     libfty-common-messagebus-dev,
     libfty-common-dto-dev,
-    libfty-lib-certificate-dev,
-    systemd,
-    asciidoc-base | asciidoc, xmlto,
-    dh-autoreconf
+    libfty-lib-certificate-dev
 
 Package: libfty-security-wallet1
 Architecture: any
