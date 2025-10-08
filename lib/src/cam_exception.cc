@@ -37,30 +37,32 @@ void CamException::throwCamException(const std::string& data)
     JSON::readFromString(data, si);
 
     // extract the error code, the message and the extra data
-    uint8_t                     errorCode = 0;
+    ErrorCode                   errorCode;
     std::string                 whatArg;
     cxxtools::SerializationInfo extraData;
 
     try {
-        si.getMember("errorCode") >>= errorCode;
         si.getMember("whatArg") >>= whatArg;
         extraData = si.getMember("extraData");
+
+        uint tmp;
+        si.getMember("errorCode") >>= tmp;
+        errorCode = ErrorCode(tmp);
     } catch (...) {
     }
 
-
     switch (errorCode) {
-        case UNSUPPORTED_COMMAND:
+        case ErrorCode::UNSUPPORTED_COMMAND:
             throw CamUnsupportedCommandException(whatArg);
-        case PROTOCOL_ERROR:
+        case ErrorCode::PROTOCOL_ERROR:
             throw CamProtocolErrorException(whatArg);
-        case BAD_COMMAND_ARGUMENT:
+        case ErrorCode::BAD_COMMAND_ARGUMENT:
             throw CamBadCommandArgumentException(extraData, whatArg);
-        case MAPPING_DOES_NOT_EXIST:
+        case ErrorCode::MAPPING_DOES_NOT_EXIST:
             throw CamMappingDoesNotExistException(extraData, whatArg);
-        case MAPPING_ALREADY_EXISTS:
+        case ErrorCode::MAPPING_ALREADY_EXISTS:
             throw CamMappingAlreadyExistsException(extraData, whatArg);
-        case MAPPING_INVALID:
+        case ErrorCode::MAPPING_INVALID:
             throw CamMappingInvalidException(whatArg);
         default:
             throw CamException(whatArg);
