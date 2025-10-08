@@ -23,6 +23,7 @@
 
 #include <exception>
 #include <string>
+#include <cstdint>
 
 namespace cxxtools {
 class SerializationInfo;
@@ -30,7 +31,7 @@ class SerializationInfo;
 
 namespace cam {
 
-enum ErrorCode : uint8_t
+enum class ErrorCode : uint8_t
 {
     GENERIC = 0,
     UNSUPPORTED_COMMAND,
