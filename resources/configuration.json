@@ -84,6 +84,35 @@
         ]
     },
     {
+        "portfolio_name": "restricted",
+        "usages": [
+            {
+                "usage_id": "virtualization_connector",
+                "supported_types": [
+                    "UserAndPassword",
+                    "TokenAndLogin",
+                    "SshKeyAndLogin"
+                ]
+            }
+        ],
+        "consumers": [
+            {
+                "client_regex": "(www-data)|(root)",
+                "usages": [
+                    "virtualization_connector"
+                ]
+            }
+        ],
+        "producers": [
+            {
+                "client_regex": "(www-data)|(root)",
+                "usages": [
+                    "virtualization_connector"
+                ]
+            }
+        ]
+    },
+    {
         "portfolio_name": "internal",
         "usages": [
             {
