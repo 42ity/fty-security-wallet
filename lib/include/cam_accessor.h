@@ -82,7 +82,6 @@ public:
 
     const std::map<CredentialId, uint32_t> getAllCredentialCounter() const;
 
-
 private:
     // for backward compatibility
     std::shared_ptr<mlm::MlmSyncClient> m_mlmClient{nullptr};
