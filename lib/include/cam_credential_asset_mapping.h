@@ -82,7 +82,7 @@ public:
     Port            m_port;
     CredentialId    m_credentialId;
     Status          m_status{Status::UNKNOWN};
-    MapExtendedInfo m_extendedInfo;
+    MapExtendedInfo m_extendedInfo{};
 };
 
 void operator<<=(cxxtools::SerializationInfo& si, const CredentialAssetMapping& mapping);

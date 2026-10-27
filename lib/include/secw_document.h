@@ -146,8 +146,8 @@ protected:
     std::string       m_name = "";
     DocumentType      m_type = "";
     Id                m_id   = "";
-    std::set<Tag>     m_tags;
-    std::set<UsageId> m_usages;
+    std::set<Tag>     m_tags{};
+    std::set<UsageId> m_usages{};
 
     // This map is use to define the supported type and how to build them
     static std::map<DocumentType, FctDocumentFactory> m_documentFactoryFuntions;
